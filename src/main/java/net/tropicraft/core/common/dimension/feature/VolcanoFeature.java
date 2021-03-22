@@ -1,17 +1,23 @@
 package net.tropicraft.core.common.dimension.feature;
 
 import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
+import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
+import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.tropicraft.core.common.block.TropicraftBlocks;
 import net.tropicraft.core.common.dimension.chunk.VolcanoGenerator;
 
@@ -26,8 +32,8 @@ import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil
  */
 public class VolcanoFeature extends Structure<NoFeatureConfig> {
 
-    public VolcanoFeature(Function<Dynamic<?>, ? extends NoFeatureConfig> func) {
-        super(func);
+    public VolcanoFeature(Codec<NoFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override
@@ -51,7 +57,7 @@ public class VolcanoFeature extends Structure<NoFeatureConfig> {
             }
 
             if (worldIn.getBlockState(posVolcanoTE).getBlock() != TropicraftBlocks.VOLCANO.get()) {
-                worldIn.setBlockState(posVolcanoTE, TropicraftBlocks.VOLCANO.get().getDefaultState(), 3);
+                worldIn.setBlockState(posVolcanoTE, TropicraftBlocks.VOLCANO.get().defaultBlockState(), 3);
                 return true;
             }
         }

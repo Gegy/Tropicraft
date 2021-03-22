@@ -19,7 +19,7 @@ import net.minecraft.world.gen.OctavesNoiseGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.tropicraft.core.common.dimension.config.TropicraftGeneratorSettings;
 
-public class TropicraftChunkGenerator extends NoiseChunkGenerator<TropicraftGeneratorSettings> {
+public class TropicraftChunkGenerator extends NoiseChunkGenerator {
     private static final float[] BIOME_WEIGHTS = Util.make(new float[25], (weights) -> {
         for(int xw = -2; xw <= 2; ++xw) {
             for(int zw = -2; zw <= 2; ++zw) {

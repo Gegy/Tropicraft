@@ -4,14 +4,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.tropicraft.core.common.TropicsConfigs;
 import net.tropicraft.core.common.entity.projectile.ExplodingCoconutEntity;
 
 public class ExplodingCoconutItem extends Item {
@@ -21,15 +16,15 @@ public class ExplodingCoconutItem extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         // TODO config option
-        final boolean canPlayerThrow = player.isCreative() || player.canUseCommandBlock();
+        final boolean canPlayerThrow = player.isCreative() || player.canUseGameMasterBlocks();
         //allow to use anywhere but in the main area of the server
-        final boolean ltOverride = !world.getDimension().getType().getRegistryName().toString().equals("tropicraft:tropics");
-        ItemStack itemstack = player.getHeldItem(hand);
+        final boolean ltOverride = !world.dimension().getRegistryName().toString().equals("tropicraft:tropics");
+        ItemStack itemstack = player.getItemInHand(hand);
         if (!canPlayerThrow && !ltOverride) {
-            if (!world.isRemote) {
-                player.sendMessage(new TranslationTextComponent("tropicraft.coconutBombWarning"));
+            if (!world.isClientSide) {
+                player.displayClientMessage(new TranslationTextComponent("tropicraft.coconutBombWarning"), false);
             }
             return new ActionResult<>(ActionResultType.PASS, itemstack);
         }
@@ -37,15 +32,15 @@ public class ExplodingCoconutItem extends Item {
         if (!player.isCreative()) {
             itemstack.shrink(1);
         }
-        world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
-        if (!world.isRemote) {
+        world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+        if (!world.isClientSide) {
             ExplodingCoconutEntity snowballentity = new ExplodingCoconutEntity(world, player);
             snowballentity.setItem(itemstack);
-            snowballentity.shoot(player, player.rotationPitch, player.rotationYaw, 0.0F, 1.5F, 1.0F);
-            world.addEntity(snowballentity);
+            snowballentity.shootFromRotation(player, player.xRot, player.yRot, 0.0F, 1.5F, 1.0F);
+            world.addFreshEntity(snowballentity);
         }
 
-        player.addStat(Stats.ITEM_USED.get(this));
+        player.awardStat(Stats.ITEM_USED.get(this));
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 }

@@ -1,8 +1,5 @@
 package net.tropicraft.core.common.block.tileentity;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
@@ -17,6 +14,9 @@ import net.tropicraft.core.common.block.AirCompressorBlock;
 import net.tropicraft.core.common.item.scuba.ScubaArmorItem;
 import net.tropicraft.core.common.network.TropicraftPackets;
 import net.tropicraft.core.common.network.message.MessageAirCompressorInventory;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class AirCompressorTileEntity extends TileEntity implements ITickableTileEntity, IMachineTile {
 
@@ -41,24 +41,24 @@ public class AirCompressorTileEntity extends TileEntity implements ITickableTile
 	}
 
 	@Override
-	public void read(CompoundNBT nbt) {
-	    super.read(nbt);
+	public void load(BlockState blockState, CompoundNBT nbt) {
+	    super.load(blockState, nbt);
 		this.compressing = nbt.getBoolean("Compressing");
 
 		if (nbt.contains("Tank")) {
-			setTank(ItemStack.read(nbt.getCompound("Tank")));
+			setTank(ItemStack.of(nbt.getCompound("Tank")));
 		} else {
 			setTank(ItemStack.EMPTY);
 		}
 	}
 
 	@Override
-	public @Nonnull CompoundNBT write(@Nonnull CompoundNBT nbt) {
-		super.write(nbt);
+	public @Nonnull CompoundNBT save(@Nonnull CompoundNBT nbt) {
+		super.save(nbt);
 		nbt.putBoolean("Compressing", compressing);
 
 		CompoundNBT var4 = new CompoundNBT();
-		this.stack.write(var4);
+		this.stack.save(var4);
 		nbt.put("Tank", var4);
 		
 		return nbt;
@@ -109,9 +109,9 @@ public class AirCompressorTileEntity extends TileEntity implements ITickableTile
 
     public void ejectTank() {
         if (!stack.isEmpty()) {
-            if (!world.isRemote) {
-                ItemEntity tankItem = new ItemEntity(world, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), stack);
-                world.addEntity(tankItem);
+            if (!level.isClientSide) {
+                ItemEntity tankItem = new ItemEntity(level, this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ(), stack);
+                level.addFreshEntity(tankItem);
             }
         }
 
@@ -168,7 +168,7 @@ public class AirCompressorTileEntity extends TileEntity implements ITickableTile
 	
 	@Override
 	public Direction getDirection(BlockState state) {
-	    return state.get(AirCompressorBlock.FACING);
+	    return state.getValue(AirCompressorBlock.FACING);
 	}
 
 	/**
@@ -182,24 +182,24 @@ public class AirCompressorTileEntity extends TileEntity implements ITickableTile
 	 */
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-		this.read(pkt.getNbtCompound());
+		this.load(getBlockState(), pkt.getTag());
     }
 
     protected void syncInventory() {
-        if (!world.isRemote) {
-            TropicraftPackets.INSTANCE.send(PacketDistributor.DIMENSION.with(getWorld().getDimension()::getType), new MessageAirCompressorInventory(this));
+        if (!level.isClientSide) {
+            TropicraftPackets.INSTANCE.send(PacketDistributor.DIMENSION.with(level::dimension), new MessageAirCompressorInventory(this));
         }
     }
 
 	@Override
 	@Nullable
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 1, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 1, this.getUpdateTag());
 	}
 
 	@Override
 	public @Nonnull CompoundNBT getUpdateTag() {
-	    CompoundNBT nbttagcompound = this.write(new CompoundNBT());
+	    CompoundNBT nbttagcompound = this.save(new CompoundNBT());
 		return nbttagcompound;
 	}
 }

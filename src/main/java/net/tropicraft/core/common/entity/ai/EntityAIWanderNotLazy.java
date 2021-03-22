@@ -1,9 +1,9 @@
 package net.tropicraft.core.common.entity.ai;
 
 import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.RandomPositionGenerator;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.util.math.vector.Vector3d;
 
 import java.util.EnumSet;
 
@@ -27,14 +27,14 @@ public class EntityAIWanderNotLazy extends Goal {
         this.entity = creatureIn;
         this.speed = speedIn;
         this.executionChance = chance;
-        this.setMutexFlags(EnumSet.of(Flag.MOVE));
+        this.setFlags(EnumSet.of(Flag.MOVE));
     }
 
     /**
      * Returns whether the EntityAIBase should begin execution.
      */
     @Override
-    public boolean shouldExecute()
+    public boolean canUse()
     {
         if (!this.mustUpdate)
         {
@@ -43,23 +43,22 @@ public class EntityAIWanderNotLazy extends Goal {
                 return false;
             }*/
 
-            if (this.entity.getRNG().nextInt(this.executionChance) != 0)
+            if (this.entity.getRandom().nextInt(this.executionChance) != 0)
             {
                 return false;
             }
         }
 
-        Vec3d vec3d = RandomPositionGenerator.findRandomTarget(this.entity, 10, 7);
-
-        if (vec3d == null)
+        Vector3d vec = RandomPositionGenerator.getLandPos(this.entity, 10, 7);
+        if (vec == null)
         {
             return false;
         }
         else
         {
-            this.xPosition = vec3d.x;
-            this.yPosition = vec3d.y;
-            this.zPosition = vec3d.z;
+            this.xPosition = vec.x;
+            this.yPosition = vec.y;
+            this.zPosition = vec.z;
             this.mustUpdate = false;
             return true;
         }
@@ -69,18 +68,18 @@ public class EntityAIWanderNotLazy extends Goal {
      * Returns whether an in-progress EntityAIBase should continue executing
      */
     @Override
-    public boolean shouldContinueExecuting()
+    public boolean canContinueToUse()
     {
-        return !this.entity.getNavigator().noPath();
+        return !this.entity.getNavigation().isDone();
     }
 
     /**
      * Execute a one shot task or start executing a continuous task
      */
     @Override
-    public void startExecuting()
+    public void start()
     {
-        this.entity.getNavigator().tryMoveToXYZ(this.xPosition, this.yPosition, this.zPosition, this.speed);
+        this.entity.getNavigation().moveTo(this.xPosition, this.yPosition, this.zPosition, this.speed);
     }
 
     /**

@@ -1,7 +1,5 @@
 package net.tropicraft.core.common.item;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -12,6 +10,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.tropicraft.core.client.TropicraftRenderUtils;
 import net.tropicraft.core.client.entity.model.PlayerHeadpieceRenderer;
+
+import javax.annotation.Nullable;
 
 public class NigelStacheItem extends ArmorItem {
 

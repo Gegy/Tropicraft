@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import com.mojang.datafixers.Dynamic;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.SharedSeedRandom;
@@ -33,27 +34,8 @@ import net.tropicraft.core.common.dimension.feature.jigsaw.NoRotateSingleJigsawP
 import net.tropicraft.core.common.dimension.feature.pools.HomeTreePools;
 
 public class HomeTreeFeature extends Structure<VillageConfig> {
-
-    public HomeTreeFeature(Function<Dynamic<?>, ? extends VillageConfig> p_i51419_1_) {
-        super(p_i51419_1_);
-    }
-
-    @Override
-    protected ChunkPos getStartPositionForPosition(ChunkGenerator<?> chunkGenerator, Random random, int x, int z, int spacingOffsetsX, int spacingOffsetsZ) {
-        int distance = chunkGenerator instanceof TropicraftChunkGenerator ? (((TropicraftChunkGenerator)chunkGenerator).getSettings().getHomeTreeDistance()) : 20;
-        int separation = chunkGenerator instanceof TropicraftChunkGenerator ? (((TropicraftChunkGenerator)chunkGenerator).getSettings().getHomeTreeSeparation()) : 4;
-        int k = x + distance * spacingOffsetsX;
-        int l = z + distance * spacingOffsetsZ;
-        int i1 = k < 0 ? k - distance + 1 : k;
-        int j1 = l < 0 ? l - distance + 1 : l;
-        int k1 = i1 / distance;
-        int l1 = j1 / distance;
-        ((SharedSeedRandom)random).setLargeFeatureSeedWithSalt(chunkGenerator.getSeed(), k1, l1, 10387312);
-        k1 = k1 * distance;
-        l1 = l1 * distance;
-        k1 = k1 + random.nextInt(distance - separation);
-        l1 = l1 + random.nextInt(distance - separation);
-        return new ChunkPos(k1, l1);
+    public HomeTreeFeature(Codec<VillageConfig> codec) {
+        super(codec);
     }
 
     @Override
@@ -84,39 +66,13 @@ public class HomeTreeFeature extends Structure<VillageConfig> {
     }
 
     @Override
-    public BlockPos findNearest(World worldIn, ChunkGenerator<? extends GenerationSettings> chunkGenerator, BlockPos pos, int radius, boolean p_211405_5_) {
-        BlockPos ret = super.findNearest(worldIn, chunkGenerator, pos, radius, p_211405_5_);
-//        for (int r = 0; r < 16; r++) {
-//            for (int d = 0; d < 4; d++) {
-//                Direction dir = Direction.byHorizontalIndex(d);
-//                BlockPos check = ret.offset(dir, r);
-//                IFluidState fluid = worldIn.getFluidState(new BlockPos(check.getX(), chunkGenerator.getSeaLevel(), check.getZ()));
-//                if (fluid.getFluid() == Fluids.WATER) {
-//                    return check;
-//                }
-//            }
-//        }
-        return ret; // Fallback ?
-    }
-
-    @Override
-    public IStartFactory getStartFactory() {
+    public IStartFactory<VillageConfig> getStartFactory() {
         return Start::new;
     }
 
-    @Override
-    public String getStructureName() {
-        return TropicraftFeatures.HOME_TREE.getId().toString();
-    }
-
-    @Override
-    public int getSize() {
-        return 8;
-    }
-    
     private static final IStructurePieceType TYPE = IStructurePieceType.register(HomeTreePiece::new, Constants.MODID + ":home_tree");
 
-    public static class Start extends StructureStart {
+    public static class Start extends StructureStart<VillageConfig> {
 
         public Start(Structure<?> p_i51110_1_, int p_i51110_2_, int p_i51110_3_, MutableBoundingBox p_i51110_5_, int p_i51110_6_, long p_i51110_7_) {
             super(p_i51110_1_, p_i51110_2_, p_i51110_3_, p_i51110_5_, p_i51110_6_, p_i51110_7_);

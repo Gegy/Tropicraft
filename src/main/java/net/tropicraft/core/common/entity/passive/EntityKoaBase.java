@@ -9,23 +9,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.AgeableEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.HurtByTargetGoal;
-import net.minecraft.entity.ai.goal.LookAtGoal;
-import net.minecraft.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.entity.ai.goal.MoveTowardsRestrictionGoal;
-import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
-import net.minecraft.entity.ai.goal.PrioritizedGoal;
-import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.ai.goal.TradeWithPlayerGoal;
+import net.minecraft.entity.*;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.merchant.villager.VillagerData;
 import net.minecraft.entity.merchant.villager.VillagerEntity;
@@ -34,12 +21,7 @@ import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.MerchantOffer;
-import net.minecraft.item.MerchantOffers;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -51,48 +33,28 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.RegistryObject;
 import net.tropicraft.core.common.TropicraftTags;
-import net.tropicraft.core.common.TropicsConfigs;
 import net.tropicraft.core.common.entity.TropicraftEntities;
-import net.tropicraft.core.common.entity.ai.EntityAIAvoidEntityOnLowHealth;
-import net.tropicraft.core.common.entity.ai.EntityAIChillAtFire;
-import net.tropicraft.core.common.entity.ai.EntityAIEatToHeal;
-import net.tropicraft.core.common.entity.ai.EntityAIGoneFishin;
-import net.tropicraft.core.common.entity.ai.EntityAIKoaMate;
-import net.tropicraft.core.common.entity.ai.EntityAIPartyTime;
-import net.tropicraft.core.common.entity.ai.EntityAIPlayKoa;
-import net.tropicraft.core.common.entity.ai.EntityAITemptHelmet;
-import net.tropicraft.core.common.entity.ai.EntityAIWanderNotLazy;
+import net.tropicraft.core.common.entity.ai.*;
 import net.tropicraft.core.common.item.TropicraftItems;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class EntityKoaBase extends VillagerEntity {
 
@@ -105,23 +67,22 @@ public class EntityKoaBase extends VillagerEntity {
 
     public Inventory inventory;
 
-    private static final DataParameter<Integer> ROLE = EntityDataManager.createKey(EntityKoaBase.class, DataSerializers.VARINT);
-    private static final DataParameter<Integer> GENDER = EntityDataManager.createKey(EntityKoaBase.class, DataSerializers.VARINT);
-    private static final DataParameter<Integer> ORIENTATION = EntityDataManager.createKey(EntityKoaBase.class, DataSerializers.VARINT);
-    private static final DataParameter<Boolean> SITTING = EntityDataManager.createKey(EntityKoaBase.class, DataSerializers.BOOLEAN);
-    private static final DataParameter<Boolean> DANCING = EntityDataManager.createKey(EntityKoaBase.class, DataSerializers.BOOLEAN);
-    private static final DataParameter<Integer> LURE_ID = EntityDataManager.createKey(EntityKoaBase.class, DataSerializers.VARINT);
+    private static final DataParameter<Integer> ROLE = EntityDataManager.defineId(EntityKoaBase.class, DataSerializers.INT);
+    private static final DataParameter<Integer> GENDER = EntityDataManager.defineId(EntityKoaBase.class, DataSerializers.INT);
+    private static final DataParameter<Integer> ORIENTATION = EntityDataManager.defineId(EntityKoaBase.class, DataSerializers.INT);
+    private static final DataParameter<Boolean> SITTING = EntityDataManager.defineId(EntityKoaBase.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> DANCING = EntityDataManager.defineId(EntityKoaBase.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Integer> LURE_ID = EntityDataManager.defineId(EntityKoaBase.class, DataSerializers.INT);
 
-    private Goal taskFishing = new EntityAIGoneFishin(this);
+    private final Goal taskFishing = new EntityAIGoneFishin(this);
 
     private float clientHealthLastTracked = 0;
 
     public static int MAX_HOME_DISTANCE = 128;
 
-    private static final int INVALID_DIM = Integer.MAX_VALUE;
     private int villageID = -1;
 
-    private int villageDimID = INVALID_DIM;
+    private RegistryKey<World> villageDimension;
 
     private FishingBobberEntity lure;
 
@@ -136,8 +97,8 @@ public class EntityKoaBase extends VillagerEntity {
     public int hitIndex3 = 0;
     public int hitDelay = 0;
     private long lastTradeTime = 0;
-    private static int TRADE_COOLDOWN = 24000*3;
-    private static int DIVE_TIME_NEEDED = 60*60;
+    private static final int TRADE_COOLDOWN = 24000*3;
+    private static final int DIVE_TIME_NEEDED = 60*60;
 
     public boolean debug = false;
 
@@ -183,15 +144,15 @@ public class EntityKoaBase extends VillagerEntity {
 
     public EntityKoaBase(EntityType<? extends EntityKoaBase> type, World worldIn) {
         super(type, worldIn);
-        this.enablePersistence();
+        this.setPersistenceRequired();
 
 
         inventory = new Inventory(9);
     }
 
     @Override
-    protected void dealFireDamage(int amount) {
-
+    public boolean fireImmune() {
+        return true;
     }
 
     public long getLastTradeTime() {
@@ -203,56 +164,56 @@ public class EntityKoaBase extends VillagerEntity {
     }
 
     public Genders getGender() {
-        return Genders.get(this.getDataManager().get(GENDER));
+        return Genders.get(this.getEntityData().get(GENDER));
     }
 
     public void setGender(Genders gender) {
-        this.getDataManager().set(GENDER, gender.ordinal());
+        this.getEntityData().set(GENDER, gender.ordinal());
     }
 
     public Roles getRole() {
-        return Roles.get(this.getDataManager().get(ROLE));
+        return Roles.get(this.getEntityData().get(ROLE));
     }
 
     public Orientations getOrientation() {
-        return Orientations.get(this.getDataManager().get(ORIENTATION));
+        return Orientations.get(this.getEntityData().get(ORIENTATION));
     }
 
     public boolean isSitting() {
-        return this.getDataManager().get(SITTING);
+        return this.getEntityData().get(SITTING);
     }
 
     public void setSitting(boolean sitting) {
-        this.getDataManager().set(SITTING, Boolean.valueOf(sitting));
+        this.getEntityData().set(SITTING, sitting);
     }
 
     public boolean isDancing() {
-        return this.getDataManager().get(DANCING);
+        return this.getEntityData().get(DANCING);
     }
 
     public void setDancing(boolean val) {
-        this.getDataManager().set(DANCING, Boolean.valueOf(val));
+        this.getEntityData().set(DANCING, val);
     }
 
     @Override
-    protected void registerData() {
-        super.registerData();
-        this.getDataManager().register(ROLE, Integer.valueOf(0));
-        this.getDataManager().register(GENDER, Integer.valueOf(0));
-        this.getDataManager().register(ORIENTATION, Integer.valueOf(0));
-        this.getDataManager().register(SITTING, Boolean.valueOf(false));
-        this.getDataManager().register(DANCING, Boolean.valueOf(false));
-        this.getDataManager().register(LURE_ID, Integer.valueOf(-1));
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.getEntityData().define(ROLE, 0);
+        this.getEntityData().define(GENDER, 0);
+        this.getEntityData().define(ORIENTATION, 0);
+        this.getEntityData().define(SITTING, false);
+        this.getEntityData().define(DANCING, false);
+        this.getEntityData().define(LURE_ID, -1);
     }
 
     @Override
-    public void notifyDataManagerChange(DataParameter<?> key) {
-        super.notifyDataManagerChange(key);
+    public void onSyncedDataUpdated(DataParameter<?> key) {
+        super.onSyncedDataUpdated(key);
 
-        if (!world.isRemote) return;
+        if (!level.isClientSide) return;
 
         if (key == LURE_ID) {
-            int id = this.getDataManager().get(LURE_ID);
+            int id = this.getEntityData().get(LURE_ID);
             if (id != -1) {
                 scheduleEntityLookup(this, id);
             } else {
@@ -269,7 +230,7 @@ public class EntityKoaBase extends VillagerEntity {
     @OnlyIn(Dist.CLIENT)
     public void scheduleEntityLookup(EntityKoaBase koa, int id) {
         Minecraft.getInstance().execute(() -> {
-            Entity ent = world.getEntityByID(id);
+            Entity ent = level.getEntity(id);
             //TODO: 1.14 fix
             /*if (ent instanceof EntityFishHook) {
                 setLure((EntityFishHook) ent);
@@ -316,7 +277,7 @@ public class EntityKoaBase extends VillagerEntity {
         Int2ObjectMap<VillagerTrades.ITrade[]> offers = null;
 
         if (getRole() == Roles.FISHERMAN) {
-            offers = func_221238_a(ImmutableMap.of(1,
+            offers = toIntMap(ImmutableMap.of(1,
                     new VillagerTrades.ITrade[]{
                             new KoaTradeForPearls(Items.TROPICAL_FISH, 20, 8, 2),
                             new KoaTradeForPearls(TropicraftItems.FISHING_NET.get(), 1, 8, 2),
@@ -327,7 +288,7 @@ public class EntityKoaBase extends VillagerEntity {
                             new KoaTradeForPearls(TropicraftItems.TROPICAL_FERTILIZER.get(), 5, 8, 2)
                     }));
         } else if (getRole() == Roles.HUNTER) {
-            offers = func_221238_a(ImmutableMap.of(1,
+            offers = toIntMap(ImmutableMap.of(1,
                     new VillagerTrades.ITrade[]{
                             new KoaTradeForPearls(TropicraftItems.FROG_LEG.get(), 5, 8, 2),
                             new KoaTradeForPearls(TropicraftItems.IGUANA_LEATHER.get(), 2, 8, 2),
@@ -337,7 +298,7 @@ public class EntityKoaBase extends VillagerEntity {
 
         return offers;
 
-        /*func_221238_a(ImmutableMap.of(1,
+        /*toIntMap(ImmutableMap.of(1,
                 new VillagerTrades.ITrade[]{
                         new KoaTradeForPearls(Items.TROPICAL_FISH, 20, 8, 2),
                         new KoaTradeForPearls(ItemRegistry.fishingNet, 1, 8, 2),
@@ -369,7 +330,7 @@ public class EntityKoaBase extends VillagerEntity {
                         new VillagerTrades.ItemsForEmeraldsTrade(Items.GLISTERING_MELON_SLICE, 4, 3, 30)}));*/
     }
 
-    private static Int2ObjectMap<VillagerTrades.ITrade[]> func_221238_a(ImmutableMap<Integer, VillagerTrades.ITrade[]> p_221238_0_) {
+    private static Int2ObjectMap<VillagerTrades.ITrade[]> toIntMap(ImmutableMap<Integer, VillagerTrades.ITrade[]> p_221238_0_) {
         return new Int2ObjectOpenHashMap<>(p_221238_0_);
     }
 
@@ -378,14 +339,14 @@ public class EntityKoaBase extends VillagerEntity {
      * @return
      */
     @Override
-    protected void populateTradeData() {
+    protected void updateTrades() {
         VillagerData villagerdata = this.getVillagerData();
         Int2ObjectMap<VillagerTrades.ITrade[]> int2objectmap = getOfferMap();
         if (int2objectmap != null && !int2objectmap.isEmpty()) {
             VillagerTrades.ITrade[] avillagertrades$itrade = int2objectmap.get(villagerdata.getLevel());
             if (avillagertrades$itrade != null) {
                 MerchantOffers merchantoffers = this.getOffers();
-                this.addTrades(merchantoffers, avillagertrades$itrade, 2);
+                this.addOffersFromItemListings(merchantoffers, avillagertrades$itrade, 2);
             }
         }
     }
@@ -474,8 +435,8 @@ public class EntityKoaBase extends VillagerEntity {
         /*this.goalSelector.taskEntries.clear();
         this.targetSelector.taskEntries.clear();*/
 
-        this.goalSelector.getRunningGoals().forEach(PrioritizedGoal::resetTask);
-        this.targetSelector.getRunningGoals().forEach(PrioritizedGoal::resetTask);
+        this.goalSelector.getRunningGoals().forEach(PrioritizedGoal::stop);
+        this.targetSelector.getRunningGoals().forEach(PrioritizedGoal::stop);
 
 
 
@@ -492,16 +453,16 @@ public class EntityKoaBase extends VillagerEntity {
 
         this.goalSelector.addGoal(curPri++, new MeleeAttackGoal(this, 1F, true) {
             @Override
-            public void startExecuting() {
-                super.startExecuting();
-                if (this.attacker instanceof EntityKoaBase) {
-                    ((EntityKoaBase) this.attacker).setFightingItem();
+            public void start() {
+                super.start();
+                if (this.mob instanceof EntityKoaBase) {
+                    ((EntityKoaBase) this.mob).setFightingItem();
                 }
             }
 
             @Override
             protected double getAttackReachSqr(LivingEntity attackTarget) {
-                return (double)(this.attacker.getType().getSize().width * 2.5F * this.attacker.getType().getSize().width * 2.5F + attackTarget.getType().getSize().width);
+                return this.mob.getType().getDimensions().width * 2.5F * this.mob.getType().getDimensions().width * 2.5F + attackTarget.getType().getDimensions().width;
             }
         });
 
@@ -516,7 +477,7 @@ public class EntityKoaBase extends VillagerEntity {
             this.goalSelector.addGoal(curPri++, taskFishing);
         }
 
-        if (isChild()) {
+        if (isBaby()) {
             this.goalSelector.addGoal(curPri++, new EntityAIPlayKoa(this, 1.2D));
         }
 
@@ -534,41 +495,39 @@ public class EntityKoaBase extends VillagerEntity {
     }
 
     @Override
-    public VillagerEntity createChild(AgeableEntity ageable) {
-        //EntityVillager ent = super.createChild(ageable);
-        EntityKoaHunter entityvillager = new EntityKoaHunter(TropicraftEntities.KOA_HUNTER.get(), this.world);
-        entityvillager.onInitialSpawn(this.world, this.world.getDifficultyForLocation(new BlockPos(entityvillager)), SpawnReason.BREEDING, null, null);
-
-        return entityvillager;
+    public VillagerEntity getBreedOffspring(ServerWorld world, AgeableEntity ageable) {
+        EntityKoaHunter child = new EntityKoaHunter(TropicraftEntities.KOA_HUNTER.get(), this.level);
+        child.finalizeSpawn(world, world.getCurrentDifficultyAt(child.blockPosition()), SpawnReason.BREEDING, null, null);
+        return child;
     }
 
     @Override
-    protected void onGrowingAdult() {
-        super.onGrowingAdult();
+    protected void ageBoundaryReached() {
+        super.ageBoundaryReached();
 
         updateUniqueEntityAI();
     }
 
     public boolean canFish() {
-        return this.getDataManager().get(ROLE) == Roles.FISHERMAN.ordinal();
+        return this.getEntityData().get(ROLE) == Roles.FISHERMAN.ordinal();
     }
 
     public boolean canHunt() {
-        return this.getDataManager().get(ROLE) == Roles.HUNTER.ordinal() && !isChild();
+        return this.getEntityData().get(ROLE) == Roles.HUNTER.ordinal() && !isBaby();
     }
 
     public void setHunter() {
-        this.getDataManager().set(ROLE, Integer.valueOf(Roles.HUNTER.ordinal()));
+        this.getEntityData().set(ROLE, Integer.valueOf(Roles.HUNTER.ordinal()));
         this.setFightingItem();
     }
 
     public void setFisher() {
-        this.getDataManager().set(ROLE, Integer.valueOf(Roles.FISHERMAN.ordinal()));
+        this.getEntityData().set(ROLE, Integer.valueOf(Roles.FISHERMAN.ordinal()));
         this.setFishingItem();
     }
 
     @Override
-    protected void updateAITasks() {
+    protected void customServerAiStep() {
         //cancel villager AI that overrides our home position
         //super.updateAITasks();
 
@@ -596,73 +555,70 @@ public class EntityKoaBase extends VillagerEntity {
 
     }
 
-    @Override
-    protected void registerAttributes() {
-        super.registerAttributes();
-        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(30.0D);
-        this.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(32D);
-        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.28D);
-        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-        this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(5.0D);
-        this.getAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(2.0D);
+    public static AttributeModifierMap.MutableAttribute createAttributes() {
+        return VillagerEntity.createAttributes()
+                .add(Attributes.MAX_HEALTH, 30.0)
+                .add(Attributes.FOLLOW_RANGE, 32.0)
+                .add(Attributes.ATTACK_DAMAGE, 5.0)
+                .add(Attributes.ARMOR, 2.0);
     }
 
     @Override
-    public void setAttackTarget(@Nullable LivingEntity entitylivingbaseIn) {
-        super.setAttackTarget(entitylivingbaseIn);
+    public void setTarget(@Nullable LivingEntity entitylivingbaseIn) {
+        super.setTarget(entitylivingbaseIn);
     }
 
     /** Copied from EntityMob */
     @Override
-    public boolean attackEntityAsMob(Entity entityIn)
+    public boolean doHurtTarget(Entity entityIn)
     {
-        float f = (float)this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue();
-        int i = 0;
+        float damage = (float)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue();
+        float knockback = (float)this.getAttributeValue(Attributes.ATTACK_KNOCKBACK);
 
         if (entityIn instanceof LivingEntity)
         {
-            f += EnchantmentHelper.getModifierForCreature(this.getHeldItemMainhand(), ((LivingEntity)entityIn).getCreatureAttribute());
-            i += EnchantmentHelper.getKnockbackModifier(this);
+            damage += EnchantmentHelper.getDamageBonus(this.getMainHandItem(), ((LivingEntity)entityIn).getMobType());
+            knockback += EnchantmentHelper.getKnockbackBonus(this);
         }
 
-        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), f);
+        boolean flag = entityIn.hurt(DamageSource.mobAttack(this), damage);
 
         if (flag)
         {
-            if (i > 0 && entityIn instanceof LivingEntity)
+            if (knockback > 0 && entityIn instanceof LivingEntity)
             {
-                ((LivingEntity)entityIn).knockBack(this, (float)i * 0.5F, (double) MathHelper.sin(this.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(this.rotationYaw * 0.017453292F)));
-                this.setMotion(this.getMotion().x * 0.6D, this.getMotion().y, this.getMotion().z * 0.6D);
+                ((LivingEntity)entityIn).knockback(knockback * 0.5F, MathHelper.sin(this.yRot * 0.017453292F), -MathHelper.cos(this.yRot * 0.017453292F));
+                this.setDeltaMovement(this.getDeltaMovement().x * 0.6D, this.getDeltaMovement().y, this.getDeltaMovement().z * 0.6D);
                 /*this.motionX *= 0.6D;
                 this.motionZ *= 0.6D;*/
             }
 
-            int j = EnchantmentHelper.getFireAspectModifier(this);
+            int j = EnchantmentHelper.getFireAspect(this);
 
             if (j > 0)
             {
-                entityIn.setFire(j * 4);
+                entityIn.setSecondsOnFire(j * 4);
             }
 
             if (entityIn instanceof PlayerEntity)
             {
                 PlayerEntity entityplayer = (PlayerEntity)entityIn;
-                ItemStack itemstack = this.getHeldItemMainhand();
-                ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : ItemStack.EMPTY;
+                ItemStack itemstack = this.getMainHandItem();
+                ItemStack itemstack1 = entityplayer.isUsingItem() ? entityplayer.getUseItem() : ItemStack.EMPTY;
 
                 if (!itemstack.isEmpty() && !itemstack1.isEmpty() && itemstack.getItem() instanceof AxeItem && itemstack1.getItem() == Items.SHIELD)
                 {
-                    float f1 = 0.25F + (float)EnchantmentHelper.getEfficiencyModifier(this) * 0.05F;
+                    float f1 = 0.25F + (float)EnchantmentHelper.getBlockEfficiency(this) * 0.05F;
 
-                    if (this.rand.nextFloat() < f1)
+                    if (this.random.nextFloat() < f1)
                     {
-                        entityplayer.getCooldownTracker().setCooldown(Items.SHIELD, 100);
-                        this.world.setEntityState(entityplayer, (byte)30);
+                        entityplayer.getCooldowns().addCooldown(Items.SHIELD, 100);
+                        this.level.broadcastEntityEvent(entityplayer, (byte)30);
                     }
                 }
             }
 
-            this.applyEnchantments(this, entityIn);
+            this.doEnchantDamageEffects(this, entityIn);
         }
 
         return flag;
@@ -672,16 +628,15 @@ public class EntityKoaBase extends VillagerEntity {
     private static final Field _buyingList = Util.findField(VillagerEntity.class, "field_70963_i", "buyingList");*/
     
     @Override
-    public boolean processInteract(PlayerEntity player, Hand hand) {
+    public ActionResultType mobInteract(PlayerEntity player, Hand hand) {
+        if (hand != Hand.MAIN_HAND) return ActionResultType.PASS;
 
-        if (hand != Hand.MAIN_HAND) return false;
-
-    	boolean ret = false;
+        ActionResultType ret = ActionResultType.PASS;
     	try {
             boolean doTrade = true;
-            if (!this.world.isRemote) {
+            if (!this.level.isClientSide) {
 
-                ItemStack stack = player.getHeldItem(Hand.MAIN_HAND);
+                ItemStack stack = player.getItemInHand(Hand.MAIN_HAND);
                 if (!stack.isEmpty() && stack.getItem() == TropicraftItems.POISON_FROG_SKIN.get()) {
                     doTrade = false;
 
@@ -693,7 +648,7 @@ public class EntityKoaBase extends VillagerEntity {
                     zapMemory();
 
                     druggedTime += 20*60*2;
-                    addPotionEffect(new EffectInstance(Effects.NAUSEA, druggedTime));
+                    addEffect(new EffectInstance(Effects.CONFUSION, druggedTime));
                     findAndSetDrums(true);
 
                 }
@@ -739,7 +694,7 @@ public class EntityKoaBase extends VillagerEntity {
                 if (doTrade) {
                     // Make the super method think this villager is already trading, to block the GUI from opening
                     //_buyingPlayer.set(this, player);
-                    ret = super.processInteract(player, hand);
+                    ret = super.mobInteract(player, hand);
                     //_buyingPlayer.set(this, null);
                 }
             }
@@ -766,8 +721,8 @@ public class EntityKoaBase extends VillagerEntity {
 
     @Nullable
     @Override
-    public ILivingEntityData onInitialSpawn(IWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
-        this.setHomePosAndDistance(this.getPosition(), MAX_HOME_DISTANCE);
+    public ILivingEntityData finalizeSpawn(IServerWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
+        this.restrictTo(this.blockPosition(), MAX_HOME_DISTANCE);
 
         rollDiceChild();
 
@@ -781,7 +736,7 @@ public class EntityKoaBase extends VillagerEntity {
         findAndSetFireSource(true);
         findAndSetDrums(true);
 
-        ILivingEntityData data = super.onInitialSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
+        ILivingEntityData data = super.finalizeSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
 
         /*VillagerRegistry.VillagerProfession koaProfession = new VillagerRegistry.VillagerProfession("koa_profession", "");
         this.setProfession(koaProfession);*/
@@ -794,13 +749,13 @@ public class EntityKoaBase extends VillagerEntity {
 
     public void rollDiceChild() {
         int childChance = 20;
-        if (childChance >= this.world.rand.nextInt(100)) {
-            this.setGrowingAge(-24000);
+        if (childChance >= this.level.random.nextInt(100)) {
+            this.setAge(-24000);
         }
     }
 
     public void rollDiceRole() {
-        int randValRole = this.world.rand.nextInt(Roles.values().length);
+        int randValRole = this.level.random.nextInt(Roles.values().length);
         if (randValRole == Roles.FISHERMAN.ordinal()) {
             this.setFisher();
         } else if (randValRole == Roles.HUNTER.ordinal()) {
@@ -809,24 +764,24 @@ public class EntityKoaBase extends VillagerEntity {
     }
 
     public void rollDiceGender() {
-        int randValGender = this.world.rand.nextInt(Genders.values().length);
-        this.getDataManager().set(GENDER, Integer.valueOf(randValGender));
+        int randValGender = this.level.random.nextInt(Genders.values().length);
+        this.getEntityData().set(GENDER, Integer.valueOf(randValGender));
     }
 
     public void rollDiceOrientation() {
-        this.getDataManager().set(ORIENTATION, Integer.valueOf(Orientations.STRAIT.ordinal()));
+        this.getEntityData().set(ORIENTATION, Integer.valueOf(Orientations.STRAIT.ordinal()));
         int chance = 5;
-        if (chance >= this.world.rand.nextInt(100)) {
-            this.getDataManager().set(ORIENTATION, Orientations.GAY.ordinal());
+        if (chance >= this.level.random.nextInt(100)) {
+            this.getEntityData().set(ORIENTATION, Orientations.GAY.ordinal());
         }
     }
 
     @Override
-    public void writeAdditional(CompoundNBT compound) {
-        super.writeAdditional(compound);
-        compound.putInt("home_X", getHomePosition().getX());
-        compound.putInt("home_Y", getHomePosition().getY());
-        compound.putInt("home_Z", getHomePosition().getZ());
+    public void addAdditionalSaveData(CompoundNBT compound) {
+        super.addAdditionalSaveData(compound);
+        compound.putInt("home_X", getRestrictCenter().getX());
+        compound.putInt("home_Y", getRestrictCenter().getY());
+        compound.putInt("home_Z", getRestrictCenter().getZ());
 
         if (posLastFireplaceFound != null) {
             compound.putInt("fireplace_X", posLastFireplaceFound.getX());
@@ -838,27 +793,27 @@ public class EntityKoaBase extends VillagerEntity {
 
         ListNBT nbttaglist = new ListNBT();
 
-        for (int i = 0; i < this.inventory.getSizeInventory(); ++i)
+        for (int i = 0; i < this.inventory.getContainerSize(); ++i)
         {
-            ItemStack itemstack = this.inventory.getStackInSlot(i);
+            ItemStack itemstack = this.inventory.getItem(i);
 
             if (!itemstack.isEmpty())
             {
                 CompoundNBT nbttagcompound = new CompoundNBT();
                 nbttagcompound.putByte("Slot", (byte)i);
-                itemstack.write(nbttagcompound);
+                itemstack.save(nbttagcompound);
                 nbttaglist.add(nbttagcompound);
             }
         }
 
         compound.put("koa_inventory", nbttaglist);
 
-        compound.putInt("role_id", this.getDataManager().get(ROLE));
-        compound.putInt("gender_id", this.getDataManager().get(GENDER));
-        compound.putInt("orientation_id", this.getDataManager().get(ORIENTATION));
+        compound.putInt("role_id", this.getEntityData().get(ROLE));
+        compound.putInt("gender_id", this.getEntityData().get(GENDER));
+        compound.putInt("orientation_id", this.getEntityData().get(ORIENTATION));
 
         compound.putInt("village_id", villageID);
-        compound.putInt("village_dim_id", villageDimID);
+        compound.putString("village_dimension", villageDimension.location().toString());
 
         compound.putLong("lastTradeTime", lastTradeTime);
 
@@ -872,10 +827,10 @@ public class EntityKoaBase extends VillagerEntity {
     }
 
     @Override
-    public void readAdditional(CompoundNBT compound) {
-        super.readAdditional(compound);
+    public void readAdditionalSaveData(CompoundNBT compound) {
+        super.readAdditionalSaveData(compound);
         if (compound.contains("home_X")) {
-            this.setHomePosAndDistance(new BlockPos(compound.getInt("home_X"), compound.getInt("home_Y"), compound.getInt("home_Z")), MAX_HOME_DISTANCE);
+            this.restrictTo(new BlockPos(compound.getInt("home_X"), compound.getInt("home_Y"), compound.getInt("home_Z")), MAX_HOME_DISTANCE);
         }
 
         if (compound.contains("fireplace_X")) {
@@ -892,31 +847,31 @@ public class EntityKoaBase extends VillagerEntity {
                 CompoundNBT nbttagcompound = nbttaglist.getCompound(i);
                 int j = nbttagcompound.getByte("Slot") & 255;
 
-                this.inventory.setInventorySlotContents(j, ItemStack.read(nbttagcompound));
+                this.inventory.setItem(j, ItemStack.of(nbttagcompound));
             }
         }
 
         this.villageID = compound.getInt("village_id");
 
         //backwards compat
-        if (!compound.contains("village_dim_id")) {
-            this.villageDimID = TropicsConfigs.tropicsDimensionID;
+        if (!compound.contains("village_dimension")) {
+            this.villageDimension = level.dimension();
         } else {
-            this.villageDimID = compound.getInt("village_dim_id");
+            this.villageDimension = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(compound.getString("village_dim_id")));
         }
 
         if (compound.contains("role_id")) {
-            this.getDataManager().set(ROLE, compound.getInt("role_id"));
+            this.getEntityData().set(ROLE, compound.getInt("role_id"));
         } else {
             rollDiceRole();
         }
         if (compound.contains("gender_id")) {
-            this.getDataManager().set(GENDER, compound.getInt("gender_id"));
+            this.getEntityData().set(GENDER, compound.getInt("gender_id"));
         } else {
             rollDiceGender();
         }
         if (compound.contains("orientation_id")) {
-            this.getDataManager().set(ORIENTATION, compound.getInt("orientation_id"));
+            this.getEntityData().set(ORIENTATION, compound.getInt("orientation_id"));
         } else {
             rollDiceOrientation();
         }
@@ -937,22 +892,22 @@ public class EntityKoaBase extends VillagerEntity {
     }
 
     public void setFishingItem() {
-        this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.FISHING_ROD));
+        this.setItemSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.FISHING_ROD));
     }
 
     public void setFightingItem() {
-        this.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(TropicraftItems.DAGGER.get()));
+        this.setItemSlot(EquipmentSlotType.MAINHAND, new ItemStack(TropicraftItems.DAGGER.get()));
     }
 
     public void monitorHomeVillage() {
-        if (villageDimID != INVALID_DIM) {
+        if (villageDimension != null) {
             //if (villageID != -1) {
 
                 //if not in home dimension, full reset
-                if (this.world.getDimension().getType().getId() != villageDimID) {
+                if (this.level.dimension() != villageDimension) {
                     dbg("koa detected different dimension, zapping memory");
                     zapMemory();
-                    addPotionEffect(new EffectInstance(Effects.SLOWNESS, 5));
+                    addEffect(new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 5));
                 }
             //}
         }
@@ -972,9 +927,9 @@ public class EntityKoaBase extends VillagerEntity {
                 this.setVillageAndDimID(village.locationID, village.dimID);
             } else {
                 //check we have a chest locked in
-                TileEntity tile = world.getTileEntity(func_213384_dI());
+                TileEntity tile = world.getTileEntity(getRestrictCenter());
                 if ((tile instanceof ChestTileEntity)) {
-                    village = createNewVillage(func_213384_dI());
+                    village = createNewVillage(getRestrictCenter());
                     if (village != null) {
                         this.setVillageAndDimID(village.locationID, village.dimID);
                         dbg("Koa created a new village!");
@@ -1021,14 +976,14 @@ public class EntityKoaBase extends VillagerEntity {
 
     public void findAndSetHomeToCloseChest(boolean force) {
 
-        if (!force && (world.getGameTime()+this.getEntityId()) % (20*30) != 0) return;
+        if (!force && (level.getGameTime()+this.getId()) % (20*30) != 0) return;
 
         //validate home position
         boolean tryFind = false;
-        if (getHomePosition() == null) {
+        if (getRestrictCenter() == null) {
             tryFind = true;
         } else {
-            TileEntity tile = world.getTileEntity(getHomePosition());
+            TileEntity tile = level.getBlockEntity(getRestrictCenter());
             if (!(tile instanceof ChestTileEntity)) {
                 //home position isnt a chest, keep current position but find better one
                 tryFind = true;
@@ -1040,12 +995,12 @@ public class EntityKoaBase extends VillagerEntity {
             for (int x = -range; x <= range; x++) {
                 for (int y = -range / 2; y <= range / 2; y++) {
                     for (int z = -range; z <= range; z++) {
-                        BlockPos pos = this.getPosition().add(x, y, z);
-                        TileEntity tile = world.getTileEntity(pos);
+                        BlockPos pos = this.blockPosition().offset(x, y, z);
+                        TileEntity tile = level.getBlockEntity(pos);
                         if (tile instanceof ChestTileEntity) {
                             //System.out.println("found chest, updating home position to " + pos);
                             dbg("found chest, updating home position to " + pos);
-                            setHomePosAndDistance(pos, MAX_HOME_DISTANCE);
+                            restrictTo(pos, MAX_HOME_DISTANCE);
                             return;
                         }
                     }
@@ -1055,22 +1010,22 @@ public class EntityKoaBase extends VillagerEntity {
     }
 
     public boolean findAndSetTownID(boolean force) {
-        if (!force && (world.getGameTime()+this.getEntityId()) % (20*30) != 0) return false;
+        if (!force && (level.getGameTime()+this.getId()) % (20*30) != 0) return false;
 
         boolean tryFind = false;
 
-        if (villageID == -1 || villageDimID == INVALID_DIM) {
+        if (villageID == -1 || villageDimension == null) {
             tryFind = true;
             //make sure return status is correct
             villageID = -1;
         }
 
         if (tryFind) {
-            List<EntityKoaBase> listEnts = world.getEntitiesWithinAABB(EntityKoaBase.class, new AxisAlignedBB(this.getPosition()).grow(20, 20, 20));
+            List<EntityKoaBase> listEnts = level.getEntitiesOfClass(EntityKoaBase.class, new AxisAlignedBB(this.blockPosition()).inflate(20, 20, 20));
             Collections.shuffle(listEnts);
             for (EntityKoaBase ent : listEnts) {
-                if (ent.villageID != -1 && ent.villageDimID != INVALID_DIM) {
-                    this.setVillageAndDimID(ent.villageID, ent.villageDimID);
+                if (ent.villageID != -1 && ent.villageDimension != null) {
+                    this.setVillageAndDimID(ent.villageID, ent.villageDimension);
                     break;
                 }
             }
@@ -1081,16 +1036,16 @@ public class EntityKoaBase extends VillagerEntity {
 
     public void findAndSetFireSource(boolean force) {
 
-        //this.setHomePosAndDistance(this.func_213384_dI(), 128);
+        //this.setHomePosAndDistance(this.getRestrictCenter(), 128);
 
-        if (!force && (world.getGameTime()+this.getEntityId()) % (20*30) != 0) return;
+        if (!force && (level.getGameTime()+this.getId()) % (20*30) != 0) return;
 
         //validate fire source
         boolean tryFind = false;
         if (posLastFireplaceFound == null) {
             tryFind = true;
         } else if (posLastFireplaceFound != null) {
-            BlockState state = world.getBlockState(posLastFireplaceFound);
+            BlockState state = level.getBlockState(posLastFireplaceFound);
             if (state.getBlock() != Blocks.CAMPFIRE) {
                 //System.out.println("removing invalid fire spot");
                 posLastFireplaceFound = null;
@@ -1103,8 +1058,8 @@ public class EntityKoaBase extends VillagerEntity {
             for (int x = -range; x <= range; x++) {
                 for (int y = -range/2; y <= range/2; y++) {
                     for (int z = -range; z <= range; z++) {
-                        BlockPos pos = this.getPosition().add(x, y, z);
-                        BlockState state = world.getBlockState(pos);
+                        BlockPos pos = this.blockPosition().offset(x, y, z);
+                        BlockState state = level.getBlockState(pos);
                         if (state.getBlock() == Blocks.CAMPFIRE) {
                             dbg("found fire place spot to chill");
                             setFirelacePos(pos);
@@ -1114,11 +1069,11 @@ public class EntityKoaBase extends VillagerEntity {
                 }
             }
 
-            List<EntityKoaBase> listEnts = world.getEntitiesWithinAABB(EntityKoaBase.class, new AxisAlignedBB(this.getPosition()).grow(20, 20, 20));
+            List<EntityKoaBase> listEnts = level.getEntitiesOfClass(EntityKoaBase.class, new AxisAlignedBB(this.blockPosition()).inflate(20, 20, 20));
             Collections.shuffle(listEnts);
             for (EntityKoaBase ent : listEnts) {
                 if (ent.posLastFireplaceFound != null) {
-                    BlockState state = world.getBlockState(ent.posLastFireplaceFound);
+                    BlockState state = level.getBlockState(ent.posLastFireplaceFound);
                     if (state.getBlock() == Blocks.CAMPFIRE) {
                         posLastFireplaceFound = new BlockPos(ent.posLastFireplaceFound);
                         dbg("found fire place spot to chill from entity");
@@ -1131,9 +1086,9 @@ public class EntityKoaBase extends VillagerEntity {
 
     //for other system not used
     public void syncBPM() {
-        if ((world.getGameTime()+this.getEntityId()) % (20) != 0) return;
+        if ((level.getGameTime()+this.getId()) % (20) != 0) return;
 
-        List<EntityKoaBase> listEnts = world.getEntitiesWithinAABB(EntityKoaBase.class, new AxisAlignedBB(this.getPosition()).grow(10, 5, 10));
+        List<EntityKoaBase> listEnts = level.getEntitiesOfClass(EntityKoaBase.class, new AxisAlignedBB(this.blockPosition()).inflate(10, 5, 10));
         //Collections.shuffle(listEnts);
         for (EntityKoaBase ent : listEnts) {
             if (hitDelay != ent.hitDelay) {
@@ -1147,16 +1102,16 @@ public class EntityKoaBase extends VillagerEntity {
     }
 
     public boolean isInstrument(BlockPos pos) {
-        BlockState state = world.getBlockState(pos);
-        return state.getBlock().isIn(TropicraftTags.Blocks.BONGOS) ||
+        BlockState state = level.getBlockState(pos);
+        return state.getBlock().is(TropicraftTags.Blocks.BONGOS) ||
                 state.getBlock() == Blocks.NOTE_BLOCK;
     }
 
     public void findAndSetDrums(boolean force) {
 
-        //this.setHomePosAndDistance(this.func_213384_dI(), 128);
+        //this.setHomePosAndDistance(this.getRestrictCenter(), 128);
 
-        if (!force && (world.getGameTime()+this.getEntityId()) % (20*30) != 0) return;
+        if (!force && (level.getGameTime()+this.getId()) % (20*30) != 0) return;
 
         Iterator<BlockPos> it = listPosDrums.iterator();
         while (it.hasNext()) {
@@ -1170,7 +1125,7 @@ public class EntityKoaBase extends VillagerEntity {
             return;
         }
 
-        List<EntityKoaBase> listEnts = world.getEntitiesWithinAABB(EntityKoaBase.class, new AxisAlignedBB(this.getPosition()).grow(20, 20, 20));
+        List<EntityKoaBase> listEnts = level.getEntitiesOfClass(EntityKoaBase.class, new AxisAlignedBB(this.blockPosition()).inflate(20, 20, 20));
         Collections.shuffle(listEnts);
         for (EntityKoaBase ent : listEnts) {
             if (listPosDrums.size() >= MAX_DRUMS) {
@@ -1208,7 +1163,7 @@ public class EntityKoaBase extends VillagerEntity {
         for (int x = -range; x <= range; x++) {
             for (int y = -range/2; y <= range/2; y++) {
                 for (int z = -range; z <= range; z++) {
-                    BlockPos pos = this.getPosition().add(x, y, z);
+                    BlockPos pos = this.blockPosition().offset(x, y, z);
                     if (isInstrument(pos)) {
                     //if (state.getBlock() == BlockRegistry.bongo) {
 
@@ -1252,15 +1207,15 @@ public class EntityKoaBase extends VillagerEntity {
     }*/
 
     public boolean tryDumpInventoryIntoHomeChest() {
-        TileEntity tile = world.getTileEntity(getHomePosition());
+        TileEntity tile = level.getBlockEntity(getRestrictCenter());
         if (tile instanceof ChestTileEntity) {
             ChestTileEntity chest = (ChestTileEntity)tile;
 
-            for (int i = 0; i < this.inventory.getSizeInventory(); ++i) {
-                ItemStack itemstack = this.inventory.getStackInSlot(i);
+            for (int i = 0; i < this.inventory.getContainerSize(); ++i) {
+                ItemStack itemstack = this.inventory.getItem(i);
 
                 if (!itemstack.isEmpty()) {
-                    this.inventory.setInventorySlotContents(i, this.addItem(chest, itemstack));
+                    this.inventory.setItem(i, this.addItem(chest, itemstack));
                 }
             }
         }
@@ -1273,20 +1228,20 @@ public class EntityKoaBase extends VillagerEntity {
     {
         ItemStack itemstack = stack.copy();
 
-        for (int i = 0; i < chest.getSizeInventory(); ++i)
+        for (int i = 0; i < chest.getContainerSize(); ++i)
         {
-            ItemStack itemstack1 = chest.getStackInSlot(i);
+            ItemStack itemstack1 = chest.getItem(i);
 
             if (itemstack1.isEmpty())
             {
-                chest.setInventorySlotContents(i, itemstack);
-                chest.markDirty();
+                chest.setItem(i, itemstack);
+                chest.setChanged();
                 return ItemStack.EMPTY;
             }
 
-            if (ItemStack.areItemsEqual(itemstack1, itemstack))
+            if (ItemStack.isSame(itemstack1, itemstack))
             {
-                int j = Math.min(chest.getInventoryStackLimit(), itemstack1.getMaxStackSize());
+                int j = Math.min(chest.getMaxStackSize(), itemstack1.getMaxStackSize());
                 int k = Math.min(itemstack.getCount(), j - itemstack1.getCount());
 
                 if (k > 0)
@@ -1296,7 +1251,7 @@ public class EntityKoaBase extends VillagerEntity {
 
                     if (itemstack.getCount() <= 0)
                     {
-                        chest.markDirty();
+                        chest.setChanged();
                         return ItemStack.EMPTY;
                     }
                 }
@@ -1305,7 +1260,7 @@ public class EntityKoaBase extends VillagerEntity {
 
         if (itemstack.getCount() != stack.getCount())
         {
-            chest.markDirty();
+            chest.setChanged();
         }
 
         return itemstack;
@@ -1316,20 +1271,20 @@ public class EntityKoaBase extends VillagerEntity {
     }
 
     @Override
-    public int getAir() {
-        return super.getAir();
+    public int getAirSupply() {
+        return super.getAirSupply();
     }
 
     @Override
-    public void livingTick() {
+    public void aiStep() {
 
-        this.updateArmSwingProgress();
-        super.livingTick();
+        this.updateSwingTime();
+        super.aiStep();
 
         if (wasInWater) {
             if (!isInWater()) {
-                if (collidedHorizontally) {
-                    this.setMotion(getMotion().add(0, 0.4F, 0));
+                if (horizontalCollision) {
+                    this.setDeltaMovement(getDeltaMovement().add(0, 0.4F, 0));
                     jumpingOutOfWater = true;
                 }
             }
@@ -1342,43 +1297,43 @@ public class EntityKoaBase extends VillagerEntity {
         if (jumpingOutOfWater) {
             if (onGround) {
                 jumpingOutOfWater = false;
-                this.getNavigator().clearPath();
+                this.getNavigation().stop();
             }
         }
 
         if (isInWater()) {
             //children have different hitbox size, use different values to keep them from getting stuck under docks and drowning
             //changing this doesnt derp up their pathing like it does for adults
-            if (isChild()) {
-                if (this.getMotion().y < -0.1F) {
-                    this.getMotion().add(0, 0.25F, 0);
+            if (isBaby()) {
+                if (this.getDeltaMovement().y < -0.1F) {
+                    this.getDeltaMovement().add(0, 0.25F, 0);
                 }
             } else {
-                if (this.getMotion().y < -0.2F) {
-                    this.getMotion().add(0, 0.15F, 0);
+                if (this.getDeltaMovement().y < -0.2F) {
+                    this.getDeltaMovement().add(0, 0.15F, 0);
                 }
             }
-            this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.60D);
+            this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.60D);
 
-            this.setPathPriority(PathNodeType.WATER, 8);
+            this.setPathfindingMalus(PathNodeType.WATER, 8);
         } else {
-            this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.28D);
+            this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.28D);
 
-            this.setPathPriority(PathNodeType.WATER, -1);
+            this.setPathfindingMalus(PathNodeType.WATER, -1);
         }
 
         wasInWater = isInWater();
 
         if (!wasNightLastTick) {
-            if (!this.world.isDaytime()) {
+            if (!this.level.isDay()) {
                 //roll dice once
                 rollDiceParty();
             }
         }
 
-        wasNightLastTick = !this.world.isDaytime();
+        wasNightLastTick = !this.level.isDay();
 
-        if (!world.isRemote) {
+        if (!level.isClientSide) {
             //if (world.getGameTime() % (20*5) == 0) {
                 //this.heal(5);
             //}
@@ -1388,11 +1343,11 @@ public class EntityKoaBase extends VillagerEntity {
             }
         }
 
-        if (world.isRemote) {
+        if (level.isClientSide) {
             //heal indicator, has a bug that spawns a heart on reload into world but not a big deal
             if (clientHealthLastTracked != this.getHealth()) {
                 if (this.getHealth() > clientHealthLastTracked) {
-                    world.addParticle(ParticleTypes.HEART, false, getPosX(), getPosY() + 2.2, getPosZ(), 0, 0, 0);
+                    level.addParticle(ParticleTypes.HEART, false, getX(), getY() + 2.2, getZ(), 0, 0, 0);
                 }
                 clientHealthLastTracked = this.getHealth();
             }
@@ -1429,11 +1384,11 @@ public class EntityKoaBase extends VillagerEntity {
     public boolean willBone(EntityKoaBase bonie) {
         EntityKoaBase boner = this;
         if (!bonie.getIsWillingToMate(true)) return false;
-        if (boner.isChild() || bonie.isChild()) return false;
+        if (boner.isBaby() || bonie.isBaby()) return false;
         if (boner.getOrientation() == Orientations.STRAIT) {
-            if (boner.getGender() == bonie.getGender()) return false;
+            return boner.getGender() != bonie.getGender();
         } else if (boner.getOrientation() == Orientations.GAY) {
-            if (boner.getGender() != bonie.getGender()) return false;
+            return boner.getGender() == bonie.getGender();
         }
         return true;
     }
@@ -1446,13 +1401,13 @@ public class EntityKoaBase extends VillagerEntity {
         this.villageID = villageID;
     }*/
 
-    public void setVillageAndDimID(int villageID, int villageDimID) {
+    public void setVillageAndDimID(int villageID, RegistryKey<World> villageDimID) {
         this.villageID = villageID;
-        this.villageDimID = villageDimID;
+        this.villageDimension = villageDimID;
     }
 
-    public int getVillageDimID() {
-        return villageDimID;
+    public RegistryKey<World> getVillageDimension() {
+        return villageDimension;
     }
 
     /*public void setVillageDimID(int villageDimID) {
@@ -1514,7 +1469,7 @@ public class EntityKoaBase extends VillagerEntity {
     @Override
     public void remove() {
         super.remove();
-        if (!world.isRemote) {
+        if (!level.isClientSide) {
             //System.out.println("hook dead " + this);
             //TODO: 1.14 readd
             /*TownKoaVillage village = getVillage();
@@ -1526,7 +1481,7 @@ public class EntityKoaBase extends VillagerEntity {
 
     //TODO: 1.14 readd listener for unload
     public void hookUnloaded() {
-        if (!world.isRemote) {
+        if (!level.isClientSide) {
             //System.out.println("hook unloaded " + this);
             //TODO: 1.14 readd
             /*TownKoaVillage village = getVillage();
@@ -1542,20 +1497,20 @@ public class EntityKoaBase extends VillagerEntity {
 
     public void setLure(FishingBobberEntity lure) {
         this.lure = lure;
-        if (!this.world.isRemote) {
+        if (!this.level.isClientSide) {
             if (lure != null) {
-                this.getDataManager().set(LURE_ID, this.lure.getEntityId());
+                this.getEntityData().set(LURE_ID, this.lure.getId());
             } else {
-                this.getDataManager().set(LURE_ID, -1);
+                this.getEntityData().set(LURE_ID, -1);
             }
         }
     }
 
     @Override
-    public boolean attackEntityFrom(DamageSource source, float amount) {
-        boolean result = super.attackEntityFrom(source, amount);
+    public boolean hurt(DamageSource source, float amount) {
+        boolean result = super.hurt(source, amount);
         if (this.getHealth() <= 0) {
-            if (source.getTrueSource() instanceof LivingEntity) {
+            if (source.getEntity() instanceof LivingEntity) {
                 //System.out.println("koa died by: " + source.getDamageType() + " - loc: " + source.getDamageLocation() + " - " + source.getDeathMessage((EntityLivingBase)source.getEntity()));
             } else {
                 //System.out.println("koa died by: " + source.getDamageType() + " - loc: " + source.getDamageLocation());
@@ -1594,7 +1549,7 @@ public class EntityKoaBase extends VillagerEntity {
     //do not constantly use throughout night, as the night doesnt happen all on the same day
     //use asap and store value
     public boolean isPartyNight() {
-        long time = world.getDayTime();
+        long time = level.getDayTime();
         long day = time / 24000;
         //party every 3rd night
         //System.out.println(time + " - " + day + " - " + (day % 3 == 0));
@@ -1605,7 +1560,7 @@ public class EntityKoaBase extends VillagerEntity {
 
         if (isPartyNight()) {
             int chance = 90;
-            if (chance >= this.world.rand.nextInt(100)) {
+            if (chance >= this.level.random.nextInt(100)) {
                 wantsToParty = true;
                 //System.out.println("roll dice party: " + wantsToParty);
                 return;
@@ -1629,16 +1584,15 @@ public class EntityKoaBase extends VillagerEntity {
     }
 
     @Override
-    public void onStruckByLightning(LightningBoltEntity lightningBolt) {
-        //cancel super witch code
+    public void thunderHit(ServerWorld world, LightningBoltEntity lightning) {
     }
 
     public void zapMemory() {
         listPosDrums.clear();
-        setHomePosAndDistance(BlockPos.ZERO, -1);
+        restrictTo(BlockPos.ZERO, -1);
         setFirelacePos(null);
 
-        villageDimID = INVALID_DIM;
+        villageDimension = null;
         villageID = -1;
     }
 
@@ -1652,7 +1606,7 @@ public class EntityKoaBase extends VillagerEntity {
     public void playSound(SoundEvent soundIn, float volume, float pitch) {
 
         //cancel villager trade sounds
-        if (soundIn == SoundEvents.ENTITY_VILLAGER_YES || soundIn == SoundEvents.ENTITY_VILLAGER_NO) {
+        if (soundIn == SoundEvents.VILLAGER_YES || soundIn == SoundEvents.VILLAGER_NO) {
             return;
         }
 

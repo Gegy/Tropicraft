@@ -7,10 +7,12 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.minecraft.world.gen.feature.TreeFeatureConfig;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.util.Constants;
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
 
 import javax.annotation.Nullable;
@@ -22,34 +24,33 @@ public class TropicraftTrees {
         protected abstract Feature<? extends NoFeatureConfig> getTropicraftTreeFeature(Random random, boolean generateBeehive);
 
         @Override
-        public boolean place(IWorld worldIn, ChunkGenerator<?> chunkGeneratorIn, BlockPos blockPosIn, BlockState blockStateIn, Random randomIn) {
-            Feature feature = getTropicraftTreeFeature(randomIn, hasAdjacentFlower(worldIn, blockPosIn));
+        public boolean growTree(ServerWorld world, ChunkGenerator generator, BlockPos pos, BlockState state, Random random) {
+            Feature feature = getTropicraftTreeFeature(random, hasAdjacentFlower(world, pos));
             if (feature == null) {
                 return false;
             } else {
-                worldIn.setBlockState(blockPosIn, Blocks.AIR.getDefaultState(), 4);
-                if (feature.place(worldIn, chunkGeneratorIn, randomIn, blockPosIn, NoFeatureConfig.NO_FEATURE_CONFIG)) {
+                world.setBlock(pos, Blocks.AIR.defaultBlockState(), 4);
+                if (feature.place(world, generator, random, pos, NoFeatureConfig.NONE)) {
                     return true;
                 } else {
-                    worldIn.setBlockState(blockPosIn, blockStateIn, 4);
+                    world.setBlock(pos, state, Constants.BlockFlags.NO_RERENDER);
                     return false;
                 }
             }
         }
 
-        private boolean hasAdjacentFlower(IWorld world, BlockPos pos) {
-            for(BlockPos blockpos : BlockPos.Mutable.getAllInBoxMutable(pos.down().north(2).west(2), pos.up().south(2).east(2))) {
-                if (world.getBlockState(blockpos).isIn(BlockTags.FLOWERS)) {
+        private boolean hasAdjacentFlower(IWorld world, BlockPos origin) {
+            for (BlockPos pos : BlockPos.Mutable.betweenClosed(origin.offset(-2, -1, -2), origin.offset(2, 1, 2))) {
+                if (world.getBlockState(pos).is(BlockTags.FLOWERS)) {
                     return true;
                 }
             }
-
             return false;
         }
 
         @Nullable
         @Override
-        protected ConfiguredFeature<TreeFeatureConfig, ?> getTreeFeature(Random randomIn, boolean p_225546_2_) {
+        protected ConfiguredFeature<BaseTreeFeatureConfig, ?> getConfiguredFeature(Random random, boolean largeHive) {
             return null;
         }
     }

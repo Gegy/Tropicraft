@@ -5,7 +5,8 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vector3d;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.provider.BiomeProviderType;
@@ -134,12 +135,12 @@ public class TropicraftDimension extends Dimension {
     }
 
     /**
-     * Return Vec3D with biome specific fog color
+     * Return Vector3d with biome specific fog color
      * Copies overworld fog code
      */
     @OnlyIn(Dist.CLIENT)
     @Override
-    public Vec3d getFogColor(float p_76562_1_, float p_76562_2_) {
+    public Vector3d getFogColor(float p_76562_1_, float p_76562_2_) {
         float f = MathHelper.cos(p_76562_1_ * ((float)Math.PI * 2F)) * 2.0F + 0.5F;
         f = MathHelper.clamp(f, 0.0F, 1.0F);
         float f1 = 0.7529412F;
@@ -148,7 +149,7 @@ public class TropicraftDimension extends Dimension {
         f1 = f1 * (f * 0.94F + 0.06F);
         f2 = f2 * (f * 0.94F + 0.06F);
         f3 = f3 * (f * 0.91F + 0.09F);
-        return new Vec3d(f1, f2, f3);
+        return new Vector3d(f1, f2, f3);
     }
 
     @Override

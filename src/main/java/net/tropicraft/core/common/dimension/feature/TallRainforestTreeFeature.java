@@ -1,19 +1,17 @@
 package net.tropicraft.core.common.dimension.feature;
 
-import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.goesBeyondWorldSize;
-import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.isBBAvailable;
-
-import java.util.Random;
-import java.util.function.Function;
-
-import com.mojang.datafixers.Dynamic;
-
+import com.mojang.serialization.Codec;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
+
+import java.util.Random;
+
+import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.goesBeyondWorldSize;
+import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.isBBAvailable;
 
 public class TallRainforestTreeFeature extends RainforestTreeFeature {
 
@@ -21,17 +19,17 @@ public class TallRainforestTreeFeature extends RainforestTreeFeature {
     private static final int SMALL_LEAF_CHANCE = 3;
     private static final int SECOND_CANOPY_CHANCE = 3;
 
-    public TallRainforestTreeFeature(Function<Dynamic<?>, ? extends NoFeatureConfig> func) {
-        super(func);
+    public TallRainforestTreeFeature(Codec<NoFeatureConfig> codec) {
+        super(codec);
     }
 
     private boolean isSoil(IWorld world, BlockPos pos) {
-        return getSapling().isValidPosition(getSapling().getDefaultState(), world, pos.down());
+        return getSapling().canSurvive(getSapling().defaultBlockState(), world, pos.below());
     }
 
     @Override
-    public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, NoFeatureConfig config) {
-        pos = pos.toImmutable();
+    public boolean place(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+        pos = pos.immutable();
         int i = pos.getX(); int j = pos.getY(); int k = pos.getZ();
         final int height = rand.nextInt(15) + 15;
 
@@ -43,31 +41,31 @@ public class TallRainforestTreeFeature extends RainforestTreeFeature {
             return false;
         }
 
-        if (!isSoil(world, pos.down())) {
+        if (!isSoil(world, pos.below())) {
             return false;
         }
 
-        if (!isSoil(world, pos.east().down())) {
+        if (!isSoil(world, pos.east().below())) {
             return false;
         }
 
-        if (!isSoil(world, pos.west().down())) {
+        if (!isSoil(world, pos.west().below())) {
             return false;
         }
 
-        if (!isSoil(world, pos.north().down())) {
+        if (!isSoil(world, pos.north().below())) {
             return false;
         }
 
-        if (!isSoil(world, pos.south().down())) {
+        if (!isSoil(world, pos.south().below())) {
             return false;
         }
 
-        setState(world, new BlockPos(i, j, k), Blocks.DIRT.getDefaultState());
-        setState(world, new BlockPos(i - 1, j, k), Blocks.DIRT.getDefaultState());
-        setState(world, new BlockPos(i + 1, j, k), Blocks.DIRT.getDefaultState());
-        setState(world, new BlockPos(i, j, k - 1), Blocks.DIRT.getDefaultState());
-        setState(world, new BlockPos(i, j, k + 1), Blocks.DIRT.getDefaultState());
+        setState(world, new BlockPos(i, j, k), Blocks.DIRT.defaultBlockState());
+        setState(world, new BlockPos(i - 1, j, k), Blocks.DIRT.defaultBlockState());
+        setState(world, new BlockPos(i + 1, j, k), Blocks.DIRT.defaultBlockState());
+        setState(world, new BlockPos(i, j, k - 1), Blocks.DIRT.defaultBlockState());
+        setState(world, new BlockPos(i, j, k + 1), Blocks.DIRT.defaultBlockState());
 
         for (int y = j; y < j + height; y++) {
             placeLog(world, i, y, k);

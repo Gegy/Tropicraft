@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import com.mojang.datafixers.Dynamic;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
@@ -31,26 +32,8 @@ import net.tropicraft.core.common.dimension.feature.pools.KoaVillagePools;
 
 public class KoaVillageStructure extends Structure<NoFeatureConfig> {
 
-    public KoaVillageStructure(Function<Dynamic<?>, ? extends NoFeatureConfig> p_i51419_1_) {
-        super(p_i51419_1_);
-    }
-
-    @Override
-    protected ChunkPos getStartPositionForPosition(ChunkGenerator<?> chunkGenerator, Random random, int x, int z, int spacingOffsetsX, int spacingOffsetsZ) {
-        int i = chunkGenerator.getSettings().getVillageDistance();
-        int j = chunkGenerator.getSettings().getVillageSeparation();
-        int k = x + i * spacingOffsetsX;
-        int l = z + i * spacingOffsetsZ;
-        int i1 = k < 0 ? k - i + 1 : k;
-        int j1 = l < 0 ? l - i + 1 : l;
-        int k1 = i1 / i;
-        int l1 = j1 / i;
-        ((SharedSeedRandom)random).setLargeFeatureSeedWithSalt(chunkGenerator.getSeed(), k1, l1, 10387312);
-        k1 = k1 * i;
-        l1 = l1 * i;
-        k1 = k1 + random.nextInt(i - j);
-        l1 = l1 + random.nextInt(i - j);
-        return new ChunkPos(k1, l1);
+    public KoaVillageStructure(Codec<NoFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override

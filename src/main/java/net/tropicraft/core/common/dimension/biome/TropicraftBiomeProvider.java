@@ -73,7 +73,7 @@ public class TropicraftBiomeProvider extends BiomeProvider {
 //     */
 //    @Nullable
 //    @Override
-//    public BlockPos func_225531_a_(int x, int y, int z, int range, List<Biome> allowedBiomes, Random random) {
+//    public BlockPos findBiomeHorizontal(int x, int y, int z, int range, List<Biome> allowedBiomes, Random random) {
 //        final int x0 = (x - range) >> 2;
 //        final int z0 = (z - range) >> 2;
 //        final int x1 = (x + range) >> 2;

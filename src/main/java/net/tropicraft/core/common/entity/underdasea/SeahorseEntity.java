@@ -1,9 +1,12 @@
 package net.tropicraft.core.common.entity.underdasea;
 
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.passive.fish.AbstractFishEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.RayTraceResult;
@@ -17,20 +20,19 @@ public class SeahorseEntity extends AbstractTexturedFishEntity {
 		super(type, world);
 	}
 
-	@Override
-	protected void registerAttributes() {
-		super.registerAttributes();
-		getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(4.0D);
+	public static AttributeModifierMap.MutableAttribute createAttributes() {
+		return AbstractFishEntity.createAttributes()
+				.add(Attributes.MAX_HEALTH, 4.0);
 	}
-	
+
 	@Override
-	protected boolean processInteract(PlayerEntity player, Hand hand) {
-		return false; // No fish bucket
+	protected ActionResultType mobInteract(PlayerEntity player, Hand hand) {
+		return ActionResultType.PASS;
 	}
 
 	@Override
 	String getRandomTexture() {
-		return SEAHORSE_TEXTURE_NAMES[rand.nextInt(SEAHORSE_TEXTURE_NAMES.length)];
+		return SEAHORSE_TEXTURE_NAMES[random.nextInt(SEAHORSE_TEXTURE_NAMES.length)];
 	}
 
 	@Override
@@ -39,7 +41,7 @@ public class SeahorseEntity extends AbstractTexturedFishEntity {
 	}
 
 	@Override
-	protected ItemStack getFishBucket() {
+	protected ItemStack getBucketItemStack() {
 		return ItemStack.EMPTY;
 	}
 

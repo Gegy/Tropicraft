@@ -1,6 +1,7 @@
 package net.tropicraft.core.common.dimension.feature;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -25,50 +26,50 @@ import java.util.function.Supplier;
 
 public class TropicraftFeatures {
 
-    public static final DeferredRegister<Feature<?>> FEATURES = new DeferredRegister<>(ForgeRegistries.FEATURES, Constants.MODID);
+    public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, Constants.MODID);
 
 	public static final RegistryObject<FruitTreeFeature> GRAPEFRUIT_TREE = register(
-	        "grapefruit_tree", () -> new FruitTreeFeature(NoFeatureConfig::deserialize, TropicraftBlocks.ORANGE_SAPLING, () -> TropicraftBlocks.ORANGE_LEAVES.get().getDefaultState()));
+	        "grapefruit_tree", () -> new FruitTreeFeature(NoFeatureConfig.CODEC, TropicraftBlocks.ORANGE_SAPLING, () -> TropicraftBlocks.ORANGE_LEAVES.get().defaultBlockState()));
 	public static final RegistryObject<FruitTreeFeature> ORANGE_TREE = register(
-	        "orange_tree", () -> new FruitTreeFeature(NoFeatureConfig::deserialize, TropicraftBlocks.ORANGE_SAPLING, () -> TropicraftBlocks.ORANGE_LEAVES.get().getDefaultState()));
+	        "orange_tree", () -> new FruitTreeFeature(NoFeatureConfig.CODEC, TropicraftBlocks.ORANGE_SAPLING, () -> TropicraftBlocks.ORANGE_LEAVES.get().defaultBlockState()));
 	public static final RegistryObject<FruitTreeFeature> LEMON_TREE = register(
-	        "lemon_tree", () -> new FruitTreeFeature(NoFeatureConfig::deserialize, TropicraftBlocks.LEMON_SAPLING, () -> TropicraftBlocks.LEMON_LEAVES.get().getDefaultState()));
+	        "lemon_tree", () -> new FruitTreeFeature(NoFeatureConfig.CODEC, TropicraftBlocks.LEMON_SAPLING, () -> TropicraftBlocks.LEMON_LEAVES.get().defaultBlockState()));
 	public static final RegistryObject<FruitTreeFeature> LIME_TREE = register(
-	        "lime_tree", () -> new FruitTreeFeature(NoFeatureConfig::deserialize, TropicraftBlocks.LIME_SAPLING, () -> TropicraftBlocks.LIME_LEAVES.get().getDefaultState()));
+	        "lime_tree", () -> new FruitTreeFeature(NoFeatureConfig.CODEC, TropicraftBlocks.LIME_SAPLING, () -> TropicraftBlocks.LIME_LEAVES.get().defaultBlockState()));
 	public static final RegistryObject<PalmTreeFeature> NORMAL_PALM_TREE = register(
-	        "normal_palm_tree", () -> new NormalPalmTreeFeature(NoFeatureConfig::deserialize));
+	        "normal_palm_tree", () -> new NormalPalmTreeFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<PalmTreeFeature> CURVED_PALM_TREE = register(
-	        "curved_palm_tree", () -> new CurvedPalmTreeFeature(NoFeatureConfig::deserialize));
+	        "curved_palm_tree", () -> new CurvedPalmTreeFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<PalmTreeFeature> LARGE_PALM_TREE = register(
-	        "large_palm_tree", () -> new LargePalmTreeFeature(NoFeatureConfig::deserialize));
+	        "large_palm_tree", () -> new LargePalmTreeFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<RainforestTreeFeature> UP_TREE = register(
-	        "up_tree", () -> new UpTreeFeature(NoFeatureConfig::deserialize));
+	        "up_tree", () -> new UpTreeFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<RainforestTreeFeature> SMALL_TUALUNG = register(
-	        "small_tualung", () -> new TualungFeature(NoFeatureConfig::deserialize, 16, 9));
+	        "small_tualung", () -> new TualungFeature(NoFeatureConfig.CODEC, 16, 9));
 	public static final RegistryObject<RainforestTreeFeature> LARGE_TUALUNG = register(
-	        "large_tualung", () -> new TualungFeature(NoFeatureConfig::deserialize, 25, 11));
+	        "large_tualung", () -> new TualungFeature(NoFeatureConfig.CODEC, 25, 11));
 	public static final RegistryObject<RainforestTreeFeature> TALL_TREE = register(
-	        "tall_tree", () -> new TallRainforestTreeFeature(NoFeatureConfig::deserialize));
+	        "tall_tree", () -> new TallRainforestTreeFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<EIHFeature> EIH = register(
-	        "eih", () -> new EIHFeature(NoFeatureConfig::deserialize));
+	        "eih", () -> new EIHFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<TropicsFlowersFeature> TROPICS_FLOWERS = register(
-	        "tropics_flowers", () -> new TropicsFlowersFeature(BlockClusterFeatureConfig::deserialize, TropicraftTags.Blocks.TROPICS_FLOWERS));
+	        "tropics_flowers", () -> new TropicsFlowersFeature(BlockClusterFeatureConfig.CODEC, TropicraftTags.Blocks.TROPICS_FLOWERS));
 	public static final RegistryObject<TropicsFlowersFeature> RAINFOREST_FLOWERS = register(
-	        "rainforest_flowers", () -> new TropicsFlowersFeature(BlockClusterFeatureConfig::deserialize, TropicraftTags.Blocks.RAINFOREST_FLOWERS));
+	        "rainforest_flowers", () -> new TropicsFlowersFeature(BlockClusterFeatureConfig.CODEC, TropicraftTags.Blocks.RAINFOREST_FLOWERS));
 	public static final RegistryObject<UndergrowthFeature> UNDERGROWTH = register(
-	        "undergrowth", () -> new UndergrowthFeature(NoFeatureConfig::deserialize));
+	        "undergrowth", () -> new UndergrowthFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<RainforestVinesFeature> VINES = register(
-	        "rainforest_vines", () -> new RainforestVinesFeature(RainforestVinesConfig::deserialize));
+	        "rainforest_vines", () -> new RainforestVinesFeature(RainforestVinesConfig.CODEC));
 	public static final RegistryObject<Structure<NoFeatureConfig>> VILLAGE = register(
-	        "koa_village", () -> new KoaVillageStructure(NoFeatureConfig::deserialize));
+	        "koa_village", () -> new KoaVillageStructure(NoFeatureConfig.CODEC));
 	public static final RegistryObject<VolcanoFeature> VOLCANO = register(
-	        "volcano", () -> new VolcanoFeature(NoFeatureConfig::deserialize));
+	        "volcano", () -> new VolcanoFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<Structure<VillageConfig>> HOME_TREE = register(
-			"home_tree", () -> new HomeTreeFeature(VillageConfig::deserialize));
+			"home_tree", () -> new HomeTreeFeature(VillageConfig.CODEC));
 	public static final RegistryObject<HomeTreeBranchFeature<HomeTreeBranchConfig>> HOME_TREE_BRANCH = register(
-			"home_tree_branch", () -> new HomeTreeBranchFeature<>(HomeTreeBranchConfig::deserialize));
+			"home_tree_branch", () -> new HomeTreeBranchFeature<>(HomeTreeBranchConfig.CODEC));
 	public static final RegistryObject<CoffeePlantFeature> COFFEE_BUSH = register(
-			"coffee_bush", () -> new CoffeePlantFeature(NoFeatureConfig::deserialize));
+			"coffee_bush", () -> new CoffeePlantFeature(NoFeatureConfig.CODEC));
 
 	public static final PlacementBehaviour KOA_PATH = PlacementBehaviour.create("KOA_PATH", Constants.MODID + ":koa_path",
             ImmutableList.of(new SmoothingGravityProcessor(Heightmap.Type.WORLD_SURFACE_WG, -1), new SinkInGroundProcessor(), new SteepPathProcessor(), new StructureSupportsProcessor(false, TropicraftBlocks.BAMBOO_FENCE.getId())));

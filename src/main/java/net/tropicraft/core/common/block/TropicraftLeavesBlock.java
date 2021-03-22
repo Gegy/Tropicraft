@@ -7,13 +7,15 @@ import net.minecraft.world.server.ServerWorld;
 
 import java.util.Random;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class TropicraftLeavesBlock extends LeavesBlock {
     public TropicraftLeavesBlock(Properties props) {
         super(props);
     }
 
     @Override
-    public boolean ticksRandomly(BlockState state) {
+    public boolean isRandomlyTicking(BlockState state) {
         return false;
     }
 

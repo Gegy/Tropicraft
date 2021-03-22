@@ -1,11 +1,6 @@
 package net.tropicraft;
 
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.google.common.collect.ImmutableMap;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -21,12 +16,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ExtensionPoint;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -42,11 +34,7 @@ import net.tropicraft.core.common.block.TropicraftBlocks;
 import net.tropicraft.core.common.block.TropicraftFlower;
 import net.tropicraft.core.common.block.tileentity.TropicraftTileEntityTypes;
 import net.tropicraft.core.common.command.CommandTropicsTeleport;
-import net.tropicraft.core.common.data.TropicraftBlockTagsProvider;
-import net.tropicraft.core.common.data.TropicraftEntityTypeTagsProvider;
-import net.tropicraft.core.common.data.TropicraftItemTagsProvider;
-import net.tropicraft.core.common.data.TropicraftLootTableProvider;
-import net.tropicraft.core.common.data.TropicraftRecipeProvider;
+import net.tropicraft.core.common.data.*;
 import net.tropicraft.core.common.dimension.TropicraftWorldUtils;
 import net.tropicraft.core.common.dimension.biome.TropicraftBiomes;
 import net.tropicraft.core.common.dimension.carver.TropicraftCarvers;
@@ -58,13 +46,16 @@ import net.tropicraft.core.common.item.IColoredItem;
 import net.tropicraft.core.common.item.TropicraftItems;
 import net.tropicraft.core.common.item.scuba.ScubaData;
 import net.tropicraft.core.common.network.TropicraftPackets;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.regex.Pattern;
 
 @Mod(Constants.MODID)
 public class Tropicraft
 {
     public static final ItemGroup TROPICRAFT_ITEM_GROUP = (new ItemGroup("tropicraft") {
         @OnlyIn(Dist.CLIENT)
-        public ItemStack createIcon() {
+        public ItemStack makeIcon() {
             return new ItemStack(TropicraftFlower.RED_ANTHURIUM.get());
         }
     });
@@ -102,10 +93,10 @@ public class Tropicraft
 
         // Hack in our item frame models the way vanilla does
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            StateContainer<Block, BlockState> frameState = new StateContainer.Builder<Block, BlockState>(Blocks.AIR).add(BooleanProperty.create("map")).create(BlockState::new);
-    
-            ModelBakery.STATE_CONTAINER_OVERRIDES = ImmutableMap.<ResourceLocation, StateContainer<Block, BlockState>>builder()
-                    .putAll(ModelBakery.STATE_CONTAINER_OVERRIDES)
+            StateContainer<Block, BlockState> frameState = new StateContainer.Builder<Block, BlockState>(Blocks.AIR).add(BooleanProperty.create("map")).create(Block::defaultBlockState, BlockState::new);
+
+            ModelBakery.STATIC_DEFINITIONS = ImmutableMap.<ResourceLocation, StateContainer<Block, BlockState>>builder()
+                    .putAll(ModelBakery.STATIC_DEFINITIONS)
                     .put(TropicraftItems.BAMBOO_ITEM_FRAME.getId(), frameState)
                     .build();
         });
@@ -150,24 +141,26 @@ public class Tropicraft
     }
     
     private void onServerStarting(final FMLServerStartingEvent event) {
-        CommandTropicsTeleport.register(event.getServer().getCommandManager().getDispatcher());
+        CommandTropicsTeleport.register(event.getServer().getCommands().getDispatcher());
     }
 
     private void gatherData(GatherDataEvent event) {
         DataGenerator gen = event.getGenerator();
+        ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
         if (event.includeClient()) {
-            TropicraftBlockstateProvider blockstates = new TropicraftBlockstateProvider(gen, event.getExistingFileHelper());
+            TropicraftBlockstateProvider blockstates = new TropicraftBlockstateProvider(gen, existingFileHelper);
             gen.addProvider(blockstates);
             gen.addProvider(new TropicraftItemModelProvider(gen, blockstates.getExistingHelper()));
             gen.addProvider(new TropicraftLangProvider(gen));
         }
         if (event.includeServer()) {
-            gen.addProvider(new TropicraftBlockTagsProvider(gen));
-            gen.addProvider(new TropicraftItemTagsProvider(gen));
+            TropicraftBlockTagsProvider blockTags = new TropicraftBlockTagsProvider(gen, existingFileHelper);
+            gen.addProvider(blockTags);
+            gen.addProvider(new TropicraftItemTagsProvider(gen, blockTags, existingFileHelper));
             gen.addProvider(new TropicraftRecipeProvider(gen));
             gen.addProvider(new TropicraftLootTableProvider(gen));
-            gen.addProvider(new TropicraftEntityTypeTagsProvider(gen));
+            gen.addProvider(new TropicraftEntityTypeTagsProvider(gen, existingFileHelper));
         }
     }
 }

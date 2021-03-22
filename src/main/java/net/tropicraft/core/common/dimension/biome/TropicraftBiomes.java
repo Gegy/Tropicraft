@@ -32,9 +32,9 @@ public class TropicraftBiomes {
         for (Biome b : ForgeRegistries.BIOMES.getValues()) {
             if (b instanceof TropicraftBiome) {
                 ((TropicraftBiome) b).addFeatures();
-            } else if (b.getCategory() == Category.BEACH) {
+            } else if (b.getBiomeCategory() == Category.BEACH) {
                 DefaultTropicsFeatures.addPalmTrees(b);
-            } else if (b.getCategory() == Category.JUNGLE) {
+            } else if (b.getBiomeCategory() == Category.JUNGLE) {
                 DefaultTropicsFeatures.addPineapples(b);
             }
         }

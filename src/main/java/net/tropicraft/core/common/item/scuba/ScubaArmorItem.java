@@ -81,9 +81,9 @@ public class ScubaArmorItem extends TropicraftArmorItem {
             return null;
         }
 
-        armorModel.isSneak = entityLiving.isSneaking();
-        armorModel.isChild = entityLiving.isChild();
-        armorModel.rightArmPose = entityLiving.getHeldItemMainhand() != null ? BipedModel.ArmPose.BLOCK : BipedModel.ArmPose.EMPTY;
+        armorModel.crouching = entityLiving.isShiftKeyDown();
+        armorModel.young = entityLiving.isBaby();
+        armorModel.rightArmPose = entityLiving.getMainHandItem() != null ? BipedModel.ArmPose.BLOCK : BipedModel.ArmPose.EMPTY;
         return (A) armorModel;
     }
 }

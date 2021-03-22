@@ -12,6 +12,8 @@ import java.awt.*;
 import java.util.Map;
 import java.util.Random;
 
+import net.minecraft.item.Item.Properties;
+
 public class LoveTropicsShellItem extends ShellItem implements IColoredItem {
 
     public static class LTUtil {
@@ -40,9 +42,9 @@ public class LoveTropicsShellItem extends ShellItem implements IColoredItem {
     }
 
     @Override
-    public ITextComponent getDisplayName(final ItemStack stack) {
+    public ITextComponent getName(final ItemStack stack) {
         if (!stack.hasTag() || !stack.getTag().contains("Name")) {
-            return super.getDisplayName(stack);
+            return super.getName(stack);
         }
         final String name = stack.getTag().getString("Name");
         final String type = name.endsWith("s") ? "with_s" : "normal";

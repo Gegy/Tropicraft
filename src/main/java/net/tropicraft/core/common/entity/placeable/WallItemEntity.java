@@ -1,7 +1,5 @@
 package net.tropicraft.core.common.entity.placeable;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
@@ -11,7 +9,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.tropicraft.core.common.entity.BambooItemFrame;
 import net.tropicraft.core.common.entity.TropicraftEntities;
-import net.tropicraft.core.common.item.TropicraftItems;
+
+import javax.annotation.Nullable;
 
 public class WallItemEntity extends BambooItemFrame {
 
@@ -24,27 +23,27 @@ public class WallItemEntity extends BambooItemFrame {
 	}
 
 	@Override
-	public int getWidthPixels() {
+	public int getWidth() {
 		return 16;
 	}
 
 	@Override
-	public int getHeightPixels() {
+	public int getHeight() {
 		return 16;
 	}
 
     @Override
-    protected void dropItemOrSelf(@Nullable Entity entityIn, boolean p_146065_2_) {
-    	super.dropItemOrSelf(entityIn, false);
+    protected void dropItem(@Nullable Entity entityIn, boolean p_146065_2_) {
+    	super.dropItem(entityIn, false);
     	this.remove();
     }
 
     @Override
-    public void playPlaceSound() {
+    public void playPlacementSound() {
     }
 
 	@Override
 	public ItemStack getPickedResult(RayTraceResult target) {
-		return getDisplayedItem();
+		return getItem();
 	}
 }

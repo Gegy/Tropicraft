@@ -57,7 +57,7 @@ public class SinkInGroundProcessor extends CheatyStructureProcessor {
         if (groundCheck.getY() > 127) {
             // Convert slabs to bundles when they are over land
             if (!isAirOrWater(worldReaderIn, pos.down()) && p_215194_3_.state.getBlock() == TropicraftBlocks.THATCH_SLAB.get()) {
-                blockInfo = new BlockInfo(pos, TropicraftBlocks.THATCH_BUNDLE.get().getDefaultState(), null);
+                blockInfo = new BlockInfo(pos, TropicraftBlocks.THATCH_BUNDLE.get().defaultBlockState(), null);
             }
             
             // Only sink solid blocks, or blocks that are above air/water -- delete all others
@@ -76,7 +76,7 @@ public class SinkInGroundProcessor extends CheatyStructureProcessor {
         for (BlockPos pos : positions) {
             BlockState current = world.getBlockState(pos);
             if (current.isIn(BlockTags.LEAVES) || current.isIn(BlockTags.LOGS)) {
-                setBlockState(world, pos, Blocks.AIR.getDefaultState());
+                setBlockState(world, pos, Blocks.AIR.defaultBlockState());
             }
         }
     }

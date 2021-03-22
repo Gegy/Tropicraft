@@ -66,12 +66,12 @@ public class SteepPathProcessor extends PathStructureProcessor {
         pos = pos.up();
         if (bridgeTo == pos.getY() && canPlaceLadderAt(worldReaderIn, pos.up(), dir) == null) {
             // If the next spot up can't support a ladder, this is a one block step, so place a stair block
-            setBlockState(worldReaderIn, pos, TropicraftBlocks.THATCH_STAIRS.get().getDefaultState().with(StairsBlock.FACING, dir));
+            setBlockState(worldReaderIn, pos, TropicraftBlocks.THATCH_STAIRS.get().defaultBlockState().with(StairsBlock.FACING, dir));
         } else {
             // Otherwise, place ladders upwards until we find air (bridging over an initial gap if required)
             while (bridgeTo >= pos.getY() || canPlaceLadderAt(worldReaderIn, pos, dir) != null) {
                 setBlockState(worldReaderIn, pos, ladder);
-                setBlockState(worldReaderIn, pos.offset(dir), TropicraftBlocks.THATCH_BUNDLE.get().getDefaultState());
+                setBlockState(worldReaderIn, pos.offset(dir), TropicraftBlocks.THATCH_BUNDLE.get().defaultBlockState());
                 pos = pos.up();
             }
         }
@@ -93,7 +93,7 @@ public class SteepPathProcessor extends PathStructureProcessor {
     }
     
     private BlockState getLadderState(Direction dir) {
-        return TropicraftBlocks.BAMBOO_LADDER.get().getDefaultState().with(LadderBlock.FACING, dir.getOpposite());
+        return TropicraftBlocks.BAMBOO_LADDER.get().defaultBlockState().with(LadderBlock.FACING, dir.getOpposite());
     }
     
     @Override

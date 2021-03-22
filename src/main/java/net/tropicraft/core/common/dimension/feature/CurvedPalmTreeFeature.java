@@ -1,25 +1,17 @@
 package net.tropicraft.core.common.dimension.feature;
 
-import static net.minecraft.world.gen.feature.AbstractTreeFeature.isAir;
-import static net.minecraft.world.gen.feature.AbstractTreeFeature.isWater;
 import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.goesBeyondWorldSize;
 import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.isBBAvailable;
 
 import java.util.Random;
-import java.util.Set;
-import java.util.function.Function;
 
-import com.mojang.datafixers.Dynamic;
-
+import com.mojang.serialization.Codec;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorldWriter;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.IWorldGenerationReader;
-import net.minecraft.world.gen.feature.AbstractTreeFeature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 
 public class CurvedPalmTreeFeature extends PalmTreeFeature {
@@ -33,13 +25,13 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
     private int originX, originZ;
     private int dir;
 
-    public CurvedPalmTreeFeature(Function<Dynamic<?>, ? extends NoFeatureConfig> func) {
-        super(func);
+    public CurvedPalmTreeFeature(Codec<NoFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override
-    public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, NoFeatureConfig config) {
-        pos = pos.toImmutable();
+    public boolean place(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+        pos = pos.immutable();
 
         final int height = 9 + rand.nextInt(3);
 
@@ -51,7 +43,7 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
             return false;
         }
 
-        if (!getSapling().isValidPosition(getSapling().getDefaultState(), world, pos.down())) {
+        if (!getSapling().canSurvive(getSapling().defaultBlockState(), world, pos.below())) {
             return false;
         }
 
@@ -241,16 +233,16 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
     private void placeBlockWithDir(final IWorldWriter world, int x, int y, int z, BlockState state) {
         switch (dir) {
             case 2:
-                setBlockState(world, pos(this.originX + x, y, this.originZ + z), state);
+                setBlock(world, pos(this.originX + x, y, this.originZ + z), state);
                 return;
             case 0:
-                setBlockState(world, pos(this.originX + z, y, this.originZ - x), state);
+                setBlock(world, pos(this.originX + z, y, this.originZ - x), state);
                 return;
             case 3:
-                setBlockState(world, pos(this.originX - x, y, this.originZ - z), state);
+                setBlock(world, pos(this.originX - x, y, this.originZ - z), state);
                 return;
             case 1:
-                setBlockState(world, pos(this.originX - z, y, this.originZ + x), state);
+                setBlock(world, pos(this.originX - z, y, this.originZ + x), state);
         }
     }
 

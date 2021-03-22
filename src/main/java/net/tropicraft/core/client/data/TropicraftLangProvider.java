@@ -9,6 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.tropicraft.Constants;
@@ -388,7 +389,7 @@ public class TropicraftLangProvider extends LanguageProvider {
         // MISC
         
         add(Tropicraft.TROPICRAFT_ITEM_GROUP, "Tropicraft");
-        add("attribute.name." + LivingEntity.SWIM_SPEED.getName(), "Swim Speed");
+        add("attribute.name." + ForgeMod.SWIM_SPEED.get().getRegistryName().getPath(), "Swim Speed");
 
         // Koa
         add("entity.tropicraft.koa.female.hunter.name", "Koa Hunter");
@@ -422,17 +423,17 @@ public class TropicraftLangProvider extends LanguageProvider {
     }
     
     private void addTooltip(Supplier<? extends IItemProvider> item, String tooltip) {
-        add(item.get().asItem().getTranslationKey() + ".desc", tooltip);
+        add(item.get().asItem().getDescriptionId() + ".desc", tooltip);
     }
     
     private void addTooltip(Supplier<? extends IItemProvider> item, List<String> tooltip) {
         for (int i = 0; i < tooltip.size(); i++) {
-            add(item.get().asItem().getTranslationKey() + ".desc." + i, tooltip.get(i));
+            add(item.get().asItem().getDescriptionId() + ".desc." + i, tooltip.get(i));
         }
     }
     
     private void add(ItemGroup group, String name) {
-        add(group.getTranslationKey(), name);
+        add(group.getRecipeFolderName(), name);
     }
     
     private void addEntityType(Supplier<? extends EntityType<?>> entity) {
@@ -495,8 +496,8 @@ public class TropicraftLangProvider extends LanguageProvider {
     }
 
     @Override
-    public void act(DirectoryCache cache) throws IOException {
-        super.act(cache);
-        upsideDown.act(cache);
+    public void run(DirectoryCache cache) throws IOException {
+        super.run(cache);
+        upsideDown.run(cache);
     }
 }

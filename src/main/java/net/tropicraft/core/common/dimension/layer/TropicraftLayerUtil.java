@@ -1,13 +1,7 @@
 package net.tropicraft.core.common.dimension.layer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.LongFunction;
-
 import com.google.common.collect.ImmutableList;
-
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.WorldType;
+import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.IExtendedNoiseRandom;
 import net.minecraft.world.gen.LazyAreaLayerContext;
@@ -25,6 +19,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLModIdMappingEvent;
 import net.tropicraft.Constants;
 import net.tropicraft.core.common.dimension.biome.TropicraftBiomes;
 import net.tropicraft.core.common.dimension.config.TropicraftGeneratorSettings;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.LongFunction;
 
 @EventBusSubscriber(modid = Constants.MODID)
 @SuppressWarnings("deprecation")
@@ -50,50 +48,50 @@ public class TropicraftLayerUtil {
     };
 
     private static LazyInt lazyId(RegistryObject<Biome> biome) {
-        LazyInt ret = new LazyInt(biome.lazyMap(Registry.BIOME::getId));
+        LazyInt ret = new LazyInt(biome.lazyMap(WorldGenRegistries.BIOME::getId));
         CACHES.add(ret);
         return ret;
     }
 
-    public static Layer[] buildTropicsProcedure(long seed, WorldType type, TropicraftGeneratorSettings settings) {
-        final ImmutableList<IAreaFactory<LazyArea>> immutablelist = buildTropicsProcedure(type, settings, procedure -> new LazyAreaLayerContext(25, seed, procedure));
+    public static Layer[] buildTropicsProcedure(long seed, TropicraftGeneratorSettings settings) {
+        final ImmutableList<IAreaFactory<LazyArea>> immutablelist = buildTropicsProcedure(settings, procedure -> new LazyAreaLayerContext(25, seed, procedure));
         final Layer noiseLayer = new Layer(immutablelist.get(0));
         final Layer blockLayer = new Layer(immutablelist.get(1));
         return new Layer[]{noiseLayer, blockLayer};
     }
 
-    private static <T extends IArea, C extends IExtendedNoiseRandom<T>> ImmutableList<IAreaFactory<T>> buildTropicsProcedure(final WorldType type, final TropicraftGeneratorSettings settings, final LongFunction<C> context) {
-        IAreaFactory<T> islandLayer = TropicsIslandLayer.INSTANCE.apply(context.apply(1));
-        IAreaFactory<T> fuzzyZoomLayer = ZoomLayer.FUZZY.apply(context.apply(2000), islandLayer);
-        IAreaFactory<T> addIslandLayer = TropicraftAddIslandLayer.BASIC_3.apply(context.apply(3), fuzzyZoomLayer);
-        IAreaFactory<T> zoomLayer = ZoomLayer.NORMAL.apply(context.apply(2000), addIslandLayer);
+    private static <T extends IArea, C extends IExtendedNoiseRandom<T>> ImmutableList<IAreaFactory<T>> buildTropicsProcedure(final TropicraftGeneratorSettings settings, final LongFunction<C> context) {
+        IAreaFactory<T> islandLayer = TropicsIslandLayer.INSTANCE.run(context.apply(1));
+        IAreaFactory<T> fuzzyZoomLayer = ZoomLayer.FUZZY.run(context.apply(2000), islandLayer);
+        IAreaFactory<T> addIslandLayer = TropicraftAddIslandLayer.BASIC_3.run(context.apply(3), fuzzyZoomLayer);
+        IAreaFactory<T> zoomLayer = ZoomLayer.NORMAL.run(context.apply(2000), addIslandLayer);
 
-        IAreaFactory<T> oceanLayer = TropicraftAddInlandLayer.INSTANCE.apply(context.apply(9), zoomLayer);
-        oceanLayer = ZoomLayer.NORMAL.apply(context.apply(9), oceanLayer);
-        addIslandLayer = TropicraftAddIslandLayer.RAINFOREST_13.apply(context.apply(6), oceanLayer);
-        zoomLayer = ZoomLayer.NORMAL.apply(context.apply(2001), addIslandLayer);
-        zoomLayer = ZoomLayer.NORMAL.apply(context.apply(2004), zoomLayer);
-        addIslandLayer = TropicraftAddIslandLayer.BASIC_2.apply(context.apply(8), zoomLayer);
+        IAreaFactory<T> oceanLayer = TropicraftAddInlandLayer.INSTANCE.run(context.apply(9), zoomLayer);
+        oceanLayer = ZoomLayer.NORMAL.run(context.apply(9), oceanLayer);
+        addIslandLayer = TropicraftAddIslandLayer.RAINFOREST_13.run(context.apply(6), oceanLayer);
+        zoomLayer = ZoomLayer.NORMAL.run(context.apply(2001), addIslandLayer);
+        zoomLayer = ZoomLayer.NORMAL.run(context.apply(2004), zoomLayer);
+        addIslandLayer = TropicraftAddIslandLayer.BASIC_2.run(context.apply(8), zoomLayer);
 
-        IAreaFactory<T> biomeLayerGen = TropicraftBiomesLayer.INSTANCE.apply(context.apply(15), addIslandLayer);
-        IAreaFactory<T> oceanLayerGen = TropicraftAddWeightedSubBiomesLayer.OCEANS.apply(context.apply(16), biomeLayerGen);
-        IAreaFactory<T> hillsLayerGen = TropicraftAddSubBiomesLayer.RAINFOREST.apply(context.apply(17), oceanLayerGen);
-        zoomLayer = ZoomLayer.NORMAL.apply(context.apply(2002), hillsLayerGen);
+        IAreaFactory<T> biomeLayerGen = TropicraftBiomesLayer.INSTANCE.run(context.apply(15), addIslandLayer);
+        IAreaFactory<T> oceanLayerGen = TropicraftAddWeightedSubBiomesLayer.OCEANS.run(context.apply(16), biomeLayerGen);
+        IAreaFactory<T> hillsLayerGen = TropicraftAddSubBiomesLayer.RAINFOREST.run(context.apply(17), oceanLayerGen);
+        zoomLayer = ZoomLayer.NORMAL.run(context.apply(2002), hillsLayerGen);
 
         IAreaFactory<T> riverLayer = zoomLayer;
-        riverLayer = TropicraftRiverInitLayer.INSTANCE.apply(context.apply(12), riverLayer);
+        riverLayer = TropicraftRiverInitLayer.INSTANCE.run(context.apply(12), riverLayer);
         riverLayer = magnify(2007, ZoomLayer.NORMAL, riverLayer, 5, context);
-        riverLayer = TropicraftRiverLayer.INSTANCE.apply(context.apply(13), riverLayer);
-        riverLayer = SmoothLayer.INSTANCE.apply(context.apply(2008L), riverLayer);
+        riverLayer = TropicraftRiverLayer.INSTANCE.run(context.apply(13), riverLayer);
+        riverLayer = SmoothLayer.INSTANCE.run(context.apply(2008L), riverLayer);
 
         IAreaFactory<T> magnifyLayer = magnify(2007L, ZoomLayer.NORMAL, zoomLayer, 3, context);
-        IAreaFactory<T> biomeLayer = TropicraftBeachLayer.INSTANCE.apply(context.apply(20), magnifyLayer);
+        IAreaFactory<T> biomeLayer = TropicraftBeachLayer.INSTANCE.run(context.apply(20), magnifyLayer);
         biomeLayer = magnify(20, ZoomLayer.NORMAL, biomeLayer, 2, context);
 
-        biomeLayer = SmoothLayer.INSTANCE.apply(context.apply(17L), biomeLayer);
-        biomeLayer = TropicraftRiverMixLayer.INSTANCE.apply(context.apply(17), biomeLayer, riverLayer);
+        biomeLayer = SmoothLayer.INSTANCE.run(context.apply(17L), biomeLayer);
+        biomeLayer = TropicraftRiverMixLayer.INSTANCE.run(context.apply(17), biomeLayer, riverLayer);
 
-        final IAreaFactory<T> blockLayer = TropicraftVoronoiZoomLayer.INSTANCE.apply(context.apply(10), biomeLayer);
+        final IAreaFactory<T> blockLayer = TropicraftVoronoiZoomLayer.INSTANCE.run(context.apply(10), biomeLayer);
 
         return ImmutableList.of(biomeLayer, blockLayer);
     }
@@ -101,7 +99,7 @@ public class TropicraftLayerUtil {
     private static <T extends IArea, C extends IExtendedNoiseRandom<T>> IAreaFactory<T> magnify(final long seed, final IAreaTransformer1 zoomLayer, final IAreaFactory<T> layer, final int count, final LongFunction<C> context) {
         IAreaFactory<T> result = layer;
         for (int i = 0; i < count; i++) {
-            result = zoomLayer.apply(context.apply(seed + i), result);
+            result = zoomLayer.run(context.apply(seed + i), result);
         }
         return result;
     }

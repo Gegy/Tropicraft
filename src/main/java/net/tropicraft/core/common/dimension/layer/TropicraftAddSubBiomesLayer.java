@@ -18,7 +18,7 @@ public enum TropicraftAddSubBiomesLayer implements IC0Transformer {
     @Override
     public int apply(INoiseRandom random, int center) {
         if (center == baseID.getAsInt()) {
-            return subBiomeIDs[random.random(subBiomeIDs.length)].getAsInt();
+            return subBiomeIDs[random.nextRandom(subBiomeIDs.length)].getAsInt();
         } else {
             return center;
         }

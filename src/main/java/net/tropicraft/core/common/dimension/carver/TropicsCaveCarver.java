@@ -1,21 +1,19 @@
 package net.tropicraft.core.common.dimension.carver;
 
-import java.util.Random;
-import java.util.function.Function;
-
 import com.google.common.collect.ImmutableSet;
-import com.mojang.datafixers.Dynamic;
-
+import com.mojang.serialization.Codec;
 import net.minecraft.block.Block;
 import net.minecraft.world.gen.carver.CaveWorldCarver;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 import net.tropicraft.core.common.block.TropicraftBlocks;
 
+import java.util.Random;
+
 public class TropicsCaveCarver extends CaveWorldCarver {
 
-    public TropicsCaveCarver(Function<Dynamic<?>, ? extends ProbabilityConfig> p_i49922_1_) {
-        super(p_i49922_1_, 256);
-        this.carvableBlocks = ImmutableSet.<Block> builder().addAll(this.carvableBlocks)
+    public TropicsCaveCarver(Codec<ProbabilityConfig> codec) {
+        super(codec, 256);
+        this.replaceableBlocks = ImmutableSet.<Block> builder().addAll(this.replaceableBlocks)
                 .add(TropicraftBlocks.CORAL_SAND.get())
                 .add(TropicraftBlocks.FOAMY_SAND.get())
                 .add(TropicraftBlocks.MINERAL_SAND.get())
@@ -23,9 +21,9 @@ public class TropicsCaveCarver extends CaveWorldCarver {
                 .add(TropicraftBlocks.PURIFIED_SAND.get())
                 .add(TropicraftBlocks.VOLCANIC_SAND.get()).build();
     }
-    
+
     @Override
-    protected int generateCaveStartY(Random rand) {
+    protected int getCaveY(Random rand) {
         if (rand.nextInt(5) == 0) {
             return rand.nextInt(240 + 8); // Add some evenly distributed caves in, in addition to the ones biased towards lower Y
         }

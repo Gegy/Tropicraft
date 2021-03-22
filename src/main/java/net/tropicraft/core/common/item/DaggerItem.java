@@ -6,8 +6,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.IItemTier;
@@ -21,7 +22,7 @@ public class DaggerItem extends Item {
 
     private final IItemTier tier;
     public DaggerItem(IItemTier tier, Properties properties) {
-        super(properties.defaultMaxDamage(tier.getMaxUses()));
+        super(properties.defaultDurability(tier.getUses()));
         this.tier = tier;
     }
 
@@ -33,25 +34,25 @@ public class DaggerItem extends Item {
             return 15.0F;
         } else {
             Material material = state.getMaterial();
-            return material != Material.PLANTS && material != Material.TALL_PLANTS && material != Material.CORAL && material != Material.LEAVES && material != Material.GOURD ? 1.0F : 1.5F;
+            return material != Material.PLANT && material != Material.REPLACEABLE_PLANT && material != Material.CORAL && material != Material.LEAVES && material != Material.VEGETABLE ? 1.0F : 1.5F;
         }
     }
 
     @Override
-    public boolean canPlayerBreakBlockWhileHolding(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+    public boolean canAttackBlock(BlockState state, World world, BlockPos pos, PlayerEntity player) {
         return !player.isCreative();
     }
 
     @Override
-    public boolean hitEntity(ItemStack itemStack, LivingEntity attacker, LivingEntity target) {
-        itemStack.damageItem(1, target, (e) -> {
-            e.sendBreakAnimation(EquipmentSlotType.MAINHAND);
+    public boolean hurtEnemy(ItemStack itemStack, LivingEntity attacker, LivingEntity target) {
+        itemStack.hurtAndBreak(1, target, (e) -> {
+            e.broadcastBreakEvent(EquipmentSlotType.MAINHAND);
         });
         return true;
     }
 
     @Override
-    public UseAction getUseAction(ItemStack itemstack) {
+    public UseAction getUseAnimation(ItemStack itemstack) {
         return UseAction.BLOCK;
     }
 
@@ -61,7 +62,7 @@ public class DaggerItem extends Item {
     }
 
     @Override
-    public boolean canHarvestBlock(BlockState state) {
+    public boolean isCorrectToolForDrops(BlockState state) {
         return state.getBlock() == Blocks.COBWEB;
     }
 
@@ -69,14 +70,13 @@ public class DaggerItem extends Item {
      * Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
      */
     @Override
-    public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
-        Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
-
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
+        Multimap<Attribute, AttributeModifier> modifiers = super.getAttributeModifiers(slot, stack);
         if (slot == EquipmentSlotType.MAINHAND) {
-            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double) tier.getAttackDamage() + 2.5D, AttributeModifier.Operation.ADDITION));
-            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", 0, AttributeModifier.Operation.ADDITION));
+            modifiers.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", (double) tier.getAttackDamageBonus() + 2.5D, AttributeModifier.Operation.ADDITION));
+            modifiers.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", 0, AttributeModifier.Operation.ADDITION));
         }
 
-        return multimap;
+        return modifiers;
     }
 }

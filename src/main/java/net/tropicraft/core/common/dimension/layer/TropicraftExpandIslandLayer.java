@@ -17,23 +17,23 @@ public enum TropicraftExpandIslandLayer implements IBishopTransformer {
                 int chance = 1;
                 int result = TropicraftLayerUtil.LAND_ID.getAsInt();
 
-                if (!isNorthWestOcean && random.random(chance++) == 0) {
+                if (!isNorthWestOcean && random.nextRandom(chance++) == 0) {
                     result = nw;
                 }
 
-                if (!isSouthWestOcean && random.random(chance++) == 0) {
+                if (!isSouthWestOcean && random.nextRandom(chance++) == 0) {
                     result = sw;
                 }
 
-                if (!isNorthEastOcean && random.random(chance++) == 0) {
+                if (!isNorthEastOcean && random.nextRandom(chance++) == 0) {
                     result = ne;
                 }
 
-                if (!isSouthEastOcean && random.random(chance++) == 0) {
+                if (!isSouthEastOcean && random.nextRandom(chance++) == 0) {
                     result = se;
                 }
 
-                if (random.random(3) == 0) {
+                if (random.nextRandom(3) == 0) {
                     return result;
                 }
 

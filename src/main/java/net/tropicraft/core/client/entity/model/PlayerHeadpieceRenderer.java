@@ -2,10 +2,9 @@ package net.tropicraft.core.client.entity.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.vector.Vector3f;
 import net.tropicraft.core.client.entity.TropicraftSpecialRenderHelper;
 
 public class PlayerHeadpieceRenderer extends BipedModel<LivingEntity> {
@@ -30,26 +29,26 @@ public class PlayerHeadpieceRenderer extends BipedModel<LivingEntity> {
 	private boolean sneaking;
 
 	@Override
-	public void setRotationAngles(LivingEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void setupAnim(LivingEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		this.rotationYaw = netHeadYaw;
 		this.rotationPitch = headPitch;
 		this.sneaking = entityIn.isCrouching();
 	}
 
 	@Override
-	public void render(MatrixStack stack, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		stack.push();
+	public void renderToBuffer(MatrixStack stack, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+		stack.pushPose();
 
 		if (sneaking) {
 			stack.translate(0, 0.25f, 0);
 		}
 
 		// Set head rotation to mask
-		stack.rotate(Vector3f.YP.rotationDegrees(rotationYaw));
-		stack.rotate(Vector3f.XP.rotationDegrees(rotationPitch));
+		stack.mulPose(Vector3f.YP.rotationDegrees(rotationYaw));
+		stack.mulPose(Vector3f.XP.rotationDegrees(rotationPitch));
 
 		// Flip mask to face away from the player
-		stack.rotate(Vector3f.YP.rotationDegrees(180));
+		stack.mulPose(Vector3f.YP.rotationDegrees(180));
 
 		// put it in the middle in front of the face
 		stack.translate(0.0F - xOffset, 0.112f + 0.0625f - yOffset, 0.2501F);
@@ -58,7 +57,7 @@ public class PlayerHeadpieceRenderer extends BipedModel<LivingEntity> {
 		// Setting the texture is handled in the item class.
 		renderer.renderMask(stack, bufferIn, this.textureIndex, packedLightIn, packedOverlayIn);
 		
-		stack.pop();
+		stack.popPose();
 	}
 	
 	

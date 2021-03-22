@@ -15,13 +15,15 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.tropicraft.core.common.entity.placeable.FurnitureEntity;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
+
+import net.minecraft.item.Item.Properties;
 
 public class FurnitureItem<T extends FurnitureEntity> extends Item implements IColoredItem {
 
@@ -40,21 +42,21 @@ public class FurnitureItem<T extends FurnitureEntity> extends Item implements IC
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity placer, Hand hand) {
-        ItemStack heldItem = placer.getHeldItem(hand);
-        RayTraceResult rayTraceResult = rayTrace(world, placer, RayTraceContext.FluidMode.ANY);
+    public ActionResult<ItemStack> use(World world, PlayerEntity placer, Hand hand) {
+        ItemStack heldItem = placer.getItemInHand(hand);
+        RayTraceResult rayTraceResult = getPlayerPOVHitResult(world, placer, RayTraceContext.FluidMode.ANY);
         if (rayTraceResult.getType() == net.minecraft.util.math.RayTraceResult.Type.MISS) {
             return new ActionResult<>(ActionResultType.PASS, heldItem);
         } else {
-            Vec3d lookvec = placer.getLook(1.0F);
-            List<Entity> nearbyEntities = world.getEntitiesInAABBexcluding(placer, placer.getBoundingBox().expand(lookvec.scale(5.0D)).grow(1.0D), EntityPredicates.NOT_SPECTATING);
+            Vector3d lookvec = placer.getViewVector(1.0F);
+            List<Entity> nearbyEntities = world.getEntities(placer, placer.getBoundingBox().expandTowards(lookvec.scale(5.0D)).inflate(1.0D), EntityPredicates.NO_SPECTATORS);
             if (!nearbyEntities.isEmpty()) {
-                Vec3d eyePosition = placer.getEyePosition(1.0F);
+                Vector3d eyePosition = placer.getEyePosition(1.0F);
                 Iterator<Entity> nearbyEntityIterator = nearbyEntities.iterator();
 
                 while (nearbyEntityIterator.hasNext()) {
                     Entity nearbyEnt = nearbyEntityIterator.next();
-                    AxisAlignedBB nearbyBB = nearbyEnt.getBoundingBox().grow((double)nearbyEnt.getCollisionBorderSize());
+                    AxisAlignedBB nearbyBB = nearbyEnt.getBoundingBox().inflate((double)nearbyEnt.getPickRadius());
                     if (nearbyBB.contains(eyePosition)) {
                         return new ActionResult<>(ActionResultType.PASS, heldItem);
                     }
@@ -62,26 +64,26 @@ public class FurnitureItem<T extends FurnitureEntity> extends Item implements IC
             }
 
             if (rayTraceResult.getType() == net.minecraft.util.math.RayTraceResult.Type.BLOCK) {
-                Vec3d hitVec = rayTraceResult.getHitVec();
+                Vector3d hitVec = rayTraceResult.getLocation();
 
                 final T entity = this.entityType.get().create(world);
-                entity.moveToBlockPosAndAngles(new BlockPos(hitVec.x, hitVec.y, hitVec.z), 0, 0);
-                entity.setMotion(Vec3d.ZERO);
-                entity.setRotation(placer.rotationYaw + 180);
+                entity.moveTo(new BlockPos(hitVec.x, hitVec.y, hitVec.z), 0, 0);
+                entity.setDeltaMovement(Vector3d.ZERO);
+                entity.setRotation(placer.yRot + 180);
                 entity.setColor(this.color);
 
-                if (!world.hasNoCollisions(entity, entity.getBoundingBox().grow(-0.1D))) {
+                if (!world.noCollision(entity, entity.getBoundingBox().inflate(-0.1D))) {
                     return new ActionResult<>(ActionResultType.FAIL, heldItem);
                 } else {
-                    if (!world.isRemote) {
-                        world.addEntity(entity);
+                    if (!world.isClientSide) {
+                        world.addFreshEntity(entity);
                     }
 
-                    if (!placer.abilities.isCreativeMode) {
+                    if (!placer.abilities.instabuild) {
                         heldItem.shrink(1);
                     }
 
-                    placer.addStat(Stats.ITEM_USED.get(this));
+                    placer.awardStat(Stats.ITEM_USED.get(this));
                     return new ActionResult<>(ActionResultType.SUCCESS, heldItem);
                 }
             } else {

@@ -1,8 +1,6 @@
 package net.tropicraft.core.common.dimension.feature;
 
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-
+import com.mojang.serialization.Codec;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -14,31 +12,21 @@ import net.minecraft.world.gen.feature.template.Template;
 import net.minecraft.world.gen.feature.template.Template.BlockInfo;
 import net.tropicraft.Constants;
 
+import javax.annotation.Nullable;
+
 public class StructureVoidProcessor extends StructureProcessor {
-    
-    static final IStructureProcessorType TYPE = Registry.register(Registry.STRUCTURE_PROCESSOR, Constants.MODID + ":structure_void", StructureVoidProcessor::new);
+    static final IStructureProcessorType<StructureVoidProcessor> TYPE = Registry.register(Registry.STRUCTURE_PROCESSOR, Constants.MODID + ":structure_void", () -> Codec.unit(new StructureVoidProcessor()));
 
-    public StructureVoidProcessor() {}
-
-    public StructureVoidProcessor(Dynamic<?> p_i51337_1_) {
-        this();
-    }
-    
     @Override
-    public BlockInfo process(IWorldReader worldReaderIn, BlockPos pos, BlockInfo p_215194_3_, BlockInfo blockInfo, PlacementSettings placementSettingsIn, Template template) {
+    public BlockInfo process(IWorldReader world, BlockPos pos, BlockPos p_230386_3_, BlockInfo blockInfo, BlockInfo p_230386_5_, PlacementSettings placementSettings, @Nullable Template template) {
         if (blockInfo.state.getBlock() == Blocks.STRUCTURE_VOID) {
-            return new BlockInfo(blockInfo.pos, Blocks.AIR.getDefaultState(), blockInfo.nbt);
+            return new BlockInfo(blockInfo.pos, Blocks.AIR.defaultBlockState(), blockInfo.nbt);
         }
         return blockInfo;
     }
 
     @Override
-    protected IStructureProcessorType getType() {
+    protected IStructureProcessorType<?> getType() {
         return TYPE;
-    }
-
-    @Override
-    protected <T> Dynamic<T> serialize0(DynamicOps<T> ops) {
-        return new Dynamic<>(ops);
     }
 }

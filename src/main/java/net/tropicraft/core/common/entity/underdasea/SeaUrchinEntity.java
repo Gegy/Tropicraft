@@ -3,7 +3,9 @@ package net.tropicraft.core.common.entity.underdasea;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.passive.WaterMobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.IPacket;
@@ -41,43 +43,42 @@ public class SeaUrchinEntity extends EchinodermEntity {
         super(entityTypeIn, worldIn);
     }
 
-    @Override
-    protected void registerAttributes() {
-        super.registerAttributes();
-        getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0D);
+    public static AttributeModifierMap.MutableAttribute createAttributes() {
+        return WaterMobEntity.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 10.0);
     }
 
     @Override
-    public boolean attackEntityFrom(DamageSource source, float amt) {
-        if (source.getDamageType().equals("player")) {
-            Entity ent = source.getTrueSource();
+    public boolean hurt(DamageSource source, float amt) {
+        if (source.getMsgId().equals("player")) {
+            Entity ent = source.getEntity();
 
             if (ent instanceof PlayerEntity) {
                 PlayerEntity player = (PlayerEntity) ent;
 
-                if (player.getHeldItemMainhand().isEmpty()) {
-                    player.attackEntityFrom(DamageSource.causeMobDamage(this), 2);
+                if (player.getMainHandItem().isEmpty()) {
+                    player.hurt(DamageSource.mobAttack(this), 2);
                 }
             }
         }
 
-        return super.attackEntityFrom(source, amt);
+        return super.hurt(source, amt);
     }
 
     @Override
-    public void applyEntityCollision(Entity ent) {
-        super.applyEntityCollision(ent);
+    public void push(Entity ent) {
+        super.push(ent);
 
-        if (!world.isRemote) {
+        if (!level.isClientSide) {
             if (ent instanceof LivingEntity && !(ent instanceof SeaUrchinEntity) && !(ent instanceof SeaUrchinEggEntity)) {
-                ent.attackEntityFrom(DamageSource.causeMobDamage(this), 2);
+                ent.hurt(DamageSource.mobAttack(this), 2);
             }
         }
     }
 
     @Override
     public EggEntity createEgg() {
-        return new SeaUrchinEggEntity(TropicraftEntities.SEA_URCHIN_EGG_ENTITY.get(), world);
+        return new SeaUrchinEggEntity(TropicraftEntities.SEA_URCHIN_EGG_ENTITY.get(), level);
     }
 
     @Override
@@ -111,7 +112,7 @@ public class SeaUrchinEntity extends EchinodermEntity {
     }
 
     @Override
-    public IPacket<?> createSpawnPacket() {
+    public IPacket<?> getAddEntityPacket() {
         return new SSpawnMobPacket(this);
     }
 

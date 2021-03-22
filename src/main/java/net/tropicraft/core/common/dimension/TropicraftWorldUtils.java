@@ -100,8 +100,8 @@ public class TropicraftWorldUtils {
 
         ServerWorld serverworld = player.server.getWorld(destination);
 
-        int posX = MathHelper.floor(player.getPosX());
-        int posZ = MathHelper.floor(player.getPosZ());
+        int posX = MathHelper.floor(player.getX());
+        int posZ = MathHelper.floor(player.getZ());
 
         Chunk chunk = serverworld.getChunk(posX >> 4, posZ >> 4);
         int topY = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE, posX & 15, posZ & 15);

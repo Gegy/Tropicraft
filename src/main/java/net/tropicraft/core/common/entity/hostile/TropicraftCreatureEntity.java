@@ -14,7 +14,7 @@ public class TropicraftCreatureEntity extends CreatureEntity {
     }
 
     @Override
-    public float getBlockPathWeight(BlockPos p_205022_1_, IWorldReader p_205022_2_) {
-        return p_205022_2_.getBlockState(p_205022_1_.down()).getBlock() == Blocks.GRASS_BLOCK ? 10.0F : p_205022_2_.getBrightness(p_205022_1_) - 0.5F;
+    public float getWalkTargetValue(BlockPos p_205022_1_, IWorldReader p_205022_2_) {
+        return p_205022_2_.getBlockState(p_205022_1_.below()).getBlock() == Blocks.GRASS_BLOCK ? 10.0F : p_205022_2_.getBrightness(p_205022_1_) - 0.5F;
     }
 }

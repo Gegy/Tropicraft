@@ -18,7 +18,7 @@ public enum TropicraftAddInlandLayer implements IBishopTransformer {
 
     @Override
     public int apply(INoiseRandom random, int ne, int se, int sw, int nw, int center) {
-        if (isLand(nw) && isLand(sw) && isLand(ne) && isLand(se) && isLand(center) && random.random(chance) == 0) {
+        if (isLand(nw) && isLand(sw) && isLand(ne) && isLand(se) && isLand(center) && random.nextRandom(chance) == 0) {
             return landID.getAsInt();
         }
 

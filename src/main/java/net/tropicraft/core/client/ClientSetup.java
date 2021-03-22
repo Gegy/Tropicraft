@@ -49,13 +49,13 @@ import net.tropicraft.core.common.entity.TropicraftEntities;
 public class ClientSetup {
 
     public static void setupBlockRenderLayers() {
-        RenderType renderType = RenderType.getCutout();
+        RenderType renderType = RenderType.cutout();
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.AIR_COMPRESSOR.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.COCONUT.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.DRINK_MIXER.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.SIFTER.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.TIKI_TORCH.get(), renderType);
-        TropicraftBlocks.FLOWERS.forEach((key, value) -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.getCutout()));
+        TropicraftBlocks.FLOWERS.forEach((key, value) -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.cutout()));
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.PINEAPPLE.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.IRIS.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.COFFEE_BUSH.get(), renderType);
@@ -71,11 +71,11 @@ public class ClientSetup {
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.BAMBOO_DOOR.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.BAMBOO_LADDER.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.BAMBOO_FLOWER_POT.get(), renderType);
-        TropicraftBlocks.BAMBOO_POTTED_TROPICS_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.getCutout()));
-        TropicraftBlocks.BAMBOO_POTTED_VANILLA_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.getCutout()));
-        TropicraftBlocks.VANILLA_POTTED_TROPICS_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.getCutout()));
+        TropicraftBlocks.BAMBOO_POTTED_TROPICS_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.cutout()));
+        TropicraftBlocks.BAMBOO_POTTED_VANILLA_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.cutout()));
+        TropicraftBlocks.VANILLA_POTTED_TROPICS_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.cutout()));
 
-        renderType = RenderType.getCutoutMipped();
+        renderType = RenderType.cutoutMipped();
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.THATCH_STAIRS_FUZZY.get(), renderType);
     }
 

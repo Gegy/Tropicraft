@@ -31,7 +31,7 @@ public class VolcanoGenerator {
 			TropicraftBiomes.TROPICS_OCEAN.getId()
 	);
 
-	private ChunkGenerator<?> generator;
+	private ChunkGenerator generator;
 
 	private final static int MAX_RADIUS = 65;
 	private final static int MIN_RADIUS = 45;
@@ -49,11 +49,11 @@ public class VolcanoGenerator {
 	public final static int CHUNK_SIZE_Z = 16;
 	public final static int CHUNK_SIZE_Y = 256;
 
-	private final static Supplier<BlockState> VOLCANO_BLOCK = TropicraftBlocks.CHUNK.lazyMap(Block::getDefaultState);
-	private final static Supplier<BlockState> LAVA_BLOCK = () -> Blocks.LAVA.getDefaultState();
-	private final static Supplier<BlockState> SAND_BLOCK = TropicraftBlocks.VOLCANIC_SAND.lazyMap(Block::getDefaultState);
+	private final static Supplier<BlockState> VOLCANO_BLOCK = TropicraftBlocks.CHUNK.lazyMap(Block::defaultBlockState);
+	private final static Supplier<BlockState> LAVA_BLOCK = () -> Blocks.LAVA.defaultBlockState();
+	private final static Supplier<BlockState> SAND_BLOCK = TropicraftBlocks.VOLCANIC_SAND.lazyMap(Block::defaultBlockState);
 
-	public VolcanoGenerator(ChunkGenerator<?> chunkGenerator) {
+	public VolcanoGenerator(ChunkGenerator chunkGenerator) {
 		this.generator = chunkGenerator;
 	}
 
@@ -95,12 +95,12 @@ public class VolcanoGenerator {
 			    double volcanoHeight = getVolcanoHeight(relativeX, relativeZ, radiusX, radiusZ, volcNoise);
 			    float distanceSquared = getDistanceSq(relativeX, relativeZ, radiusX, radiusZ);
 
-                int groundHeight = chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
+                int groundHeight = chunk.getHeight(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
                 groundHeight = Math.min(groundHeight, lavaLevel - 3);
 
 				if (distanceSquared < 1) {
 					for (int y = CHUNK_SIZE_Y; y > 0; y--) {
-						pos.setPos(x, y, z);
+						pos.set(x, y, z);
 
 						if (volcanoHeight + groundHeight < calderaCutoff) {
 							if (volcanoHeight + groundHeight <= volcanoTop) {
@@ -125,7 +125,7 @@ public class VolcanoGenerator {
 							} else if (y <= lavaLevel) {
 								placeBlock(pos, LAVA_BLOCK, chunk);
 							} else {
-								placeBlock(pos, Blocks.AIR::getDefaultState, chunk);
+								placeBlock(pos, Blocks.AIR::defaultBlockState, chunk);
 							}
 						}
 					}
@@ -227,7 +227,7 @@ public class VolcanoGenerator {
 	 * Rarity is determined by the numChunks/offsetChunks vars (smaller numbers
 	 * mean more spawning)
 	 */
-	public static int canGenVolcanoAtCoords(ChunkGenerator<?> generator, int i, int j) {
+	public static int canGenVolcanoAtCoords(ChunkGenerator generator, int i, int j) {
 		byte numChunks = 64; // was 32
 		byte offsetChunks = 16; // was 8
 		int oldi = i;
@@ -269,7 +269,7 @@ public class VolcanoGenerator {
 	 * this chunk, otherwise returns null.
 	 * The posY of the returned object should be used as the volcano radius
 	 */
-	public static BlockPos getVolcanoNear(ChunkGenerator<?> generator, int i, int j) {
+	public static BlockPos getVolcanoNear(ChunkGenerator generator, int i, int j) {
 		//Check 4 chunks in each direction (volcanoes are never more than 4 chunks wide)
 		int range = 4;
 		for (int x = i - range; x <= i + range; x++) {
@@ -290,9 +290,9 @@ public class VolcanoGenerator {
 		return biome == SURFACE_BIOME ? 0: OCEAN_HEIGHT_OFFSET;
 	}
 
-	private static boolean hasAllBiomes(ChunkGenerator<?> generator, int centerX, int centerY, int centerZ, List<ResourceLocation> allowedBiomes) {
-		BiomeProvider biomeProvider = generator.getBiomeProvider();
-		for (Biome biome : biomeProvider.getBiomes(centerX, centerY, centerZ,0)) {
+	private static boolean hasAllBiomes(ChunkGenerator generator, int centerX, int centerY, int centerZ, List<ResourceLocation> allowedBiomes) {
+		BiomeProvider biomeProvider = generator.getBiomeSource();
+		for (Biome biome : biomeProvider.getBiomesWithin(centerX, centerY, centerZ,0)) {
 			if (!allowedBiomes.contains(biome.getRegistryName())) {
 				return false;
 			}

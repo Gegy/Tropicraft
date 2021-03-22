@@ -7,6 +7,8 @@ import net.minecraft.item.IArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.tropicraft.Constants;
 
+import net.minecraft.item.Item.Properties;
+
 public class TropicraftArmorItem extends ArmorItem {
     public TropicraftArmorItem(IArmorMaterial armorMaterial, EquipmentSlotType slotType, Properties properties) {
         super(armorMaterial, slotType, properties);
@@ -18,6 +20,6 @@ public class TropicraftArmorItem extends ArmorItem {
 
     @Override
     public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot, String type) {
-        return getTexturePath(String.format("%s_layer_" + (slot == EquipmentSlotType.LEGS ? 2 : 1) + ".png", getArmorMaterial().getName()));
+        return getTexturePath(String.format("%s_layer_" + (slot == EquipmentSlotType.LEGS ? 2 : 1) + ".png", getMaterial().getName()));
     }
 }

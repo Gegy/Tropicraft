@@ -1,17 +1,17 @@
 package net.tropicraft.core.common.item.scuba;
 
-import java.util.UUID;
-
 import com.google.common.collect.Multimap;
-
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.ForgeMod;
 import net.tropicraft.Constants;
+
+import java.util.UUID;
 
 public class ScubaFlippersItem extends ScubaArmorItem {
     
@@ -22,10 +22,10 @@ public class ScubaFlippersItem extends ScubaArmorItem {
     }
 
     @Override
-    public Multimap<String, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
-        Multimap<String, AttributeModifier> mods = super.getAttributeModifiers(slot, stack);
-        if (slot == EquipmentSlotType.FEET && EnchantmentHelper.getEnchantmentLevel(Enchantments.DEPTH_STRIDER, stack) == 0) {
-            mods.put(LivingEntity.SWIM_SPEED.getName(), SWIM_SPEED_BOOST);
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
+        Multimap<Attribute, AttributeModifier> mods = super.getAttributeModifiers(slot, stack);
+        if (slot == EquipmentSlotType.FEET && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.DEPTH_STRIDER, stack) == 0) {
+            mods.put(ForgeMod.SWIM_SPEED.get(), SWIM_SPEED_BOOST);
         }
         return mods;
     }

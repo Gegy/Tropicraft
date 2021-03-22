@@ -1,7 +1,5 @@
 package net.tropicraft.core.common.block;
 
-import java.util.Random;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.entity.Entity;
@@ -12,6 +10,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.tropicraft.core.common.dimension.TropicraftWorldUtils;
 
+import java.util.Random;
+
 public class PortalWaterBlock extends FlowingFluidBlock {
 
     public PortalWaterBlock(Properties builder) {
@@ -19,16 +19,11 @@ public class PortalWaterBlock extends FlowingFluidBlock {
     }
     
     @Override
-    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
-        super.onEntityCollision(state, worldIn, pos, entityIn);
-        if (!worldIn.isRemote && entityIn instanceof ServerPlayerEntity && entityIn.timeUntilPortal <= 0 && !entityIn.isPassenger() && !entityIn.isBeingRidden() && entityIn.isNonBoss()) {
+    public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
+        super.entityInside(state, worldIn, pos, entityIn);
+        if (!worldIn.isClientSide && entityIn instanceof ServerPlayerEntity && entityIn.getPortalWaitTime() <= 0 && !entityIn.isPassenger() && !entityIn.isPassenger() && entityIn.canChangeDimensions()) {
             TropicraftWorldUtils.teleportPlayer((ServerPlayerEntity) entityIn, TropicraftWorldUtils.TROPICS_DIMENSION);
         }
-    }
-    
-    @Override
-    public boolean reactWithNeighbors(World worldIn, BlockPos pos, BlockState state) {
-        return false;
     }
 
     @Override
@@ -38,8 +33,8 @@ public class PortalWaterBlock extends FlowingFluidBlock {
             double d1 = (double)pos.getY();
             double d2 = (double)pos.getZ();
             
-            worldIn.addOptionalParticle(ParticleTypes.BUBBLE_COLUMN_UP, d0 + 0.5D, d1, d2 + 0.5D, 0.0D, 0.04D, 0.0D);
-            worldIn.addOptionalParticle(ParticleTypes.BUBBLE_COLUMN_UP, d0 + (double)rand.nextFloat(), d1 + (double)rand.nextFloat(), d2 + (double)rand.nextFloat(), 0.0D, 0.04D, 0.0D);
+            worldIn.addParticle(ParticleTypes.BUBBLE_COLUMN_UP, d0 + 0.5D, d1, d2 + 0.5D, 0.0D, 0.04D, 0.0D);
+            worldIn.addParticle(ParticleTypes.BUBBLE_COLUMN_UP, d0 + (double)rand.nextFloat(), d1 + (double)rand.nextFloat(), d2 + (double)rand.nextFloat(), 0.0D, 0.04D, 0.0D);
         }
     }
 }

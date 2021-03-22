@@ -1,42 +1,54 @@
 package net.tropicraft.core.common.dimension.feature.jigsaw;
 
-import java.util.List;
-import java.util.Random;
-
-import com.mojang.datafixers.Dynamic;
-
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.jigsaw.IJigsawDeserializer;
+import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
+import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.PlacementSettings;
-import net.minecraft.world.gen.feature.template.StructureProcessor;
+import net.minecraft.world.gen.feature.template.StructureProcessorList;
+import net.minecraft.world.gen.feature.template.Template;
 import net.minecraft.world.gen.feature.template.Template.BlockInfo;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.tropicraft.Constants;
 
-public class NoRotateSingleJigsawPiece extends FixedSingleJigsawPiece {
-    
-    private static final IJigsawDeserializer TYPE = IJigsawDeserializer.register(Constants.MODID + ":no_rotate", NoRotateSingleJigsawPiece::new);
+import java.util.List;
+import java.util.Random;
+import java.util.function.Supplier;
 
-    public NoRotateSingleJigsawPiece(String p_i51400_1_, List<StructureProcessor> p_i51400_2_) {
-        super(p_i51400_1_, p_i51400_2_);
+public class NoRotateSingleJigsawPiece extends FixedSingleJigsawPiece {
+
+    public static final Codec<NoRotateSingleJigsawPiece> CODEC = RecordCodecBuilder.create(instance -> {
+        return instance.group(templateCodec(), processorsCodec(), projectionCodec())
+                .apply(instance, NoRotateSingleJigsawPiece::new);
+    });
+
+    private static final IJigsawDeserializer<NoRotateSingleJigsawPiece> TYPE = IJigsawDeserializer.register(Constants.MODID + ":no_rotate", CODEC);
+
+    public NoRotateSingleJigsawPiece(Either<ResourceLocation, Template> template, Supplier<StructureProcessorList> processors, JigsawPattern.PlacementBehaviour placementBehaviour) {
+        super(template, processors, placementBehaviour);
     }
-    
-    public NoRotateSingleJigsawPiece(Dynamic<?> nbt) {
-        super(nbt);
+
+    public NoRotateSingleJigsawPiece(Template template) {
+        super(template);
     }
-    
+
     @Override
-    public IJigsawDeserializer getType() {
+    public IJigsawDeserializer<?> getType() {
         return TYPE;
     }
 
     @Override
-    protected PlacementSettings createPlacementSettings(Rotation rotation, MutableBoundingBox bb) {
-        return super.createPlacementSettings(Rotation.NONE, bb);
+    protected PlacementSettings getSettings(Rotation rotation, MutableBoundingBox box, boolean b) {
+        return this.getSettings(Rotation.NONE, box, b);
     }
 
     @Override
@@ -55,12 +67,12 @@ public class NoRotateSingleJigsawPiece extends FixedSingleJigsawPiece {
     }
 
     @Override
-    public List<BlockInfo> getJigsawBlocks(TemplateManager templateManagerIn, BlockPos pos, Rotation rotationIn, Random rand) {
-        return super.getJigsawBlocks(templateManagerIn, pos, Rotation.NONE, rand);
+    public List<BlockInfo> getShuffledJigsawBlocks(TemplateManager templateManager, BlockPos pos, Rotation rotation, Random random) {
+        return super.getShuffledJigsawBlocks(templateManager, pos, Rotation.NONE, random);
     }
 
     @Override
-    public boolean place(TemplateManager templateManagerIn, IWorld worldIn, ChunkGenerator<?> chunkGen, BlockPos pos, Rotation rot, MutableBoundingBox boundsIn, Random rand) {
-        return super.place(templateManagerIn, worldIn, chunkGen, pos, Rotation.NONE, boundsIn, rand);
+    public boolean place(TemplateManager templates, ISeedReader world, StructureManager structures, ChunkGenerator generator, BlockPos pos, BlockPos pos2, Rotation rotation, MutableBoundingBox box, Random random, boolean b) {
+        return super.place(templates, world, structures, generator, pos, pos2, Rotation.NONE, box, random, b);
     }
 }

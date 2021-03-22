@@ -25,7 +25,7 @@ public class EntityAIMeleeAndRangedAttack extends Goal
 	 */
 	private int rangedAttackTime;
 	private double entityMoveSpeed;
-	private int field_75318_f;
+	private int seeTime;
 	private int maxMeleeAttackTime;
 	/** The maximum time the AI has to wait before peforming another ranged attack. */
 	private int maxRangedAttackTime;
@@ -47,15 +47,15 @@ public class EntityAIMeleeAndRangedAttack extends Goal
 		this.shootCutoffRange = p_i1650_6_;
 		this.shootCutoffRangeSqr = p_i1650_6_ * p_i1650_6_;
 		this.meleeHitRange = meleeHitRange;
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 
 	/**
 	 * Returns whether the EntityAIBase should begin execution.
 	 */
 	@Override
-    public boolean shouldExecute() {
-		LivingEntity entitylivingbase = entityHost.getRevengeTarget();
+    public boolean canUse() {
+		LivingEntity entitylivingbase = entityHost.getLastHurtByMob();
 
 		if (entitylivingbase == null) {
 			return false;
@@ -69,17 +69,17 @@ public class EntityAIMeleeAndRangedAttack extends Goal
 	 * Returns whether an in-progress EntityAIBase should continue executing
 	 */
 	@Override
-    public boolean shouldContinueExecuting() {
-		return shouldExecute() || !entityHost.getNavigator().noPath();
+    public boolean canContinueToUse() {
+		return canUse() || !entityHost.getNavigation().isDone();
 	}
 
 	/**
 	 * Resets the task
 	 */
 	@Override
-    public void resetTask() {
+    public void stop() {
 		attackTarget = null;
-		field_75318_f = 0;
+		seeTime = 0;
 		rangedAttackTime = -1;
 	}
 
@@ -89,31 +89,31 @@ public class EntityAIMeleeAndRangedAttack extends Goal
 	@Override
     public void tick() {
 	    if (attackTarget != null) {
-	        ItemStack headGear = attackTarget.getItemStackFromSlot(EquipmentSlotType.HEAD);
+	        ItemStack headGear = attackTarget.getItemBySlot(EquipmentSlotType.HEAD);
 			if (headGear.getItem() instanceof AshenMaskItem) {
 				return;
 			}
 	    }
-		double d0 = entityHost.getDistanceSq(attackTarget.getPosX(), attackTarget.getBoundingBox().minY, attackTarget.getPosZ());
-		boolean flag = entityHost.getEntitySenses().canSee(attackTarget);
+		double d0 = entityHost.distanceToSqr(attackTarget.getX(), attackTarget.getBoundingBox().minY, attackTarget.getZ());
+		boolean flag = entityHost.getSensing().canSee(attackTarget);
 
 		if (flag) {
-			++field_75318_f;
+			++seeTime;
 		} else {
-			field_75318_f = 0;
+			seeTime = 0;
 		}
 
-		if (d0 <= (double)shootCutoffRangeSqr && field_75318_f >= 20) {
-			//this.entityHost.getNavigator().clearPathEntity();
+		if (d0 <= (double)shootCutoffRangeSqr && seeTime >= 20) {
+			//this.entityHost.getNavigation().clearPathEntity();
 		} else {
-			//this.entityHost.getNavigator().tryMoveToEntityLiving(this.attackTarget, this.entityMoveSpeed);
+			//this.entityHost.getNavigation().tryMoveToEntityLiving(this.attackTarget, this.entityMoveSpeed);
 		}
 
-		if (field_75318_f >= 20) {
-			entityHost.getNavigator().tryMoveToEntityLiving(attackTarget, entityMoveSpeed);
+		if (seeTime >= 20) {
+			entityHost.getNavigation().moveTo(attackTarget, entityMoveSpeed);
 		}
 
-		entityHost.getLookController().setLookPositionWithEntity(attackTarget, 30.0F, 30.0F);
+		entityHost.getLookControl().setLookAt(attackTarget, 30.0F, 30.0F);
 		float f;
 
 		//System.out.println(rangedAttackTime);
@@ -131,11 +131,11 @@ public class EntityAIMeleeAndRangedAttack extends Goal
 			}
 
 			if (d0 >= (double)shootCutoffRange * (double)shootCutoffRange) {
-				rangedAttackEntityHost.attackEntityWithRangedAttack(attackTarget, f1);
+				rangedAttackEntityHost.performRangedAttack(attackTarget, f1);
 				rangedAttackTime = maxRangedAttackTime;
 			} else if (d0 <= meleeHitRange * meleeHitRange) {
-				entityHost.attackEntityAsMob(attackTarget);
-				entityHost.swingArm(Hand.MAIN_HAND);
+				entityHost.doHurtTarget(attackTarget);
+				entityHost.swing(Hand.MAIN_HAND);
 				rangedAttackTime = maxMeleeAttackTime;
 			}
 		}
