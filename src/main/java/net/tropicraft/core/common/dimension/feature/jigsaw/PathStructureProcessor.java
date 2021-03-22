@@ -1,14 +1,6 @@
 package net.tropicraft.core.common.dimension.feature.jigsaw;
 
-import java.util.List;
-import java.util.WeakHashMap;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-
 import com.google.common.base.Preconditions;
-import com.mojang.datafixers.Dynamic;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.block.JigsawBlock;
 import net.minecraft.util.Direction;
@@ -16,12 +8,16 @@ import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.util.math.Vector3d;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.gen.feature.template.PlacementSettings;
 import net.minecraft.world.gen.feature.template.Template;
 import net.minecraft.world.gen.feature.template.Template.BlockInfo;
 import net.tropicraft.Constants;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 
 public abstract class PathStructureProcessor extends CheatyStructureProcessor {
 
@@ -35,14 +31,14 @@ public abstract class PathStructureProcessor extends CheatyStructureProcessor {
         PathVector(BlockPos start, Direction dir) {
             Preconditions.checkArgument(dir.getAxis().isHorizontal(), "Invalid direction for path vector at " + start);
             this.dir = dir;
-            Vector3d ortho = new Vector3d(dir.getClockWise().getNormal());
+            Vector3d ortho = Vector3d.atLowerCornerOf(dir.getClockWise().getNormal());
             bb = toMutable(new AxisAlignedBB(start)
                     // Expand 16 blocks in front of the vector
-                    .expandTowards(new Vector3d(dir.getNormal()).scale(16))
+                    .expandTowards(Vector3d.atLowerCornerOf(dir.getNormal()).scale(16))
                     // Add 1 block to each side
-                    .expand(ortho).expand(ortho.reverse())
+                    .expandTowards(ortho).expandTowards(ortho.reverse())
                     // Cover a good amount of vertical space
-                    .grow(0, 3, 0));
+                    .inflate(0, 3, 0));
         }
 
         boolean contains(BlockPos pos, PlacementSettings settings) {

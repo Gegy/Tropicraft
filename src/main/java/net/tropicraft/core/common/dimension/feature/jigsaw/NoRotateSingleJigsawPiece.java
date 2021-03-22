@@ -22,6 +22,7 @@ import net.tropicraft.Constants;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class NoRotateSingleJigsawPiece extends FixedSingleJigsawPiece {
@@ -39,6 +40,10 @@ public class NoRotateSingleJigsawPiece extends FixedSingleJigsawPiece {
 
     public NoRotateSingleJigsawPiece(Template template) {
         super(template);
+    }
+
+    public static Function<JigsawPattern.PlacementBehaviour, NoRotateSingleJigsawPiece> createNoRotate(String id, StructureProcessorList processors) {
+        return placementBehaviour -> new NoRotateSingleJigsawPiece(Either.left(new ResourceLocation(id)), () -> processors, placementBehaviour);
     }
 
     @Override

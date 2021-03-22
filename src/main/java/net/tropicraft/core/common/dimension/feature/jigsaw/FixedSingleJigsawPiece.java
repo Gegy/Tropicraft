@@ -15,6 +15,7 @@ import net.minecraft.world.gen.feature.template.StructureProcessorList;
 import net.minecraft.world.gen.feature.template.Template;
 import net.tropicraft.Constants;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -34,6 +35,10 @@ public class FixedSingleJigsawPiece extends SingleJigsawPiece {
 
     public FixedSingleJigsawPiece(Template template) {
         super(template);
+    }
+
+    public static Function<JigsawPattern.PlacementBehaviour, FixedSingleJigsawPiece> create(String id, StructureProcessorList processors) {
+        return placementBehaviour -> new FixedSingleJigsawPiece(Either.left(new ResourceLocation(id)), () -> processors, placementBehaviour);
     }
 
     @Override

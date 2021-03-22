@@ -1,18 +1,19 @@
 package net.tropicraft.core.common.dimension.feature;
 
-import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.goesBeyondWorldSize;
-import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.isBBAvailable;
-
-import java.util.Random;
-
 import com.mojang.serialization.Codec;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorldWriter;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.IWorldGenerationReader;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
+
+import java.util.Random;
+
+import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.goesBeyondWorldSize;
+import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.isBBAvailable;
 
 public class CurvedPalmTreeFeature extends PalmTreeFeature {
     private static final int Z_PLUS = 0;
@@ -129,7 +130,6 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
         int iNeg = 0;
         int kPos = 0;
         int kNeg = 0;
-
         while (iPos < WATER_SEARCH_DIST &&  !isWater(world, new BlockPos(x + iPos, 127, z))) {
             iPos++;
         }
@@ -191,6 +191,10 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
         } else {
             return -1;
         }
+    }
+
+    private static boolean isWater(IWorldGenerationReader world, BlockPos pos) {
+        return world.isStateAtPosition(pos, state -> state.is(Blocks.WATER));
     }
 
     private int pickDirection(final IWorldGenerationReader world, final Random rand, int x, int z) {

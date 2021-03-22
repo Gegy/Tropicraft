@@ -1,34 +1,25 @@
 package net.tropicraft.core.common.dimension.feature;
 
-import static net.minecraft.world.gen.feature.AbstractTreeFeature.isAirOrLeaves;
-import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.goesBeyondWorldSize;
-import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.isBBAvailable;
-
-import java.util.Random;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import com.mojang.datafixers.Dynamic;
-
 import com.mojang.serialization.Codec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.BushBlock;
 import net.minecraft.block.SaplingBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.IWorldGenerationBaseReader;
 import net.minecraft.world.gen.IWorldGenerationReader;
-import net.minecraft.world.gen.feature.AbstractTreeFeature;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.TreeFeature;
-import net.minecraftforge.common.IPlantable;
 import net.tropicraft.core.common.block.TropicraftBlocks;
+
+import java.util.Random;
+import java.util.function.Supplier;
+
+import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.goesBeyondWorldSize;
+import static net.tropicraft.core.common.dimension.feature.TropicraftFeatureUtil.isBBAvailable;
 
 public class FruitTreeFeature extends Feature<NoFeatureConfig> {
 
@@ -64,7 +55,7 @@ public class FruitTreeFeature extends Feature<NoFeatureConfig> {
 			return false;
 		}
 
-		setDirtAt(world, pos, pos.below());
+		setDirtAt(world, pos);
 
 		for (int y = (pos.getY() - 3) + height; y <= pos.getY() + height; y++) {
 			int presizeMod = y - (pos.getY() + height);
@@ -111,11 +102,7 @@ public class FruitTreeFeature extends Feature<NoFeatureConfig> {
 		}
 	}
 
-	protected void setDirtAt(IWorldGenerationReader reader, BlockPos pos, BlockPos origin) {
-		if (!(reader instanceof IWorld)) {
-			setDirt(reader, pos);
-			return;
-		}
-		((IWorld)reader).getBlockState(pos).onPlantGrow((IWorld)reader, pos, origin);
+	protected void setDirtAt(IWorldGenerationReader reader, BlockPos pos) {
+		setDirt(reader, pos);
 	}
 }
