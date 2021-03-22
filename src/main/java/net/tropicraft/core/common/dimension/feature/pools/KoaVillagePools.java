@@ -24,7 +24,7 @@ public class KoaVillagePools {
     }
         
     static {
-        StructureSupportsProcessor fenceExtender = new StructureSupportsProcessor(false, ImmutableList.of(TropicraftBlocks.BAMBOO_FENCE.getId()));
+        StructureSupportsProcessor fenceExtender = new StructureSupportsProcessor(false, ImmutableList.of(TropicraftBlocks.BAMBOO_FENCE.get()));
 
         StructureProcessorList townCenterProcessors = registerProcessorList("koa_village_town_center", ImmutableList.of(fenceExtender, new StructureVoidProcessor()));
         StructureProcessorList buildingProcessors = registerProcessorList("koa_village_buildings", ImmutableList.of(new AdjustBuildingHeightProcessor(126), fenceExtender, new StructureVoidProcessor()));

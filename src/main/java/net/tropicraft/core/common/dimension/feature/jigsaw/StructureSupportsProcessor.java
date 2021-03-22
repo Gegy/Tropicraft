@@ -1,13 +1,13 @@
 package net.tropicraft.core.common.dimension.feature.jigsaw;
 
-import com.google.common.collect.Sets;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FenceBlock;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.IWorldReader;
@@ -27,24 +27,24 @@ public class StructureSupportsProcessor extends CheatyStructureProcessor {
     public static final Codec<StructureSupportsProcessor> CODEC = RecordCodecBuilder.create(instance -> {
         return instance.group(
             Codec.BOOL.optionalFieldOf("can_replace_land", false).forGetter(p -> p.canReplaceLand),
-            ResourceLocation.CODEC.listOf().fieldOf("states_to_extend").forGetter(p -> new ArrayList<>(p.statesToExtend))
+            Registry.BLOCK.listOf().fieldOf("states_to_extend").forGetter(p -> new ArrayList<>(p.statesToExtend))
         ).apply(instance, StructureSupportsProcessor::new);
     });
 
     static final IStructureProcessorType<StructureSupportsProcessor> TYPE = Registry.register(Registry.STRUCTURE_PROCESSOR, Constants.MODID + ":structure_supports", () -> CODEC);
     
     private final boolean canReplaceLand;
-    private final Set<ResourceLocation> statesToExtend;
+    private final Set<Block> statesToExtend;
 
-    public StructureSupportsProcessor(boolean canReplaceLand, List<ResourceLocation> statesToExtend) {
+    public StructureSupportsProcessor(boolean canReplaceLand, List<Block> statesToExtend) {
         this.canReplaceLand = canReplaceLand;
-        this.statesToExtend = Sets.newHashSet(statesToExtend);
+        this.statesToExtend = new ReferenceOpenHashSet<>(statesToExtend);
     }
 
     @Override
     public BlockInfo process(IWorldReader world, BlockPos seedPos, BlockPos pos2, BlockInfo p_215194_3_, BlockInfo blockInfo, PlacementSettings placement, Template template) {
         BlockPos pos = blockInfo.pos;
-        if (p_215194_3_.pos.getY() <= 1 && statesToExtend.contains(blockInfo.state.getBlock().getRegistryName())) {
+        if (p_215194_3_.pos.getY() <= 1 && statesToExtend.contains(blockInfo.state.getBlock())) {
             if (!canReplaceLand && !canPassThrough(world, pos)) {
                 // Delete blocks that would generate inside land
                 return null;

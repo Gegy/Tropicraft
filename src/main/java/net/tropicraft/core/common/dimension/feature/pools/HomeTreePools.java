@@ -31,7 +31,7 @@ public class HomeTreePools {
 
         StructureProcessorList startProcessors = registerProcessorList("home_tree_start", ImmutableList.<StructureProcessor>builder()
                 .addAll(baseProcessors.list())
-                .add(new StructureSupportsProcessor(true, ImmutableList.of(TropicraftBlocks.MAHOGANY_LOG.getId())))
+                .add(new StructureSupportsProcessor(true, ImmutableList.of(TropicraftBlocks.MAHOGANY_LOG.get())))
                 .build()
         );
 

@@ -1,10 +1,5 @@
 package net.tropicraft.core.common.dimension.feature;
 
-import java.util.Random;
-import java.util.function.Function;
-
-import com.mojang.datafixers.Dynamic;
-
 import com.mojang.serialization.Codec;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Rotation;
@@ -12,57 +7,41 @@ import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeManager;
+import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.jigsaw.FeatureJigsawPiece;
 import net.minecraft.world.gen.feature.jigsaw.JigsawManager;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPiece;
-import net.minecraft.world.gen.feature.structure.AbstractVillagePiece;
-import net.minecraft.world.gen.feature.structure.IStructurePieceType;
-import net.minecraft.world.gen.feature.structure.Structure;
-import net.minecraft.world.gen.feature.structure.StructureStart;
-import net.minecraft.world.gen.feature.structure.VillageConfig;
+import net.minecraft.world.gen.feature.structure.*;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.tropicraft.Constants;
-import net.tropicraft.core.common.dimension.biome.TropicraftRainforestBiome;
-import net.tropicraft.core.common.dimension.chunk.TropicraftChunkGenerator;
 import net.tropicraft.core.common.dimension.feature.jigsaw.NoRotateSingleJigsawPiece;
 import net.tropicraft.core.common.dimension.feature.pools.HomeTreePools;
 
-public class HomeTreeFeature extends Structure<VillageConfig> {
+public class HomeTreeFeature extends JigsawStructure {
     public HomeTreeFeature(Codec<VillageConfig> codec) {
-        super(codec);
+        super(codec, 0, true, true);
+        HomeTreePools.init();
     }
 
     @Override
-	public boolean canBeGenerated(BiomeManager biomeManagerIn, ChunkGenerator<?> generatorIn, Random randIn, int chunkX, int chunkZ, Biome biomeIn) {
-    	if (!biomeIn.hasStructure(this)) return false;
-        ChunkPos chunkpos = this.getStartPositionForPosition(generatorIn, randIn, chunkX, chunkZ, 0, 0);
-        if (chunkX == chunkpos.x && chunkZ == chunkpos.z) {
-           BlockPos pos = new BlockPos((chunkX << 4) + 8, 0, (chunkZ << 4) + 8);
-           int centerY = generatorIn.getHeight(pos.getX(), pos.getZ(), Heightmap.Type.WORLD_SURFACE_WG);
-           return isValid(generatorIn, pos.add(-4, 0, -4), centerY) &&
-                  isValid(generatorIn, pos.add(-4, 0, 4), centerY) &&
-                  isValid(generatorIn, pos.add(4, 0, 4), centerY) &&
-                  isValid(generatorIn, pos.add(4, 0, -4), centerY);
-        } else {
-            return false;
-        }
+    protected boolean isFeatureChunk(ChunkGenerator generator, BiomeProvider biomes, long seed, SharedSeedRandom random, int chunkX, int chunkZ, Biome biome, ChunkPos startChunkPos, VillageConfig config) {
+        BlockPos pos = new BlockPos((chunkX << 4) + 8, 0, (chunkZ << 4) + 8);
+        int centerY = generator.getBaseHeight(pos.getX(), pos.getZ(), Heightmap.Type.WORLD_SURFACE_WG);
+        return isValid(generator, pos.offset(-4, 0, -4), centerY) &&
+                isValid(generator, pos.offset(-4, 0, 4), centerY) &&
+                isValid(generator, pos.offset(4, 0, 4), centerY) &&
+                isValid(generator, pos.offset(4, 0, -4), centerY);
     }
 
-    private boolean isValid(ChunkGenerator<?> chunkGen, BlockPos pos, int startY) {
-        int y = chunkGen.getHeight(pos.getX(), pos.getZ(), Heightmap.Type.WORLD_SURFACE_WG);
-        Biome biome = chunkGen.getBiomeProvider().getNoiseBiome(pos.getX(), startY, pos.getZ());
-        return chunkGen.hasStructure(biome, TropicraftFeatures.HOME_TREE.get())
-                && y >= chunkGen.getSeaLevel()
+    private boolean isValid(ChunkGenerator generator, BlockPos pos, int startY) {
+        int y = generator.getBaseHeight(pos.getX(), pos.getZ(), Heightmap.Type.WORLD_SURFACE_WG);
+        return y >= generator.getSeaLevel()
                 && Math.abs(y - startY) < 10
                 && y < 150
-                && y > chunkGen.getSeaLevel() + 2
-                && biome instanceof TropicraftRainforestBiome;
+                && y > generator.getSeaLevel() + 2;
     }
 
     @Override
@@ -100,7 +79,8 @@ public class HomeTreeFeature extends Structure<VillageConfig> {
     }
 
     public static class HomeTreePiece extends AbstractVillagePiece {
-        
+
+        // TODO: we can't pass through our custom type to AbstractVillagePiece
         public HomeTreePiece(TemplateManager p_i50890_1_, JigsawPiece p_i50890_2_, BlockPos p_i50890_3_, int p_i50890_4_, Rotation p_i50890_5_, MutableBoundingBox p_i50890_6_) {
             super(TYPE, p_i50890_1_, p_i50890_2_, p_i50890_3_, p_i50890_4_, p_i50890_5_, p_i50890_6_);
         }
@@ -108,7 +88,7 @@ public class HomeTreeFeature extends Structure<VillageConfig> {
         public HomeTreePiece(TemplateManager p_i50891_1_, CompoundNBT p_i50891_2_) {
             super(p_i50891_1_, p_i50891_2_, TYPE);
         }
-        
+
         @Override
         public MutableBoundingBox getBoundingBox() {
             if (this.jigsawPiece instanceof FeatureJigsawPiece) {

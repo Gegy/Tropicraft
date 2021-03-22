@@ -1,7 +1,6 @@
 package net.tropicraft.core.common.dimension.feature;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -27,6 +26,7 @@ import java.util.function.Supplier;
 public class TropicraftFeatures {
 
     public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, Constants.MODID);
+	public static final DeferredRegister<Structure<?>> STRUCTURES = DeferredRegister.create(ForgeRegistries.STRUCTURE_FEATURES, Constants.MODID);
 
 	public static final RegistryObject<FruitTreeFeature> GRAPEFRUIT_TREE = register(
 	        "grapefruit_tree", () -> new FruitTreeFeature(NoFeatureConfig.CODEC, TropicraftBlocks.ORANGE_SAPLING, () -> TropicraftBlocks.ORANGE_LEAVES.get().defaultBlockState()));
@@ -60,11 +60,9 @@ public class TropicraftFeatures {
 	        "undergrowth", () -> new UndergrowthFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<RainforestVinesFeature> VINES = register(
 	        "rainforest_vines", () -> new RainforestVinesFeature(RainforestVinesConfig.CODEC));
-	public static final RegistryObject<Structure<NoFeatureConfig>> VILLAGE = register(
-	        "koa_village", () -> new KoaVillageStructure(NoFeatureConfig.CODEC));
-	public static final RegistryObject<VolcanoFeature> VOLCANO = register(
-	        "volcano", () -> new VolcanoFeature(NoFeatureConfig.CODEC));
-	public static final RegistryObject<Structure<VillageConfig>> HOME_TREE = register(
+	public static final RegistryObject<Structure<VillageConfig>> VILLAGE = registerStructure(
+	        "koa_village", () -> new KoaVillageStructure(VillageConfig.CODEC));
+	public static final RegistryObject<Structure<VillageConfig>> HOME_TREE = registerStructure(
 			"home_tree", () -> new HomeTreeFeature(VillageConfig.CODEC));
 	public static final RegistryObject<HomeTreeBranchFeature<HomeTreeBranchConfig>> HOME_TREE_BRANCH = register(
 			"home_tree_branch", () -> new HomeTreeBranchFeature<>(HomeTreeBranchConfig.CODEC));
@@ -72,9 +70,13 @@ public class TropicraftFeatures {
 			"coffee_bush", () -> new CoffeePlantFeature(NoFeatureConfig.CODEC));
 
 	public static final PlacementBehaviour KOA_PATH = PlacementBehaviour.create("KOA_PATH", Constants.MODID + ":koa_path",
-            ImmutableList.of(new SmoothingGravityProcessor(Heightmap.Type.WORLD_SURFACE_WG, -1), new SinkInGroundProcessor(), new SteepPathProcessor(), new StructureSupportsProcessor(false, TropicraftBlocks.BAMBOO_FENCE.getId())));
+            ImmutableList.of(new SmoothingGravityProcessor(Heightmap.Type.WORLD_SURFACE_WG, -1), new SinkInGroundProcessor(), new SteepPathProcessor(), new StructureSupportsProcessor(false, ImmutableList.of(TropicraftBlocks.BAMBOO_FENCE.get()))));
 
     private static <T extends Feature<?>> RegistryObject<T> register(final String name, final Supplier<T> sup) {
         return FEATURES.register(name, sup);
     }
+
+	private static <T extends Structure<?>> RegistryObject<T> registerStructure(final String name, final Supplier<T> sup) {
+		return STRUCTURES.register(name, sup);
+	}
 }
