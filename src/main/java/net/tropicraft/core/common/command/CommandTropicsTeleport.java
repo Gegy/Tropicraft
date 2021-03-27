@@ -5,7 +5,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.StringTextComponent;
-import net.tropicraft.core.common.dimension.TropicraftWorldUtils;
+import net.tropicraft.core.common.dimension.TropicraftDimension;
 
 import static net.minecraft.command.Commands.literal;
 
@@ -23,7 +23,7 @@ public class CommandTropicsTeleport {
 		if (source.getEntity().getType() != EntityType.PLAYER) {
 			source.sendFailure(new StringTextComponent("Cannot teleport non-players!"));
 		}
-		TropicraftWorldUtils.teleportPlayer((ServerPlayerEntity) source.getEntity(), TropicraftWorldUtils.TROPICS);
+		TropicraftDimension.teleportPlayer((ServerPlayerEntity) source.getEntity(), TropicraftDimension.WORLD);
 		return 1;
 	}
 }

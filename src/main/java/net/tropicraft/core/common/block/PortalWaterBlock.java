@@ -8,7 +8,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.tropicraft.core.common.dimension.TropicraftWorldUtils;
+import net.tropicraft.core.common.dimension.TropicraftDimension;
 
 import java.util.Random;
 
@@ -22,7 +22,7 @@ public class PortalWaterBlock extends FlowingFluidBlock {
     public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
         super.entityInside(state, worldIn, pos, entityIn);
         if (!worldIn.isClientSide && entityIn instanceof ServerPlayerEntity && entityIn.getPortalWaitTime() <= 0 && !entityIn.isPassenger() && !entityIn.isPassenger() && entityIn.canChangeDimensions()) {
-            TropicraftWorldUtils.teleportPlayer((ServerPlayerEntity) entityIn, TropicraftWorldUtils.TROPICS);
+            TropicraftDimension.teleportPlayer((ServerPlayerEntity) entityIn, TropicraftDimension.WORLD);
         }
     }
 

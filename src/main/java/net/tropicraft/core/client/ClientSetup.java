@@ -46,7 +46,7 @@ import net.tropicraft.core.client.tileentity.DrinkMixerRenderer;
 import net.tropicraft.core.client.tileentity.SifterRenderer;
 import net.tropicraft.core.common.block.TropicraftBlocks;
 import net.tropicraft.core.common.block.tileentity.TropicraftTileEntityTypes;
-import net.tropicraft.core.common.dimension.TropicraftWorldUtils;
+import net.tropicraft.core.common.dimension.TropicraftDimension;
 import net.tropicraft.core.common.entity.TropicraftEntities;
 
 public class ClientSetup {
@@ -129,7 +129,7 @@ public class ClientSetup {
     }
 
     public static void setupDimensionRenderInfo() {
-        DimensionRenderInfo.EFFECTS.put(TropicraftWorldUtils.TROPICS.location(), new DimensionRenderInfo(192.0F, true, DimensionRenderInfo.FogType.NORMAL, false, false) {
+        DimensionRenderInfo.EFFECTS.put(TropicraftDimension.WORLD.location(), new DimensionRenderInfo(192.0F, true, DimensionRenderInfo.FogType.NORMAL, false, false) {
             @Override
             public Vector3d getBrightnessDependentFogColor(Vector3d color, float brightness) {
                 return color.multiply(brightness * 0.94F + 0.06F, brightness * 0.94F + 0.06F, brightness * 0.91F + 0.09F);

@@ -8,7 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.tropicraft.core.common.dimension.TropicraftWorldUtils;
+import net.tropicraft.core.common.dimension.TropicraftDimension;
 import net.tropicraft.core.common.entity.placeable.ChairEntity;
 import net.tropicraft.core.common.item.TropicraftItems;
 
@@ -27,7 +27,7 @@ public class Drink {
         @Override
         public void onDrink(PlayerEntity player) {
             if (!player.level.isClientSide && isSunset(player.level) && player.getVehicle() instanceof ChairEntity) {
-                TropicraftWorldUtils.teleportPlayer((ServerPlayerEntity) player, TropicraftWorldUtils.TROPICS);
+                TropicraftDimension.teleportPlayer((ServerPlayerEntity) player, TropicraftDimension.WORLD);
             }
         }
 

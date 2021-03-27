@@ -42,6 +42,11 @@ public class TropicraftChunkGenerator extends NoiseChunkGenerator {
     }
 
     @Override
+    protected Codec<? extends ChunkGenerator> codec() {
+        return CODEC;
+    }
+
+    @Override
     @OnlyIn(Dist.CLIENT)
     public ChunkGenerator withSeed(long seed) {
         return new TropicraftChunkGenerator(this.biomeSource.withSeed(seed), seed, this.settings);

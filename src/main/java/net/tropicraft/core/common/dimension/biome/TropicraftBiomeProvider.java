@@ -15,6 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.tropicraft.Constants;
 import net.tropicraft.core.common.dimension.layer.TropicraftLayerUtil;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class TropicraftBiomeProvider extends BiomeProvider {
@@ -43,7 +44,7 @@ public class TropicraftBiomeProvider extends BiomeProvider {
     private final Layer noiseLayer;
 
     public TropicraftBiomeProvider(long seed, Registry<Biome> biomes) {
-        super(POSSIBLE_BIOMES.stream().map(key -> () -> biomes.getOrThrow(key)));
+        super(POSSIBLE_BIOMES.stream().map(biomes::get).filter(Objects::nonNull).map(biome -> () -> biome));
 
         this.seed = seed;
         this.biomes = biomes;
