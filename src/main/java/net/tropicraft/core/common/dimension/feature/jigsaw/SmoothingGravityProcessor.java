@@ -40,7 +40,7 @@ public class SmoothingGravityProcessor extends PathStructureProcessor {
     }
 
     @Override
-    public BlockInfo process(IWorldReader world, BlockPos seedPos, BlockPos pos2, BlockInfo p_215194_3_, BlockInfo blockInfo, PlacementSettings placementSettingsIn, Template template) {
+    public BlockInfo process(IWorldReader world, BlockPos seedPos, BlockPos pos2, BlockInfo originalBlockInfo, BlockInfo blockInfo, PlacementSettings placementSettingsIn, Template template) {
         Axis pathDir = getPathDirection(seedPos, blockInfo, placementSettingsIn, template);
         if (pathDir == null) {
             pathDir = Axis.X; // Better than nothing
@@ -54,7 +54,7 @@ public class SmoothingGravityProcessor extends PathStructureProcessor {
         if (heightForward > height && heightBackward > height) {
             return new BlockInfo(new BlockPos(pos.getX(), Math.min(heightForward, heightBackward), pos.getZ()), blockInfo.state, blockInfo.nbt);
         }
-        return baseline.process(world, seedPos, pos2, p_215194_3_, blockInfo, placementSettingsIn, template);
+        return baseline.process(world, seedPos, pos2, originalBlockInfo, blockInfo, placementSettingsIn, template);
     }
 
     @Override

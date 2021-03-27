@@ -48,7 +48,7 @@ public class SpawnerProcessor extends StructureProcessor {
 
     @Override
     @Nullable
-    public Template.BlockInfo process(IWorldReader world, BlockPos pos, BlockPos pos2, Template.BlockInfo p_215194_3_, Template.BlockInfo blockInfo, PlacementSettings settings, @Nullable Template template) {
+    public Template.BlockInfo process(IWorldReader world, BlockPos pos, BlockPos pos2, Template.BlockInfo originalBlockInfo, Template.BlockInfo blockInfo, PlacementSettings settings, @Nullable Template template) {
         final Block block = blockInfo.state.getBlock();
 
         if (block != Blocks.SPAWNER) {

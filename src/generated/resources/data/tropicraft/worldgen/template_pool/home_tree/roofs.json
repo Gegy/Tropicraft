@@ -8,7 +8,7 @@
         "location": "tropicraft:home_tree/roofs/roof_0",
         "processors": "tropicraft:home_tree/base",
         "projection": "rigid",
-        "element_type": "tropicraft:fixed"
+        "element_type": "minecraft:single_pool_element"
       }
     }
   ]

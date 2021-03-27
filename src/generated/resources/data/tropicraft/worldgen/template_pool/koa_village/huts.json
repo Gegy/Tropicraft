@@ -8,7 +8,7 @@
         "location": "tropicraft:koa_village/huts/hut_01",
         "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -17,7 +17,7 @@
         "location": "tropicraft:koa_village/huts/hut_02",
         "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -26,7 +26,7 @@
         "location": "tropicraft:koa_village/huts/hut_03",
         "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -35,7 +35,7 @@
         "location": "tropicraft:koa_village/huts/hut_04",
         "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -44,7 +44,7 @@
         "location": "tropicraft:koa_village/huts/hut_05",
         "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -53,7 +53,7 @@
         "location": "tropicraft:koa_village/huts/bongo_hut_01",
         "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -62,7 +62,7 @@
         "location": "tropicraft:koa_village/huts/trade_hut_01",
         "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     }
   ]

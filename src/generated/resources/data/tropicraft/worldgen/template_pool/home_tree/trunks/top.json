@@ -8,7 +8,7 @@
         "location": "tropicraft:home_tree/trunks/top/trunk_0",
         "processors": "tropicraft:home_tree/base",
         "projection": "rigid",
-        "element_type": "tropicraft:no_rotate"
+        "element_type": "tropicraft:single_no_rotate"
       }
     },
     {
@@ -17,7 +17,7 @@
         "location": "tropicraft:home_tree/trunks/top/trunk_1",
         "processors": "tropicraft:home_tree/base",
         "projection": "rigid",
-        "element_type": "tropicraft:no_rotate"
+        "element_type": "tropicraft:single_no_rotate"
       }
     },
     {
@@ -26,7 +26,7 @@
         "location": "tropicraft:home_tree/trunks/top/trunk_2",
         "processors": "tropicraft:home_tree/base",
         "projection": "rigid",
-        "element_type": "tropicraft:no_rotate"
+        "element_type": "tropicraft:single_no_rotate"
       }
     },
     {
@@ -35,7 +35,7 @@
         "location": "tropicraft:home_tree/trunks/top/trunk_3",
         "processors": "tropicraft:home_tree/base",
         "projection": "rigid",
-        "element_type": "tropicraft:no_rotate"
+        "element_type": "tropicraft:single_no_rotate"
       }
     }
   ]

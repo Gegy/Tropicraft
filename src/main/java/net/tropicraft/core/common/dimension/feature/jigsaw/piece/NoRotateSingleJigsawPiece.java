@@ -12,6 +12,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.jigsaw.IJigsawDeserializer;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
+import net.minecraft.world.gen.feature.jigsaw.SingleJigsawPiece;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.PlacementSettings;
 import net.minecraft.world.gen.feature.template.StructureProcessorList;
@@ -25,14 +26,14 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class NoRotateSingleJigsawPiece extends FixedSingleJigsawPiece {
+public class NoRotateSingleJigsawPiece extends SingleJigsawPiece {
 
     public static final Codec<NoRotateSingleJigsawPiece> CODEC = RecordCodecBuilder.create(instance -> {
         return instance.group(templateCodec(), processorsCodec(), projectionCodec())
                 .apply(instance, NoRotateSingleJigsawPiece::new);
     });
 
-    private static final IJigsawDeserializer<NoRotateSingleJigsawPiece> TYPE = IJigsawDeserializer.register(Constants.MODID + ":no_rotate", CODEC);
+    private static final IJigsawDeserializer<NoRotateSingleJigsawPiece> TYPE = IJigsawDeserializer.register(Constants.MODID + ":single_no_rotate", CODEC);
 
     public NoRotateSingleJigsawPiece(Either<ResourceLocation, Template> template, Supplier<StructureProcessorList> processors, JigsawPattern.PlacementBehaviour placementBehaviour) {
         super(template, processors, placementBehaviour);
@@ -53,7 +54,7 @@ public class NoRotateSingleJigsawPiece extends FixedSingleJigsawPiece {
 
     @Override
     protected PlacementSettings getSettings(Rotation rotation, MutableBoundingBox box, boolean b) {
-        return this.getSettings(Rotation.NONE, box, b);
+        return super.getSettings(Rotation.NONE, box, b);
     }
 
     @Override

@@ -23,14 +23,14 @@ public class SteepPathProcessor extends PathStructureProcessor {
     static final IStructureProcessorType<SteepPathProcessor> TYPE = Registry.register(Registry.STRUCTURE_PROCESSOR, Constants.MODID + ":steep_path", () -> CODEC);
 
     @Override
-    public BlockInfo process(IWorldReader worldReaderIn, BlockPos seedPos, BlockPos pos2, BlockInfo p_215194_3_, BlockInfo blockInfo, PlacementSettings placementSettingsIn, Template template) {
+    public BlockInfo process(IWorldReader worldReaderIn, BlockPos seedPos, BlockPos pos2, BlockInfo originalBlockInfo, BlockInfo blockInfo, PlacementSettings placementSettingsIn, Template template) {
         BlockPos pos = blockInfo.pos;
 
-        if (p_215194_3_.pos.getY() != 1 || p_215194_3_.state.getBlock() == TropicraftBlocks.BAMBOO_STAIRS.get()) {
+        if (originalBlockInfo.pos.getY() != 1 || originalBlockInfo.state.getBlock() == TropicraftBlocks.BAMBOO_STAIRS.get()) {
             return blockInfo;
         }
 
-        Direction.Axis axis = getPathDirection(seedPos, p_215194_3_, placementSettingsIn, template);
+        Direction.Axis axis = getPathDirection(seedPos, blockInfo, placementSettingsIn, template);
         if (axis == null) {
             return blockInfo;
         }

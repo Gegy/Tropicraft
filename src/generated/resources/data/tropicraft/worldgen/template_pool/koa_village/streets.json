@@ -1,6 +1,6 @@
 {
   "name": "tropicraft:koa_village/streets",
-  "fallback": "minecraft:empty",
+  "fallback": "tropicraft:koa_village/terminators",
   "elements": [
     {
       "weight": 3,
@@ -8,7 +8,7 @@
         "location": "tropicraft:koa_village/streets/straight_01",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -17,7 +17,7 @@
         "location": "tropicraft:koa_village/streets/straight_02",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -26,7 +26,7 @@
         "location": "tropicraft:koa_village/streets/straight_03",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -35,7 +35,7 @@
         "location": "tropicraft:koa_village/streets/straight_04",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -44,7 +44,7 @@
         "location": "tropicraft:koa_village/streets/straight_05",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -53,7 +53,7 @@
         "location": "tropicraft:koa_village/streets/straight_06",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -62,7 +62,7 @@
         "location": "tropicraft:koa_village/streets/corner_01",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -71,7 +71,7 @@
         "location": "tropicraft:koa_village/streets/corner_02",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -80,7 +80,7 @@
         "location": "tropicraft:koa_village/streets/corner_03",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -89,7 +89,7 @@
         "location": "tropicraft:koa_village/streets/corner_04",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -98,7 +98,7 @@
         "location": "tropicraft:koa_village/streets/crossroad_01",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -107,7 +107,7 @@
         "location": "tropicraft:koa_village/streets/crossroad_02",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -116,7 +116,7 @@
         "location": "tropicraft:koa_village/streets/crossroad_03",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     },
     {
@@ -125,7 +125,7 @@
         "location": "tropicraft:koa_village/streets/crossroad_04",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     }
   ]

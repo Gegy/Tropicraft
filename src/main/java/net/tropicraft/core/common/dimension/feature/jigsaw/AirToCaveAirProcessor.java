@@ -22,11 +22,11 @@ public class AirToCaveAirProcessor extends StructureProcessor {
     
     @Override
     @Nullable
-    public BlockInfo process(IWorldReader worldReaderIn, BlockPos pos, BlockPos pos2, BlockInfo p_215194_3_, BlockInfo blockInfo, PlacementSettings placementSettingsIn, @Nullable Template template) {
+    public BlockInfo process(IWorldReader world, BlockPos pos, BlockPos pos2, BlockInfo originalInfo, BlockInfo blockInfo, PlacementSettings placementSettingsIn, @Nullable Template template) {
         if (blockInfo.state.getBlock() == Blocks.AIR) {
             return new BlockInfo(blockInfo.pos, Blocks.CAVE_AIR.defaultBlockState(), blockInfo.nbt);
         }
-        return super.process(worldReaderIn, pos, pos2, p_215194_3_, blockInfo, placementSettingsIn, template);
+        return super.process(world, pos, pos2, originalInfo, blockInfo, placementSettingsIn, template);
     }
 
     @Override

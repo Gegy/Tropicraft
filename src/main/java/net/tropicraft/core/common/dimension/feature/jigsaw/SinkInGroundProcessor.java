@@ -25,10 +25,10 @@ public class SinkInGroundProcessor extends CheatyStructureProcessor {
     static final IStructureProcessorType<SinkInGroundProcessor> TYPE = Registry.register(Registry.STRUCTURE_PROCESSOR, Constants.MODID + ":sink_in_ground", () -> CODEC);
 
     @Override
-    public BlockInfo process(IWorldReader worldReaderIn, BlockPos pos, BlockPos pos2, BlockInfo p_215194_3_, BlockInfo blockInfo, PlacementSettings placement, @Nullable Template template) {
+    public BlockInfo process(IWorldReader worldReaderIn, BlockPos pos, BlockPos pos2, BlockInfo originalBlockInfo, BlockInfo blockInfo, PlacementSettings placement, @Nullable Template template) {
         pos = blockInfo.pos;
 
-        if (p_215194_3_.pos.getY() == 0) {
+        if (originalBlockInfo.pos.getY() == 0) {
             if (!isAirOrWater(worldReaderIn, pos)) {
                 return null;
             }
@@ -38,7 +38,7 @@ public class SinkInGroundProcessor extends CheatyStructureProcessor {
         // Get height of the ground at this spot
         BlockPos groundCheck = worldReaderIn.getHeightmapPos(Heightmap.Type.WORLD_SURFACE_WG, pos);
         // y == 2, we're above the path, remove fence blocks that are above sea level or next to some other block
-        if (p_215194_3_.pos.getY() == 2 && p_215194_3_.state.getBlock() == TropicraftBlocks.BAMBOO_FENCE.get()) {
+        if (originalBlockInfo.pos.getY() == 2 && originalBlockInfo.state.getBlock() == TropicraftBlocks.BAMBOO_FENCE.get()) {
             if (groundCheck.getY() > 127 || !isAirOrWater(worldReaderIn, pos.below(2))) {
                 return null;
             }
@@ -52,7 +52,7 @@ public class SinkInGroundProcessor extends CheatyStructureProcessor {
         // If above sea level, sink into the ground by one block
         if (groundCheck.getY() > 127) {
             // Convert slabs to bundles when they are over land
-            if (!isAirOrWater(worldReaderIn, pos.below()) && p_215194_3_.state.getBlock() == TropicraftBlocks.THATCH_SLAB.get()) {
+            if (!isAirOrWater(worldReaderIn, pos.below()) && originalBlockInfo.state.getBlock() == TropicraftBlocks.THATCH_SLAB.get()) {
                 blockInfo = new BlockInfo(pos, TropicraftBlocks.THATCH_BUNDLE.get().defaultBlockState(), null);
             }
             

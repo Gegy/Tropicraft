@@ -81,7 +81,7 @@ public class VolcanoGenerator {
 
 		LiteralArgumentBuilder<CommandSource> locate = Commands.literal("locate").requires(source -> source.hasPermission(2));
 		dispatcher.register(
-				locate.then(Commands.literal(Constants.MODID + ":volcano"))
+			locate.then(Commands.literal(Constants.MODID + ":volcano")
 				.executes(ctx -> {
 					CommandSource source = ctx.getSource();
 					BlockPos pos = new BlockPos(source.getPosition());
@@ -91,7 +91,7 @@ public class VolcanoGenerator {
 					} else {
 						return LocateCommand.showLocateResult(source, "Volcano", pos, volcanoPos, "commands.locate.success");
 					}
-				})
+			}))
 		);
 	}
 

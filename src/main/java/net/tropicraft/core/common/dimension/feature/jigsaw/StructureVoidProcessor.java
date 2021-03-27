@@ -18,7 +18,7 @@ public class StructureVoidProcessor extends StructureProcessor {
     static final IStructureProcessorType<StructureVoidProcessor> TYPE = Registry.register(Registry.STRUCTURE_PROCESSOR, Constants.MODID + ":structure_void", () -> Codec.unit(new StructureVoidProcessor()));
 
     @Override
-    public BlockInfo process(IWorldReader world, BlockPos pos, BlockPos p_230386_3_, BlockInfo blockInfo, BlockInfo p_230386_5_, PlacementSettings placementSettings, @Nullable Template template) {
+    public BlockInfo process(IWorldReader world, BlockPos pos, BlockPos p_230386_3_, BlockInfo originalInfo, BlockInfo blockInfo, PlacementSettings placementSettings, @Nullable Template template) {
         if (blockInfo.state.getBlock() == Blocks.STRUCTURE_VOID) {
             return new BlockInfo(blockInfo.pos, Blocks.AIR.defaultBlockState(), blockInfo.nbt);
         }

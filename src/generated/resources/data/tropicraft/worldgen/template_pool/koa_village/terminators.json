@@ -8,7 +8,7 @@
         "location": "tropicraft:koa_village/terminators/terminator_01",
         "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
-        "element_type": "minecraft:single_pool_element"
+        "element_type": "tropicraft:single_no_air"
       }
     }
   ]
