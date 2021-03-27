@@ -14,7 +14,6 @@ import net.minecraft.world.gen.feature.structure.VillageConfig;
 public class KoaVillageStructure extends JigsawStructure {
 	public KoaVillageStructure(Codec<VillageConfig> codec) {
 		super(codec, 0, true, true);
-		KoaVillagePools.init();
 	}
 
 	@Override

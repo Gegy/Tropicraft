@@ -6,10 +6,13 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.NoiseChunkGenerator;
 import net.minecraft.world.gen.feature.structure.StructureManager;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.function.Supplier;
 
@@ -30,6 +33,12 @@ public class TropicraftChunkGenerator extends NoiseChunkGenerator {
         super(biomeProvider, seed, settings);
         this.seed = seed;
         this.volcano = new VolcanoGenerator(seed, biomeSource);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public ChunkGenerator withSeed(long seed) {
+        return new TropicraftChunkGenerator(this.biomeSource.withSeed(seed), seed, this.settings);
     }
 
     @Override

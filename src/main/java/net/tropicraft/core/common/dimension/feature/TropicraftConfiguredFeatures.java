@@ -46,7 +46,11 @@ public final class TropicraftConfiguredFeatures {
 
 	public final ConfiguredFeature<?, ?> pineapplePatch;
 	public final ConfiguredFeature<?, ?> tropicsFlowers;
+	public final ConfiguredFeature<?, ?> rainforestFlowers;
 	public final ConfiguredFeature<?, ?> irisFlowers;
+
+	public final ConfiguredFeature<?, ?> coffeeBush;
+	public final ConfiguredFeature<?, ?> undergrowth;
 
 	public final ConfiguredFeature<?, ?> undergroundSeagrassOnStone;
 	public final ConfiguredFeature<?, ?> undergroundSeagrassOnDirt;
@@ -111,12 +115,24 @@ public final class TropicraftConfiguredFeatures {
 		this.tropicsFlowers = features.register("tropics_flowers", Feature.FLOWER, feature -> {
 			BlockStateProvider stateProvider = new NoiseFromTagBlockStateProvider(TropicraftTags.Blocks.TROPICS_FLOWERS);
 			BlockClusterFeatureConfig config = new BlockClusterFeatureConfig.Builder(stateProvider, SimpleBlockPlacer.INSTANCE).tries(64).build();
-			return feature.configured(config).decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE)).count(12);
+			return feature.configured(config).decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE).count(12));
+		});
+		this.rainforestFlowers = features.register("rainforest_flowers", Feature.FLOWER, feature -> {
+			BlockStateProvider stateProvider = new NoiseFromTagBlockStateProvider(TropicraftTags.Blocks.RAINFOREST_FLOWERS);
+			BlockClusterFeatureConfig config = new BlockClusterFeatureConfig.Builder(stateProvider, SimpleBlockPlacer.INSTANCE).tries(64).noProjection().build();
+			return feature.configured(config).decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE).count(4));
 		});
 		this.irisFlowers = features.register("iris_flowers", Feature.FLOWER, feature -> {
 			BlockStateProvider stateProvider = new SimpleBlockStateProvider(TropicraftBlocks.IRIS.get().defaultBlockState());
 			BlockClusterFeatureConfig config = new BlockClusterFeatureConfig.Builder(stateProvider, new DoublePlantBlockPlacer()).tries(64).noProjection().build();
-			return feature.configured(config).decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE)).count(10);
+			return feature.configured(config).decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE).count(10));
+		});
+
+		this.coffeeBush = features.noConfig("coffee_bush", TropicraftFeatures.COFFEE_BUSH, feature -> {
+			return feature.decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE).count(5));
+		});
+		this.undergrowth = features.noConfig("undergrowth", TropicraftFeatures.COFFEE_BUSH, feature -> {
+			return feature.decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE).count(100));
 		});
 
 		this.undergroundSeagrassOnStone = features.register("underground_seagrass_on_stone", Feature.SIMPLE_BLOCK, feature -> {

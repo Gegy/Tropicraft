@@ -23,7 +23,6 @@ import net.tropicraft.core.common.dimension.feature.jigsaw.NoRotateSingleJigsawP
 public class HomeTreeStructure extends Structure<VillageConfig> {
     public HomeTreeStructure(Codec<VillageConfig> codec) {
         super(codec);
-        HomeTreePools.init();
     }
 
     @Override

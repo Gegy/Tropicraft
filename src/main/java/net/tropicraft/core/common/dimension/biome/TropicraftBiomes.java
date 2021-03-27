@@ -1,6 +1,5 @@
 package net.tropicraft.core.common.dimension.biome;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.RegistryKey;
@@ -8,20 +7,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.*;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.Features;
-import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.feature.SingleRandomFeature;
-import net.minecraft.world.gen.placement.Placement;
-import net.minecraft.world.gen.placement.TopSolidWithNoiseConfig;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilders;
 import net.tropicraft.Constants;
 import net.tropicraft.core.common.data.WorldgenDataConsumer;
 import net.tropicraft.core.common.dimension.carver.TropicraftConfiguredCarvers;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredFeatures;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredStructures;
-import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftConfiguredSurfaceBuilders;
 import net.tropicraft.core.common.entity.TropicraftEntities;
 
@@ -155,11 +147,9 @@ public final class TropicraftBiomes {
 		features.addTropicsGems(generation);
 		features.addRainforestTrees(generation);
 
-		// TODO used a dummy config here for 1.15 - fix later
-		addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, TropicraftFeatures.RAINFOREST_FLOWERS.get().withConfiguration(DefaultBiomeFeatures.ROSE_BUSH_CONFIG).withPlacement(Placement.COUNT_HEIGHTMAP_32.configure(new FrequencyConfig(4))));
-
-		addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, TropicraftFeatures.COFFEE_BUSH.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.COUNT_HEIGHTMAP_32.configure(new FrequencyConfig(5))));
-		addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, TropicraftFeatures.UNDERGROWTH.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.COUNT_HEIGHTMAP_32.configure(new FrequencyConfig(100))));
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, features.rainforestFlowers);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, features.coffeeBush);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, features.undergrowth);
 
 		generation.addStructureStart(structures.homeTree);
 
@@ -191,13 +181,7 @@ public final class TropicraftBiomes {
 
 		features.addTropicsMetals(generation);
 
-		addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Feature.SIMPLE_RANDOM_SELECTOR
-				.withConfiguration(new SingleRandomFeature(ImmutableList.of(
-						Feature.CORAL_TREE.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG),
-						Feature.CORAL_CLAW.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG),
-						Feature.CORAL_MUSHROOM.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG))))
-				.withPlacement(Placement.TOP_SOLID_HEIGHTMAP_NOISE_BIASED
-						.configure(new TopSolidWithNoiseConfig(20, 400.0D, 0.0D, Heightmap.Type.OCEAN_FLOOR_WG))));
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.WARM_OCEAN_VEGETATION);
 
 		DefaultBiomeFeatures.addDefaultSeagrass(generation);
 		features.addUndergroundSeagrass(generation);
