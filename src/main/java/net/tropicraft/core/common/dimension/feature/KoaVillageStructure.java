@@ -10,7 +10,6 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.structure.JigsawStructure;
 import net.minecraft.world.gen.feature.structure.VillageConfig;
-import net.tropicraft.core.common.dimension.feature.pools.KoaVillagePools;
 
 public class KoaVillageStructure extends JigsawStructure {
 	public KoaVillageStructure(Codec<VillageConfig> codec) {

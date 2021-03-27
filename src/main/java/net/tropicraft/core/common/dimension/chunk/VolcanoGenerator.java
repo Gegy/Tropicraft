@@ -37,10 +37,10 @@ import java.util.function.Supplier;
 public class VolcanoGenerator {
 
 	public static Set<ResourceLocation> volcanoSpawnBiomesLand = ImmutableSet.of(
-			TropicraftBiomes.TROPICS.getId(), TropicraftBiomes.RAINFOREST_PLAINS.getId()
+			TropicraftBiomes.TROPICS.getRegistryName(), TropicraftBiomes.RAINFOREST_PLAINS.getRegistryName()
 	);
 	public static Set<ResourceLocation> volcanoSpawnBiomesOcean = ImmutableSet.of(
-			TropicraftBiomes.TROPICS_OCEAN.getId()
+			TropicraftBiomes.TROPICS_OCEAN.getRegistryName()
 	);
 
 	private final long worldSeed;

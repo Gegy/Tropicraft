@@ -9,10 +9,14 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
 import net.minecraft.data.IDataProvider;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
+import net.minecraft.world.gen.feature.template.IStructureProcessorType;
+import net.minecraft.world.gen.feature.template.StructureProcessorList;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,53 +32,78 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 	private static final Logger LOGGER = LogManager.getLogger(TropicraftWorldgenProvider.class);
 
 	private final Path root;
-	private final String namespace;
+	private final String path;
 	private final Registry<T> registry;
 	private final EntryGenerator<T, R> entryGenerator;
 	private final Codec<Supplier<T>> codec;
 
 	private R result;
 
-	private TropicraftWorldgenProvider(DataGenerator dataGenerator, String path, Registry<T> registry, Codec<Supplier<T>> codec, String namespace, EntryGenerator<T, R> entryGenerator) {
-		this.root = dataGenerator.getOutputFolder().resolve("data/" + namespace + "/" + path);
-
-		this.namespace = namespace;
+	private TropicraftWorldgenProvider(DataGenerator dataGenerator, String path, Registry<T> registry, Codec<Supplier<T>> codec, EntryGenerator<T, R> entryGenerator) {
+		this.root = dataGenerator.getOutputFolder().resolve("data");
+		this.path = path;
 		this.registry = registry;
 		this.entryGenerator = entryGenerator;
 		this.codec = codec;
 	}
 
-	public static <R> Supplier<R> addConfiguredFeatures(
-			DataGenerator dataGenerator, String namespace,
-			EntryGenerator<ConfiguredFeature<?, ?>, R> entryGenerator
-	) {
+	public static <R> Supplier<R> addConfiguredFeatures(DataGenerator dataGenerator, EntryGenerator<ConfiguredFeature<?, ?>, R> entryGenerator) {
 		return add(
 				dataGenerator,
 				"worldgen/configured_feature", WorldGenRegistries.CONFIGURED_FEATURE, ConfiguredFeature.CODEC,
-				namespace, entryGenerator
+				entryGenerator
 		);
 	}
 
-	public static <R> Supplier<R> addConfiguredSurfaceBuilders(
-			DataGenerator dataGenerator, String namespace,
-			EntryGenerator<ConfiguredSurfaceBuilder<?>, R> entryGenerator
-	) {
+	public static <R> Supplier<R> addConfiguredSurfaceBuilders(DataGenerator dataGenerator, EntryGenerator<ConfiguredSurfaceBuilder<?>, R> entryGenerator) {
 		return add(
 				dataGenerator,
 				"worldgen/configured_surface_builder", WorldGenRegistries.CONFIGURED_SURFACE_BUILDER, ConfiguredSurfaceBuilder.CODEC,
-				namespace, entryGenerator
+				entryGenerator
+		);
+	}
+
+	public static <R> Supplier<R> addConfiguredCarvers(DataGenerator dataGenerator, EntryGenerator<ConfiguredCarver<?>, R> entryGenerator) {
+		return add(
+				dataGenerator,
+				"worldgen/configured_carver", WorldGenRegistries.CONFIGURED_CARVER, ConfiguredCarver.CODEC,
+				entryGenerator
+		);
+	}
+
+	public static <R> Supplier<R> addProcessorLists(DataGenerator dataGenerator, EntryGenerator<StructureProcessorList, R> entryGenerator) {
+		return add(
+				dataGenerator,
+				"worldgen/processor_list", WorldGenRegistries.PROCESSOR_LIST, IStructureProcessorType.LIST_CODEC,
+				entryGenerator
+		);
+	}
+
+	public static <R> Supplier<R> addTemplatePools(DataGenerator dataGenerator, EntryGenerator<JigsawPattern, R> entryGenerator) {
+		return add(
+				dataGenerator,
+				"worldgen/template_pool", WorldGenRegistries.TEMPLATE_POOL, JigsawPattern.CODEC,
+				entryGenerator
+		);
+	}
+
+	public static <R> Supplier<R> addBiomes(DataGenerator dataGenerator, EntryGenerator<Biome, R> entryGenerator) {
+		return add(
+				dataGenerator,
+				"worldgen/biome", WorldGenRegistries.BIOME, Biome.CODEC,
+				entryGenerator
 		);
 	}
 
 	private static <T, R> Supplier<R> add(
 			DataGenerator dataGenerator,
 			String path, Registry<T> registry, Codec<Supplier<T>> codec,
-			String namespace, EntryGenerator<T, R> entryGenerator
+			EntryGenerator<T, R> entryGenerator
 	) {
 		TropicraftWorldgenProvider<T, R> provider = new TropicraftWorldgenProvider<>(
 				dataGenerator,
 				path, registry, codec,
-				namespace, entryGenerator
+				entryGenerator
 		);
 		dataGenerator.addProvider(provider);
 
@@ -84,9 +113,9 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 	@Override
 	public void run(DirectoryCache cache) {
 		this.result = this.entryGenerator.generate((id, entry) -> {
-			Registry.register(this.registry, new ResourceLocation(this.namespace, id), entry);
+			Registry.register(this.registry, id, entry);
 
-			Path path = this.root.resolve(id + ".json");
+			Path path = this.root.resolve(id.getNamespace()).resolve(this.path).resolve(id.getPath() + ".json");
 
 			Function<Supplier<T>, DataResult<JsonElement>> function = JsonOps.INSTANCE.withEncoder(this.codec);
 

@@ -19,71 +19,36 @@ import javax.annotation.Nullable;
 import java.util.Random;
 
 public class TropicraftTrees {
-    private static abstract class TropicraftTree extends Tree {
-
-        protected abstract Feature<? extends NoFeatureConfig> getTropicraftTreeFeature(Random random, boolean generateBeehive);
-
-        @Override
-        public boolean growTree(ServerWorld world, ChunkGenerator generator, BlockPos pos, BlockState state, Random random) {
-            Feature feature = getTropicraftTreeFeature(random, hasAdjacentFlower(world, pos));
-            if (feature == null) {
-                return false;
-            } else {
-                world.setBlock(pos, Blocks.AIR.defaultBlockState(), 4);
-                if (feature.place(world, generator, random, pos, NoFeatureConfig.NONE)) {
-                    return true;
-                } else {
-                    world.setBlock(pos, state, Constants.BlockFlags.NO_RERENDER);
-                    return false;
-                }
-            }
-        }
-
-        private boolean hasAdjacentFlower(IWorld world, BlockPos origin) {
-            for (BlockPos pos : BlockPos.Mutable.betweenClosed(origin.offset(-2, -1, -2), origin.offset(2, 1, 2))) {
-                if (world.getBlockState(pos).is(BlockTags.FLOWERS)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Nullable
-        @Override
-        protected ConfiguredFeature<BaseTreeFeatureConfig, ?> getConfiguredFeature(Random random, boolean largeHive) {
-            return null;
-        }
-    }
-
-    public static final TropicraftTree GRAPEFRUIT = new TropicraftTree() {
+    // TODO: how do we reference generated features here?
+    public static final Tree GRAPEFRUIT = new Tree() {
         @Override
         protected Feature<? extends NoFeatureConfig> getTropicraftTreeFeature(Random random, boolean generateBeehive) {
             return TropicraftFeatures.GRAPEFRUIT_TREE.get();
         }
     };
 
-    public static final Tree LEMON = new TropicraftTree() {
+    public static final Tree LEMON = new Tree() {
         @Override
         protected Feature<? extends NoFeatureConfig> getTropicraftTreeFeature(Random random, boolean generateBeehive) {
             return TropicraftFeatures.LEMON_TREE.get();
         }
     };
 
-    public static final Tree LIME = new TropicraftTree() {
+    public static final Tree LIME = new Tree() {
         @Override
         protected Feature<? extends NoFeatureConfig> getTropicraftTreeFeature(Random random, boolean generateBeehive) {
             return TropicraftFeatures.LIME_TREE.get();
         }
     };
 
-    public static final Tree ORANGE = new TropicraftTree() {
+    public static final Tree ORANGE = new Tree() {
         @Override
         protected Feature<? extends NoFeatureConfig> getTropicraftTreeFeature(Random random, boolean generateBeehive) {
             return TropicraftFeatures.ORANGE_TREE.get();
         }
     };
 
-    public static final Tree RAINFOREST = new TropicraftTree() {
+    public static final Tree RAINFOREST = new Tree() {
         @Override
         protected Feature<? extends NoFeatureConfig> getTropicraftTreeFeature(Random random, boolean generateBeehive) {
             final int treeType = random.nextInt(4);
@@ -99,7 +64,7 @@ public class TropicraftTrees {
         }
     };
 
-    public static final Tree PALM = new TropicraftTree() {
+    public static final Tree PALM = new Tree() {
         @Override
         protected Feature<? extends NoFeatureConfig> getTropicraftTreeFeature(Random random, boolean generateBeehive) {
             final int palmType = random.nextInt(3);

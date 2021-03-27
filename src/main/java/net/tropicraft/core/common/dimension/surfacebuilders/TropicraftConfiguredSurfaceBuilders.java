@@ -3,11 +3,13 @@ package net.tropicraft.core.common.dimension.surfacebuilders;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.LazyValue;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilderConfig;
 import net.minecraftforge.fml.RegistryObject;
+import net.tropicraft.Constants;
 import net.tropicraft.core.common.block.BlockTropicraftSand;
 import net.tropicraft.core.common.block.TropicraftBlocks;
 import net.tropicraft.core.common.data.WorldgenDataConsumer;
@@ -42,7 +44,7 @@ public final class TropicraftConfiguredSurfaceBuilders {
 		}
 
 		public <C extends ISurfaceBuilderConfig, S extends SurfaceBuilder<C>> ConfiguredSurfaceBuilder<?> register(String id, RegistryObject<S> surfaceBuilder, C config) {
-			return this.worldgen.register(id, surfaceBuilder.get().configured(config));
+			return this.worldgen.register(new ResourceLocation(Constants.MODID, id), surfaceBuilder.get().configured(config));
 		}
 	}
 }

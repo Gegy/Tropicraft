@@ -1,5 +1,7 @@
 package net.tropicraft.core.common.data;
 
+import net.minecraft.util.ResourceLocation;
+
 public interface WorldgenDataConsumer<T> {
-	T register(String id, T entry);
+	T register(ResourceLocation id, T entry);
 }

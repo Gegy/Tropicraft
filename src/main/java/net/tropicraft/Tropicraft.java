@@ -38,9 +38,12 @@ import net.tropicraft.core.common.data.*;
 import net.tropicraft.core.common.dimension.TropicraftWorldUtils;
 import net.tropicraft.core.common.dimension.biome.TropicraftBiomes;
 import net.tropicraft.core.common.dimension.carver.TropicraftCarvers;
+import net.tropicraft.core.common.dimension.carver.TropicraftConfiguredCarvers;
 import net.tropicraft.core.common.dimension.chunk.TropicraftChunkGeneratorTypes;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredFeatures;
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
+import net.tropicraft.core.common.dimension.feature.jigsaw.TropicraftProcessorLists;
+import net.tropicraft.core.common.dimension.feature.pools.TropicraftTemplatePools;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftConfiguredSurfaceBuilders;
 import net.tropicraft.core.common.drinks.MixerRecipes;
 import net.tropicraft.core.common.entity.TropicraftEntities;
@@ -166,8 +169,17 @@ public class Tropicraft
             gen.addProvider(new TropicraftLootTableProvider(gen));
             gen.addProvider(new TropicraftEntityTypeTagsProvider(gen, existingFileHelper));
 
-            Supplier<TropicraftConfiguredFeatures> features = TropicraftWorldgenProvider.addConfiguredFeatures(gen, Constants.MODID, TropicraftConfiguredFeatures::new);
-            Supplier<TropicraftConfiguredSurfaceBuilders> surfaceBuilders = TropicraftWorldgenProvider.addConfiguredSurfaceBuilders(gen, Constants.MODID, TropicraftConfiguredSurfaceBuilders::new);
+            Supplier<TropicraftConfiguredFeatures> features = TropicraftWorldgenProvider.addConfiguredFeatures(gen, TropicraftConfiguredFeatures::new);
+            Supplier<TropicraftConfiguredSurfaceBuilders> surfaceBuilders = TropicraftWorldgenProvider.addConfiguredSurfaceBuilders(gen, TropicraftConfiguredSurfaceBuilders::new);
+            Supplier<TropicraftConfiguredCarvers> carvers = TropicraftWorldgenProvider.addConfiguredCarvers(gen, TropicraftConfiguredCarvers::new);
+            Supplier<TropicraftProcessorLists> processors = TropicraftWorldgenProvider.addProcessorLists(gen, TropicraftProcessorLists::new);
+            Supplier<TropicraftTemplatePools> templates = TropicraftWorldgenProvider.addTemplatePools(gen, consumer -> {
+                return new TropicraftTemplatePools(consumer, processors.get());
+            });
+
+            TropicraftWorldgenProvider.addBiomes(gen, consumer -> {
+                return new TropicraftBiomes(consumer, features.get(), surfaceBuilders.get(), carvers.get());
+            });
         }
     }
 }

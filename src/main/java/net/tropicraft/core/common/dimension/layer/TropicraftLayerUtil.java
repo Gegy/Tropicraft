@@ -1,6 +1,7 @@
 package net.tropicraft.core.common.dimension.layer;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.IExtendedNoiseRandom;
@@ -13,7 +14,6 @@ import net.minecraft.world.gen.layer.SmoothLayer;
 import net.minecraft.world.gen.layer.ZoomLayer;
 import net.minecraft.world.gen.layer.traits.IAreaTransformer1;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLModIdMappingEvent;
 import net.tropicraft.Constants;
@@ -28,7 +28,7 @@ import java.util.function.LongFunction;
 @SuppressWarnings("deprecation")
 public class TropicraftLayerUtil {
 
-    private static final List<LazyInt> CACHES = new ArrayList<>();
+    private static final List<LazyInt> BIOME_IDS = new ArrayList<>();
 
     protected static final LazyInt OCEAN_ID = lazyId(TropicraftBiomes.TROPICS_OCEAN);
     protected static final LazyInt KELP_FOREST_ID = lazyId(TropicraftBiomes.KELP_FOREST);
@@ -47,9 +47,12 @@ public class TropicraftLayerUtil {
             //RAINFOREST_ISLAND_MOUNTAINS_ID
     };
 
-    private static LazyInt lazyId(RegistryObject<Biome> biome) {
-        LazyInt ret = new LazyInt(biome.lazyMap(WorldGenRegistries.BIOME::getId));
-        CACHES.add(ret);
+    private static LazyInt lazyId(RegistryKey<Biome> biomeKey) {
+        LazyInt ret = new LazyInt(() -> {
+            Biome biome = WorldGenRegistries.BIOME.get(biomeKey);
+            return WorldGenRegistries.BIOME.getId(biome);
+        });
+        BIOME_IDS.add(ret);
         return ret;
     }
 
@@ -115,9 +118,9 @@ public class TropicraftLayerUtil {
     public static boolean isLand(final int biome) {
         return biome == LAND_ID.getAsInt();
     }
-    
+
     @SubscribeEvent
     public static void onRegistryRemap(FMLModIdMappingEvent event) {
-        CACHES.forEach(LazyInt::invalidate);
+        BIOME_IDS.forEach(LazyInt::invalidate);
     }
 }
