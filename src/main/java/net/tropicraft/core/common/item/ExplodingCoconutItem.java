@@ -7,6 +7,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.util.*;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.tropicraft.core.common.dimension.TropicraftWorldUtils;
 import net.tropicraft.core.common.entity.projectile.ExplodingCoconutEntity;
 
 public class ExplodingCoconutItem extends Item {
@@ -20,7 +21,7 @@ public class ExplodingCoconutItem extends Item {
         // TODO config option
         final boolean canPlayerThrow = player.isCreative() || player.canUseGameMasterBlocks();
         //allow to use anywhere but in the main area of the server
-        final boolean ltOverride = !world.dimension().location().toString().equals("tropicraft:tropics");
+        final boolean ltOverride = world.dimension() != TropicraftWorldUtils.TROPICS;
         ItemStack itemstack = player.getItemInHand(hand);
         if (!canPlayerThrow && !ltOverride) {
             if (!world.isClientSide) {

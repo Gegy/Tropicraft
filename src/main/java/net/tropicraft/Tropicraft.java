@@ -35,15 +35,14 @@ import net.tropicraft.core.common.block.TropicraftFlower;
 import net.tropicraft.core.common.block.tileentity.TropicraftTileEntityTypes;
 import net.tropicraft.core.common.command.CommandTropicsTeleport;
 import net.tropicraft.core.common.data.*;
-import net.tropicraft.core.common.dimension.TropicraftWorldUtils;
 import net.tropicraft.core.common.dimension.biome.TropicraftBiomeProvider;
 import net.tropicraft.core.common.dimension.biome.TropicraftBiomes;
 import net.tropicraft.core.common.dimension.carver.TropicraftCarvers;
 import net.tropicraft.core.common.dimension.carver.TropicraftConfiguredCarvers;
-import net.tropicraft.core.common.dimension.feature.block_state_provider.TropicraftBlockStateProviders;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredFeatures;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredStructures;
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
+import net.tropicraft.core.common.dimension.feature.block_state_provider.TropicraftBlockStateProviders;
 import net.tropicraft.core.common.dimension.feature.jigsaw.TropicraftProcessorLists;
 import net.tropicraft.core.common.dimension.feature.pools.TropicraftTemplatePools;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftConfiguredSurfaceBuilders;
@@ -93,11 +92,9 @@ public class Tropicraft
         TropicraftTileEntityTypes.TILE_ENTITIES.register(modBus);
         TropicraftEntities.ENTITIES.register(modBus);
         //TODO 1.15 TropicraftBiomeProviderTypes.BIOME_PROVIDER_TYPES.register(modBus);
-        TropicraftWorldUtils.DIMENSIONS.register(modBus);
         TropicraftCarvers.CARVERS.register(modBus);
         TropicraftFeatures.FEATURES.register(modBus);
         TropicraftFeatures.STRUCTURES.register(modBus);
-        TropicraftChunkGeneratorTypes.CHUNK_GENERATOR_TYPES.register(modBus);
         TropicraftBlockStateProviders.BLOCK_STATE_PROVIDERS.register(modBus);
 
         // Hack in our item frame models the way vanilla does

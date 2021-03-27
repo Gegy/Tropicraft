@@ -1,3 +1,4 @@
+/* TODO: Port (not used in 1.15?)
 package net.tropicraft.core.common.dimension;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -13,6 +14,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.pattern.BlockPattern.PortalInfo;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.TeleportationRepositioner;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ColumnPos;
@@ -40,7 +42,9 @@ public class TeleporterTropics extends Teleporter {
     private final ServerWorld world;
     private final Random random;
 
-    /** Stores successful portal placement locations for rapid lookup. */
+    */
+/** Stores successful portal placement locations for rapid lookup. *//*
+
     private final Long2ObjectMap<PortalPosition> destinationCoordinateCache = new Long2ObjectOpenHashMap<>(4096);
     private final Object2LongMap<ColumnPos> columnPosCache = new Object2LongOpenHashMap<>();
 
@@ -54,10 +58,12 @@ public class TeleporterTropics extends Teleporter {
         }
     }
 
-    /**
+    */
+/**
      * A list of valid keys for the destinationCoordainteCache. These are based on the X & Z of the players initial
      * location.
-     */
+     *//*
+
     private final List<?> destinationCoordinateKeys = new ArrayList<>();
 
     public TeleporterTropics(ServerWorld world) {
@@ -95,7 +101,7 @@ public class TeleporterTropics extends Teleporter {
         // TODO Auto-generated method stub
         return super.placeInPortal(p_222268_1_, p_222268_2_);
     }
-    
+
     @Override
     public PortalInfo placeInExistingPortal(BlockPos p_222272_1_, Vector3d p_222272_2_, Direction directionIn, double posX, double posZ, boolean isPlayer) {
         int searchArea = 148;
@@ -131,11 +137,11 @@ public class TeleporterTropics extends Teleporter {
                         BlockPos pos = new BlockPos(x, y, z);
                         if (world.getBlockState(pos).getBlock() == PORTAL_BLOCK)
                         {
-                            pos = pos.down();
+                            pos = pos.below();
                             while (world.getBlockState(pos).getBlock() == PORTAL_BLOCK)
                             {
                                 --y;
-                                pos = pos.down();
+                                pos = pos.below();
                             }
 
                             double distY = y + 0.5D - p_222272_1_.getY();
@@ -170,22 +176,10 @@ public class TeleporterTropics extends Teleporter {
 
             BlockPos pos = new BlockPos(x, y, z);
 
-            if (world.getBlockState(pos.offset(Direction.WEST)).getBlock() == PORTAL_BLOCK)
-            {
-                newLocX -= 0.5D;
-            }
-            if (world.getBlockState(pos.offset(Direction.EAST)).getBlock() == PORTAL_BLOCK)
-            {
-                newLocX += 0.5D;
-            }
-            if (world.getBlockState(pos.offset(Direction.NORTH)).getBlock() == PORTAL_BLOCK)
-            {
-                newLocZ -= 0.5D;
-            }
-            if (world.getBlockState(pos.offset(Direction.SOUTH)).getBlock() == PORTAL_BLOCK)
-            {
-                newLocZ += 0.5D;
-            }
+            if (world.getBlockState(pos.west()).getBlock() == PORTAL_BLOCK) newLocX -= 0.5D;
+            if (world.getBlockState(pos.east()).getBlock() == PORTAL_BLOCK) newLocX += 0.5D;
+            if (world.getBlockState(pos.north()).getBlock() == PORTAL_BLOCK) newLocZ -= 0.5D;
+            if (world.getBlockState(pos.south()).getBlock() == PORTAL_BLOCK) newLocZ += 0.5D;
 //            entity.setLocationAndAngles();
 //            int worldSpawnX = MathHelper.floor(newLocX);//TODO + ((new Random()).nextBoolean() ? 3 : -3);
 //            int worldSpawnZ = MathHelper.floor(newLocZ);//TODO + ((new Random()).nextBoolean() ? 3 : -3);
@@ -329,9 +323,11 @@ public class TeleporterTropics extends Teleporter {
         // just put the portal at sea level
         if(closestSpot < 0.0D) {
             // Perhaps this was the culprit
-            /*  Random r = new Random();
+            */
+/*  Random r = new Random();
             foundX += r.nextInt(16) - 8;
-            foundZ += r.nextInt(16) - 8;*/
+            foundZ += r.nextInt(16) - 8;*//*
+
             foundY = worldSpawnY - 2;
             boolean foundLand = false;
 
@@ -405,12 +401,14 @@ public class TeleporterTropics extends Teleporter {
         }
     }
 
-    /**
+    */
+/**
      * Gets the terrain height at the specified coordinates
      * @param x The x coordinate
      * @param z The z coordinate
      * @return The terrain height at the specified coordinates
-     */
+     *//*
+
     public int getTerrainHeightAt(int x, int z) {
         for(int y = 100; y > 0; y--)
         {
@@ -529,10 +527,12 @@ public class TeleporterTropics extends Teleporter {
 
     }
 
-    /**
+    */
+/**
      * TODO why in the world is this a thing?
      * @return List of valid block states to build portal on
-     */
+     *//*
+
     private List<BlockState> getValidBuildBlocks() {
         return Arrays.asList(
                 Blocks.SAND.defaultBlockState(),
@@ -541,3 +541,4 @@ public class TeleporterTropics extends Teleporter {
                 TropicraftBlocks.PURIFIED_SAND.get().defaultBlockState());
     }
 }
+*/

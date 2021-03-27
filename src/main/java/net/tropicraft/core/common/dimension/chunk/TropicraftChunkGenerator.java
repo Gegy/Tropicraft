@@ -43,12 +43,7 @@ public class TropicraftChunkGenerator extends NoiseChunkGenerator {
 
     @Override
     public int getSpawnHeight() {
-        return 128;
-    }
-
-    @Override
-    public int getSeaLevel() {
-        return getSpawnHeight() - 1;
+        return getSeaLevel() + 1;
     }
 
     @Override

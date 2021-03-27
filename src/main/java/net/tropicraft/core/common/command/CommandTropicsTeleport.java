@@ -23,7 +23,7 @@ public class CommandTropicsTeleport {
 		if (source.getEntity().getType() != EntityType.PLAYER) {
 			source.sendFailure(new StringTextComponent("Cannot teleport non-players!"));
 		}
-		TropicraftWorldUtils.teleportPlayer((ServerPlayerEntity) source.getEntity(), TropicraftWorldUtils.TROPICS_DIMENSION);
+		TropicraftWorldUtils.teleportPlayer((ServerPlayerEntity) source.getEntity(), TropicraftWorldUtils.TROPICS);
 		return 1;
 	}
 }
