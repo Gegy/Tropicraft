@@ -37,7 +37,7 @@ public class FruitTreeFeature extends Feature<FruitTreeConfig> {
 		}
 
 		BlockState sapling = config.sapling;
-		if (!sapling.canSurvive(world, pos.below())) {
+		if (!sapling.canSurvive(world, pos)) {
 			return false;
 		}
 

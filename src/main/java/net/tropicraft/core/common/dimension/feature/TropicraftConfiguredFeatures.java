@@ -122,7 +122,7 @@ public final class TropicraftConfiguredFeatures {
 			BlockClusterFeatureConfig config = new BlockClusterFeatureConfig.Builder(stateProvider, SimpleBlockPlacer.INSTANCE).tries(64).noProjection().build();
 			return feature.configured(config).decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE).count(4));
 		});
-		this.irisFlowers = features.register("iris_flowers", Feature.FLOWER, feature -> {
+		this.irisFlowers = features.register("iris_flowers", Feature.RANDOM_PATCH, feature -> {
 			BlockStateProvider stateProvider = new SimpleBlockStateProvider(TropicraftBlocks.IRIS.get().defaultBlockState());
 			BlockClusterFeatureConfig config = new BlockClusterFeatureConfig.Builder(stateProvider, new DoublePlantBlockPlacer()).tries(64).noProjection().build();
 			return feature.configured(config).decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE).count(10));

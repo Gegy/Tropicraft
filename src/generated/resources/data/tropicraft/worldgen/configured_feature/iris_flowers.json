@@ -24,7 +24,7 @@
           "type": "minecraft:double_plant_placer"
         }
       },
-      "type": "minecraft:flower"
+      "type": "minecraft:random_patch"
     },
     "decorator": {
       "config": {

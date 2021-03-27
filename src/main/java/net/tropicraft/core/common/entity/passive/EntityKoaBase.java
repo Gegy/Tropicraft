@@ -811,7 +811,10 @@ public class EntityKoaBase extends VillagerEntity {
         compound.putInt("orientation_id", this.getEntityData().get(ORIENTATION));
 
         compound.putInt("village_id", villageID);
-        compound.putString("village_dimension", villageDimension.location().toString());
+
+        if (villageDimension != null) {
+            compound.putString("village_dimension", villageDimension.location().toString());
+        }
 
         compound.putLong("lastTradeTime", lastTradeTime);
 

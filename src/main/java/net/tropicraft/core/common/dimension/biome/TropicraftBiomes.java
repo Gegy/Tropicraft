@@ -185,7 +185,7 @@ public final class TropicraftBiomes {
 
 		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.WARM_OCEAN_VEGETATION);
 
-		DefaultBiomeFeatures.addDefaultSeagrass(generation);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.SEAGRASS_WARM);
 		features.addUndergroundSeagrass(generation);
 
 		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.SEA_PICKLE);

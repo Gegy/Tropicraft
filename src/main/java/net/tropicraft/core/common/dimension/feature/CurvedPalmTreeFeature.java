@@ -44,7 +44,7 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
             return false;
         }
 
-        if (!getSapling().canSurvive(getSapling().defaultBlockState(), world, pos.below())) {
+        if (!getSapling().canSurvive(getSapling().defaultBlockState(), world, pos)) {
             return false;
         }
 
