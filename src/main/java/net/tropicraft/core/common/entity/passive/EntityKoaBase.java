@@ -109,6 +109,8 @@ public class EntityKoaBase extends VillagerEntity {
     private boolean isMating;
     private boolean isPlaying;
 
+    private boolean finalizedSpawn;
+
     public static Predicate<Entity> ENEMY_PREDICATE =
             //TODO: 1.14 fix
             input -> (input instanceof MonsterEntity/* && !(input instanceof CreeperEntity)) || input instanceof EntityTropiSkeleton || input instanceof EntityIguana || input instanceof EntityAshen*/);
@@ -732,11 +734,7 @@ public class EntityKoaBase extends VillagerEntity {
 
         updateUniqueEntityAI();
 
-        findAndSetHomeToCloseChest(true);
-        findAndSetFireSource(true);
-        findAndSetDrums(true);
-
-        ILivingEntityData data = super.finalizeSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
+        finalizedSpawn = true;
 
         /*VillagerRegistry.VillagerProfession koaProfession = new VillagerRegistry.VillagerProfession("koa_profession", "");
         this.setProfession(koaProfession);*/
@@ -744,7 +742,7 @@ public class EntityKoaBase extends VillagerEntity {
         //TODO: 1.14 make sure not needed, overwritten with getOfferMap now
         //initTrades();
 
-        return data;
+        return super.finalizeSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
     }
 
     public void rollDiceChild() {
@@ -1277,6 +1275,12 @@ public class EntityKoaBase extends VillagerEntity {
 
     @Override
     public void aiStep() {
+        if (finalizedSpawn) {
+            finalizedSpawn = false;
+            findAndSetHomeToCloseChest(true);
+            findAndSetFireSource(true);
+            findAndSetDrums(true);
+        }
 
         this.updateSwingTime();
         super.aiStep();

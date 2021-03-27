@@ -132,6 +132,8 @@ public class Tropicraft
         ClientSetup.setupEntityRenderers(event);
 
         ClientSetup.setupTileEntityRenderers();
+
+        ClientSetup.setupDimensionRenderInfo();
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -437,27 +437,33 @@ public class TropicraftEntities {
 
     @SubscribeEvent
     public static void onCreateEntityAttributes(EntityAttributeCreationEvent event) {
-        event.put(SEA_TURTLE_EGG.get(), EggEntity.createAttributes().build());
-        event.put(STARFISH_EGG.get(), EggEntity.createAttributes().build());
-        event.put(TROPI_SPIDER_EGG.get(), EggEntity.createAttributes().build());
-        event.put(SEA_URCHIN_EGG_ENTITY.get(), EggEntity.createAttributes().build());
-        event.put(ASHEN.get(), AshenEntity.createAttributes().build());
-        event.put(EIH.get(), EIHEntity.createAttributes().build());
-        event.put(IGUANA.get(), IguanaEntity.createAttributes().build());
-        event.put(TREE_FROG.get(), TreeFrogEntity.createAttributes().build());
-        event.put(V_MONKEY.get(), VMonkeyEntity.createAttributes().build());
         event.put(KOA_HUNTER.get(), EntityKoaBase.createAttributes().build());
-        event.put(FAILGULL.get(), FailgullEntity.createAttributes().build());
         event.put(TROPI_CREEPER.get(), TropiCreeperEntity.createAttributes().build());
-        event.put(EAGLE_RAY.get(), EagleRayEntity.createAttributes().build());
-        event.put(MAN_O_WAR.get(), ManOWarEntity.createAttributes().build());
+        event.put(IGUANA.get(), IguanaEntity.createAttributes().build());
+        event.put(TROPI_SKELLY.get(), TropiSkellyEntity.createMobAttributes().build());
+        event.put(EIH.get(), EIHEntity.createAttributes().build());
+        event.put(SEA_TURTLE.get(), SeaTurtleEntity.createAttributes().build());
         event.put(MARLIN.get(), MarlinEntity.createAttributes().build());
-        event.put(PIRANHA.get(), PiranhaEntity.createAttributes().build());
-        event.put(RIVER_SARDINE.get(), SardineEntity.createAttributes().build());
+        event.put(FAILGULL.get(), FailgullEntity.createAttributes().build());
+        event.put(DOLPHIN.get(), TropicraftDolphinEntity.createAttributes().build());
         event.put(SEAHORSE.get(), SeahorseEntity.createAttributes().build());
+        event.put(TREE_FROG.get(), TreeFrogEntity.createAttributes().build());
         event.put(SEA_URCHIN.get(), SeaUrchinEntity.createAttributes().build());
-        event.put(HAMMERHEAD.get(), SharkEntity.createAttributes().build());
+        event.put(SEA_URCHIN_EGG_ENTITY.get(), EggEntity.createAttributes().build());
         event.put(STARFISH.get(), StarfishEntity.createAttributes().build());
+        event.put(STARFISH_EGG.get(), EggEntity.createAttributes().build());
+        event.put(V_MONKEY.get(), VMonkeyEntity.createAttributes().build());
+        event.put(RIVER_SARDINE.get(), SardineEntity.createAttributes().build());
+        event.put(PIRANHA.get(), PiranhaEntity.createAttributes().build());
         event.put(TROPICAL_FISH.get(), TropicraftTropicalFishEntity.createAttributes().build());
+        event.put(EAGLE_RAY.get(), EagleRayEntity.createAttributes().build());
+        event.put(TROPI_SPIDER.get(), TropiSpiderEntity.createAttributes().build());
+        event.put(TROPI_SPIDER_EGG.get(), EggEntity.createAttributes().build());
+        event.put(ASHEN.get(), AshenEntity.createAttributes().build());
+        event.put(HAMMERHEAD.get(), SharkEntity.createAttributes().build());
+        event.put(SEA_TURTLE_EGG.get(), EggEntity.createAttributes().build());
+        event.put(TROPI_BEE.get(), TropiBeeEntity.createAttributes().build());
+        event.put(COWKTAIL.get(), CowktailEntity.createAttributes().build());
+        event.put(MAN_O_WAR.get(), ManOWarEntity.createAttributes().build());
     }
 }

@@ -3,6 +3,8 @@ package net.tropicraft.core.client;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.entity.SpriteRenderer;
+import net.minecraft.client.world.DimensionRenderInfo;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -44,6 +46,7 @@ import net.tropicraft.core.client.tileentity.DrinkMixerRenderer;
 import net.tropicraft.core.client.tileentity.SifterRenderer;
 import net.tropicraft.core.common.block.TropicraftBlocks;
 import net.tropicraft.core.common.block.tileentity.TropicraftTileEntityTypes;
+import net.tropicraft.core.common.dimension.TropicraftWorldUtils;
 import net.tropicraft.core.common.entity.TropicraftEntities;
 
 public class ClientSetup {
@@ -123,5 +126,19 @@ public class ClientSetup {
         ClientRegistry.bindTileEntityRenderer(TropicraftTileEntityTypes.SIFTER.get(), SifterRenderer::new);
         ClientRegistry.bindTileEntityRenderer(TropicraftTileEntityTypes.DRINK_MIXER.get(), DrinkMixerRenderer::new);
         ClientRegistry.bindTileEntityRenderer(TropicraftTileEntityTypes.AIR_COMPRESSOR.get(), AirCompressorRenderer::new);
+    }
+
+    public static void setupDimensionRenderInfo() {
+        DimensionRenderInfo.EFFECTS.put(TropicraftWorldUtils.TROPICS.location(), new DimensionRenderInfo(192.0F, true, DimensionRenderInfo.FogType.NORMAL, false, false) {
+            @Override
+            public Vector3d getBrightnessDependentFogColor(Vector3d color, float brightness) {
+                return color.multiply(brightness * 0.94F + 0.06F, brightness * 0.94F + 0.06F, brightness * 0.91F + 0.09F);
+            }
+
+            @Override
+            public boolean isFoggyAt(int x, int z) {
+                return false;
+            }
+        });
     }
 }

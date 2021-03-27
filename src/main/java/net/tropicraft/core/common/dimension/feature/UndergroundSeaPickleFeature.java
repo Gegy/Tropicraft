@@ -26,7 +26,7 @@ public class UndergroundSeaPickleFeature extends Feature<NoFeatureConfig> {
 		}
 
 		if (world.getBlockState(pos).is(Blocks.WATER) && world.getBlockState(pos.above()).is(Blocks.WATER)) {
-			int count = random.nextInt(random.nextInt(4)) + 1;
+			int count = random.nextInt(random.nextInt(4) + 1) + 1;
 			if (surface.is(Blocks.DIRT)) {
 				count = Math.min(count + random.nextInt(2), 4);
 			}
