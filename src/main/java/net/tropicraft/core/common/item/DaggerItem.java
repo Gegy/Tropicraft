@@ -1,5 +1,6 @@
 package net.tropicraft.core.common.item;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -21,9 +22,17 @@ import net.minecraft.world.World;
 public class DaggerItem extends Item {
 
     private final IItemTier tier;
+    private final Multimap<Attribute, AttributeModifier> defaultModifiers;
+
     public DaggerItem(IItemTier tier, Properties properties) {
         super(properties.defaultDurability(tier.getUses()));
         this.tier = tier;
+
+        this.defaultModifiers = ImmutableMultimap.<Attribute, AttributeModifier>builder()
+                .putAll(super.getAttributeModifiers(EquipmentSlotType.MAINHAND, new ItemStack(this)))
+                .put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", (double) tier.getAttackDamageBonus() + 2.5D, AttributeModifier.Operation.ADDITION))
+                .put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", 0, AttributeModifier.Operation.ADDITION))
+                .build();
     }
 
     @Override
@@ -66,17 +75,12 @@ public class DaggerItem extends Item {
         return state.getBlock() == Blocks.COBWEB;
     }
 
-    /**
-     * Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
-     */
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
-        Multimap<Attribute, AttributeModifier> modifiers = super.getAttributeModifiers(slot, stack);
         if (slot == EquipmentSlotType.MAINHAND) {
-            modifiers.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", (double) tier.getAttackDamageBonus() + 2.5D, AttributeModifier.Operation.ADDITION));
-            modifiers.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", 0, AttributeModifier.Operation.ADDITION));
+            return defaultModifiers;
+        } else {
+            return super.getAttributeModifiers(slot, stack);
         }
-
-        return modifiers;
     }
 }

@@ -6,22 +6,7 @@
       "weight": 5,
       "element": {
         "location": "tropicraft:koa_village/huts/hut_01",
-        "processors": {
-          "processors": [
-            {
-              "processor_type": "tropicraft:adjust_building_height"
-            },
-            {
-              "states_to_extend": [
-                "tropicraft:bamboo_fence"
-              ],
-              "processor_type": "tropicraft:structure_supports"
-            },
-            {
-              "processor_type": "tropicraft:structure_void"
-            }
-          ]
-        },
+        "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
         "element_type": "minecraft:single_pool_element"
       }
@@ -30,22 +15,7 @@
       "weight": 2,
       "element": {
         "location": "tropicraft:koa_village/huts/hut_02",
-        "processors": {
-          "processors": [
-            {
-              "processor_type": "tropicraft:adjust_building_height"
-            },
-            {
-              "states_to_extend": [
-                "tropicraft:bamboo_fence"
-              ],
-              "processor_type": "tropicraft:structure_supports"
-            },
-            {
-              "processor_type": "tropicraft:structure_void"
-            }
-          ]
-        },
+        "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
         "element_type": "minecraft:single_pool_element"
       }
@@ -54,22 +24,7 @@
       "weight": 3,
       "element": {
         "location": "tropicraft:koa_village/huts/hut_03",
-        "processors": {
-          "processors": [
-            {
-              "processor_type": "tropicraft:adjust_building_height"
-            },
-            {
-              "states_to_extend": [
-                "tropicraft:bamboo_fence"
-              ],
-              "processor_type": "tropicraft:structure_supports"
-            },
-            {
-              "processor_type": "tropicraft:structure_void"
-            }
-          ]
-        },
+        "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
         "element_type": "minecraft:single_pool_element"
       }
@@ -78,22 +33,7 @@
       "weight": 4,
       "element": {
         "location": "tropicraft:koa_village/huts/hut_04",
-        "processors": {
-          "processors": [
-            {
-              "processor_type": "tropicraft:adjust_building_height"
-            },
-            {
-              "states_to_extend": [
-                "tropicraft:bamboo_fence"
-              ],
-              "processor_type": "tropicraft:structure_supports"
-            },
-            {
-              "processor_type": "tropicraft:structure_void"
-            }
-          ]
-        },
+        "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
         "element_type": "minecraft:single_pool_element"
       }
@@ -102,22 +42,7 @@
       "weight": 10,
       "element": {
         "location": "tropicraft:koa_village/huts/hut_05",
-        "processors": {
-          "processors": [
-            {
-              "processor_type": "tropicraft:adjust_building_height"
-            },
-            {
-              "states_to_extend": [
-                "tropicraft:bamboo_fence"
-              ],
-              "processor_type": "tropicraft:structure_supports"
-            },
-            {
-              "processor_type": "tropicraft:structure_void"
-            }
-          ]
-        },
+        "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
         "element_type": "minecraft:single_pool_element"
       }
@@ -126,22 +51,7 @@
       "weight": 2,
       "element": {
         "location": "tropicraft:koa_village/huts/bongo_hut_01",
-        "processors": {
-          "processors": [
-            {
-              "processor_type": "tropicraft:adjust_building_height"
-            },
-            {
-              "states_to_extend": [
-                "tropicraft:bamboo_fence"
-              ],
-              "processor_type": "tropicraft:structure_supports"
-            },
-            {
-              "processor_type": "tropicraft:structure_void"
-            }
-          ]
-        },
+        "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
         "element_type": "minecraft:single_pool_element"
       }
@@ -150,22 +60,7 @@
       "weight": 2,
       "element": {
         "location": "tropicraft:koa_village/huts/trade_hut_01",
-        "processors": {
-          "processors": [
-            {
-              "processor_type": "tropicraft:adjust_building_height"
-            },
-            {
-              "states_to_extend": [
-                "tropicraft:bamboo_fence"
-              ],
-              "processor_type": "tropicraft:structure_supports"
-            },
-            {
-              "processor_type": "tropicraft:structure_void"
-            }
-          ]
-        },
+        "processors": "tropicraft:koa_village/buildings",
         "projection": "rigid",
         "element_type": "minecraft:single_pool_element"
       }

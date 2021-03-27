@@ -1,5 +1,6 @@
 package net.tropicraft.core.common.item.scuba;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -30,8 +31,6 @@ import net.tropicraft.core.client.data.TropicraftLangKeys;
 
 import java.util.UUID;
 
-import net.minecraft.item.Item.Properties;
-
 @EventBusSubscriber(modid = Constants.MODID, bus = Bus.FORGE, value = Dist.CLIENT)
 public class ScubaGogglesItem extends ScubaArmorItem {
 
@@ -42,8 +41,15 @@ public class ScubaGogglesItem extends ScubaArmorItem {
     private static final Attribute UNDERWATER_VISIBILITY = new RangedAttribute(TropicraftLangKeys.SCUBA_VISIBILITY_STAT.getKey(), 0, -1, 1);
     private static final AttributeModifier VISIBILITY_BOOST = new AttributeModifier(UUID.fromString("b09a907f-8264-455b-af81-997c06aa2268"), Constants.MODID + ".underwater.visibility", 0.25, Operation.MULTIPLY_BASE);
 
+    private final Multimap<Attribute, AttributeModifier> boostedModifiers;
+
     public ScubaGogglesItem(ScubaType type, Properties builder) {
         super(type, EquipmentSlotType.HEAD, builder);
+
+        this.boostedModifiers = ImmutableMultimap.<Attribute, AttributeModifier>builder()
+                .putAll(super.getAttributeModifiers(EquipmentSlotType.HEAD, new ItemStack(this)))
+                .put(UNDERWATER_VISIBILITY, VISIBILITY_BOOST)
+                .build();
     }
     
     // Taken from ForgeIngameGui#renderPumpkinOverlay
@@ -96,10 +102,10 @@ public class ScubaGogglesItem extends ScubaArmorItem {
 
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
-        Multimap<Attribute, AttributeModifier> ret = super.getAttributeModifiers(slot, stack);
         if (slot == EquipmentSlotType.HEAD) {
-            ret.put(UNDERWATER_VISIBILITY, VISIBILITY_BOOST);
+            return boostedModifiers;
+        } else {
+            return super.getAttributeModifiers(slot, stack);
         }
-        return ret;
     }
 }

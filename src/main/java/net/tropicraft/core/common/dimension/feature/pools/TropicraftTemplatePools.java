@@ -10,8 +10,8 @@ import net.tropicraft.Constants;
 import net.tropicraft.core.common.data.WorldgenDataConsumer;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredFeatures;
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
-import net.tropicraft.core.common.dimension.feature.jigsaw.FixedSingleJigsawPiece;
-import net.tropicraft.core.common.dimension.feature.jigsaw.NoRotateSingleJigsawPiece;
+import net.tropicraft.core.common.dimension.feature.jigsaw.piece.FixedSingleJigsawPiece;
+import net.tropicraft.core.common.dimension.feature.jigsaw.piece.NoRotateSingleJigsawPiece;
 import net.tropicraft.core.common.dimension.feature.jigsaw.TropicraftProcessorLists;
 
 import java.util.Arrays;

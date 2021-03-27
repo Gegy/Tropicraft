@@ -1,55 +1,6 @@
 {
   "config": {
-    "start_pool": {
-      "name": "tropicraft:home_tree/starts",
-      "fallback": "minecraft:empty",
-      "elements": [
-        {
-          "weight": 1,
-          "element": {
-            "location": "tropicraft:home_tree/trunks/bottom/trunk_0",
-            "processors": {
-              "processors": [
-                {
-                  "processor_type": "tropicraft:air_to_cave_air"
-                },
-                {
-                  "can_replace_land": true,
-                  "states_to_extend": [
-                    "tropicraft:mahogany_log"
-                  ],
-                  "processor_type": "tropicraft:structure_supports"
-                }
-              ]
-            },
-            "projection": "rigid",
-            "element_type": "tropicraft:fixed"
-          }
-        },
-        {
-          "weight": 1,
-          "element": {
-            "location": "tropicraft:home_tree/trunks/bottom/trunk_1",
-            "processors": {
-              "processors": [
-                {
-                  "processor_type": "tropicraft:air_to_cave_air"
-                },
-                {
-                  "can_replace_land": true,
-                  "states_to_extend": [
-                    "tropicraft:mahogany_log"
-                  ],
-                  "processor_type": "tropicraft:structure_supports"
-                }
-              ]
-            },
-            "projection": "rigid",
-            "element_type": "tropicraft:fixed"
-          }
-        }
-      ]
-    },
+    "start_pool": "tropicraft:home_tree/starts",
     "size": 7
   },
   "type": "tropicraft:home_tree"

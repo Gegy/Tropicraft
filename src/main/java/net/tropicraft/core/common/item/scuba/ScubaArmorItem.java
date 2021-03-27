@@ -1,7 +1,5 @@
 package net.tropicraft.core.common.item.scuba;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -17,10 +15,12 @@ import net.tropicraft.core.client.scuba.ModelScubaGear;
 import net.tropicraft.core.common.item.ArmorMaterials;
 import net.tropicraft.core.common.item.TropicraftArmorItem;
 
+import javax.annotation.Nullable;
+
 public class ScubaArmorItem extends TropicraftArmorItem {
     
     private final ScubaType type;
-     
+
     public ScubaArmorItem(ScubaType type, EquipmentSlotType slotType, Item.Properties properties) {
         super(ArmorMaterials.SCUBA, slotType, properties);
         this.type = type;

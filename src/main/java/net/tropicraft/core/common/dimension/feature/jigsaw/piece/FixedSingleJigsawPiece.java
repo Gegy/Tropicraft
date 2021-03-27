@@ -1,4 +1,4 @@
-package net.tropicraft.core.common.dimension.feature.jigsaw;
+package net.tropicraft.core.common.dimension.feature.jigsaw.piece;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;

@@ -6,13 +6,7 @@
       "weight": 1,
       "element": {
         "location": "tropicraft:home_tree/roofs/roof_0",
-        "processors": {
-          "processors": [
-            {
-              "processor_type": "tropicraft:air_to_cave_air"
-            }
-          ]
-        },
+        "processors": "tropicraft:home_tree/base",
         "projection": "rigid",
         "element_type": "tropicraft:fixed"
       }

@@ -1,6 +1,7 @@
 package net.tropicraft;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.reflect.Reflection;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -44,6 +45,8 @@ import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredStructur
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
 import net.tropicraft.core.common.dimension.feature.block_state_provider.TropicraftBlockStateProviders;
 import net.tropicraft.core.common.dimension.feature.jigsaw.TropicraftProcessorLists;
+import net.tropicraft.core.common.dimension.feature.jigsaw.piece.FixedSingleJigsawPiece;
+import net.tropicraft.core.common.dimension.feature.jigsaw.piece.NoRotateSingleJigsawPiece;
 import net.tropicraft.core.common.dimension.feature.pools.TropicraftTemplatePools;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftConfiguredSurfaceBuilders;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftSurfaceBuilders;
@@ -98,6 +101,8 @@ public class Tropicraft
         TropicraftFeatures.STRUCTURES.register(modBus);
         TropicraftSurfaceBuilders.SURFACE_BUILDERS.register(modBus);
         TropicraftBlockStateProviders.BLOCK_STATE_PROVIDERS.register(modBus);
+
+        Reflection.initialize(FixedSingleJigsawPiece.class, NoRotateSingleJigsawPiece.class);
 
         // Hack in our item frame models the way vanilla does
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {

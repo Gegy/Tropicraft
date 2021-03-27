@@ -6,12 +6,17 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
 import net.minecraft.data.IDataProvider;
+import net.minecraft.util.LazyValue;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
+import net.minecraft.util.registry.WorldGenSettingsExport;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -26,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -33,6 +39,26 @@ import java.util.function.Supplier;
 public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final Logger LOGGER = LogManager.getLogger(TropicraftWorldgenProvider.class);
+
+	private static final LazyValue<DynamicRegistries.Impl> DYNAMIC_REGISTRIES = new LazyValue<>(() -> {
+		DynamicRegistries.Impl dynamicRegistries = new DynamicRegistries.Impl();
+		for (Registry<?> registry : WorldGenRegistries.REGISTRY) {
+			copyAllToDynamicRegistry(registry, dynamicRegistries);
+		}
+		return dynamicRegistries;
+	});
+
+	private static <T> void copyAllToDynamicRegistry(Registry<T> from, DynamicRegistries dynamicRegistries) {
+		dynamicRegistries.registry(from.key()).ifPresent(dynamicRegistry -> {
+			copyAllToRegistry(from, dynamicRegistry);
+		});
+	}
+
+	private static <T> void copyAllToRegistry(Registry<T> from, Registry<T> to) {
+		for (Map.Entry<RegistryKey<T>, T> entry : from.entrySet()) {
+			Registry.register(to, entry.getKey().location(), entry.getValue());
+		}
+	}
 
 	private final Path root;
 	private final String path;
@@ -123,14 +149,13 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 
 	@Override
 	public void run(DirectoryCache cache) {
-		this.result = this.entryGenerator.generate((id, entry) -> {
-			if (this.registry != null) {
-				Registry.register(this.registry, id, entry);
-			}
+		DynamicRegistries.Impl dynamicRegistries = DYNAMIC_REGISTRIES.get();
+		DynamicOps<JsonElement> ops = WorldGenSettingsExport.create(JsonOps.INSTANCE, dynamicRegistries);
 
+		this.result = this.entryGenerator.generate((id, entry) -> {
 			Path path = this.root.resolve(id.getNamespace()).resolve(this.path).resolve(id.getPath() + ".json");
 
-			Function<Supplier<T>, DataResult<JsonElement>> function = JsonOps.INSTANCE.withEncoder(this.codec);
+			Function<Supplier<T>, DataResult<JsonElement>> function = ops.withEncoder(this.codec);
 
 			try {
 				Optional<JsonElement> serialized = function.apply(() -> entry).result();
@@ -141,6 +166,13 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 				}
 			} catch (IOException e) {
 				LOGGER.error("Couldn't save worldgen entry at {}", path, e);
+			}
+
+			if (this.registry != null) {
+				Registry.register(this.registry, id, entry);
+				dynamicRegistries.registry(this.registry.key()).ifPresent(dynamicRegistry -> {
+					Registry.register(dynamicRegistry, id, entry);
+				});
 			}
 
 			return entry;

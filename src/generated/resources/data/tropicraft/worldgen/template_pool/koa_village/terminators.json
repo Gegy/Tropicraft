@@ -6,9 +6,7 @@
       "weight": 1,
       "element": {
         "location": "tropicraft:koa_village/terminators/terminator_01",
-        "processors": {
-          "processors": []
-        },
+        "processors": "minecraft:empty",
         "projection": "tropicraft:koa_path",
         "element_type": "minecraft:single_pool_element"
       }

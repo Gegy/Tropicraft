@@ -5,13 +5,7 @@
     {
       "weight": 4,
       "element": {
-        "feature": {
-          "config": {
-            "min_angle": 240.0,
-            "max_angle": 300.0
-          },
-          "type": "tropicraft:home_tree_branch"
-        },
+        "feature": "tropicraft:home_tree/branch/west",
         "projection": "rigid",
         "element_type": "minecraft:feature_pool_element"
       }
@@ -19,13 +13,7 @@
     {
       "weight": 1,
       "element": {
-        "feature": {
-          "config": {
-            "min_angle": 270.0,
-            "max_angle": 270.0
-          },
-          "type": "tropicraft:home_tree_branch"
-        },
+        "feature": "tropicraft:home_tree/branch/west_exact",
         "projection": "rigid",
         "element_type": "minecraft:feature_pool_element"
       }

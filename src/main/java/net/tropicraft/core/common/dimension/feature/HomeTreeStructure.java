@@ -18,7 +18,7 @@ import net.minecraft.world.gen.feature.jigsaw.JigsawPiece;
 import net.minecraft.world.gen.feature.structure.*;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.tropicraft.Constants;
-import net.tropicraft.core.common.dimension.feature.jigsaw.NoRotateSingleJigsawPiece;
+import net.tropicraft.core.common.dimension.feature.jigsaw.piece.NoRotateSingleJigsawPiece;
 
 public class HomeTreeStructure extends Structure<VillageConfig> {
     public HomeTreeStructure(Codec<VillageConfig> codec) {
