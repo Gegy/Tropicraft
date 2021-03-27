@@ -43,7 +43,7 @@ public class TropicraftFeatures {
 	public static final RegistryObject<UndergrowthFeature> UNDERGROWTH = register("undergrowth", () -> new UndergrowthFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<RainforestVinesFeature> VINES = register("rainforest_vines", () -> new RainforestVinesFeature(RainforestVinesConfig.CODEC));
 
-	public static final RegistryObject<Structure<VillageConfig>> VILLAGE = registerStructure("koa_village", () -> new KoaVillageStructure(VillageConfig.CODEC));
+	public static final RegistryObject<Structure<VillageConfig>> KOA_VILLAGE = registerStructure("koa_village", () -> new KoaVillageStructure(VillageConfig.CODEC));
 	public static final RegistryObject<Structure<VillageConfig>> HOME_TREE = registerStructure("home_tree", () -> new HomeTreeStructure(VillageConfig.CODEC));
 	public static final RegistryObject<HomeTreeBranchFeature<HomeTreeBranchConfig>> HOME_TREE_BRANCH = register("home_tree_branch", () -> new HomeTreeBranchFeature<>(HomeTreeBranchConfig.CODEC));
 	public static final RegistryObject<CoffeePlantFeature> COFFEE_BUSH = register("coffee_bush", () -> new CoffeePlantFeature(NoFeatureConfig.CODEC));

@@ -1,5 +1,6 @@
 package net.tropicraft.core.common.data;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -14,6 +15,7 @@ import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
 import net.minecraft.world.gen.feature.template.IStructureProcessorType;
 import net.minecraft.world.gen.feature.template.StructureProcessorList;
@@ -87,6 +89,14 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 		);
 	}
 
+	public static <R> Supplier<R> addConfiguredStructures(DataGenerator dataGenerator, EntryGenerator<StructureFeature<?, ?>, R> entryGenerator) {
+		return add(
+				dataGenerator,
+				"worldgen/configured_structure_feature", WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE, StructureFeature.CODEC,
+				entryGenerator
+		);
+	}
+
 	public static <R> Supplier<R> addBiomes(DataGenerator dataGenerator, EntryGenerator<Biome, R> entryGenerator) {
 		return add(
 				dataGenerator,
@@ -134,7 +144,8 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 		});
 	}
 
-	public R getResult() {
+	private R getResult() {
+		Preconditions.checkNotNull(result, "worldgen data not yet generated");
 		return result;
 	}
 

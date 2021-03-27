@@ -41,6 +41,7 @@ import net.tropicraft.core.common.dimension.carver.TropicraftCarvers;
 import net.tropicraft.core.common.dimension.carver.TropicraftConfiguredCarvers;
 import net.tropicraft.core.common.dimension.chunk.TropicraftChunkGeneratorTypes;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredFeatures;
+import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredStructures;
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
 import net.tropicraft.core.common.dimension.feature.jigsaw.TropicraftProcessorLists;
 import net.tropicraft.core.common.dimension.feature.pools.TropicraftTemplatePools;
@@ -90,7 +91,6 @@ public class Tropicraft
         MixerRecipes.addMixerRecipes();
         TropicraftTileEntityTypes.TILE_ENTITIES.register(modBus);
         TropicraftEntities.ENTITIES.register(modBus);
-        TropicraftBiomes.BIOMES.register(modBus);
         //TODO 1.15 TropicraftBiomeProviderTypes.BIOME_PROVIDER_TYPES.register(modBus);
         TropicraftWorldUtils.DIMENSIONS.register(modBus);
         TropicraftCarvers.CARVERS.register(modBus);
@@ -142,7 +142,6 @@ public class Tropicraft
     
     private void setup(final FMLCommonSetupEvent event) {
         TropicraftPackets.init();
-        TropicraftBiomes.addFeatures();
         ScubaData.registerCapability();
         TropicraftEntities.registerSpawns();
     }
@@ -169,17 +168,20 @@ public class Tropicraft
             gen.addProvider(new TropicraftLootTableProvider(gen));
             gen.addProvider(new TropicraftEntityTypeTagsProvider(gen, existingFileHelper));
 
-            Supplier<TropicraftConfiguredFeatures> features = TropicraftWorldgenProvider.addConfiguredFeatures(gen, TropicraftConfiguredFeatures::new);
-            Supplier<TropicraftConfiguredSurfaceBuilders> surfaceBuilders = TropicraftWorldgenProvider.addConfiguredSurfaceBuilders(gen, TropicraftConfiguredSurfaceBuilders::new);
-            Supplier<TropicraftConfiguredCarvers> carvers = TropicraftWorldgenProvider.addConfiguredCarvers(gen, TropicraftConfiguredCarvers::new);
-            Supplier<TropicraftProcessorLists> processors = TropicraftWorldgenProvider.addProcessorLists(gen, TropicraftProcessorLists::new);
-            Supplier<TropicraftTemplatePools> templates = TropicraftWorldgenProvider.addTemplatePools(gen, consumer -> {
-                return new TropicraftTemplatePools(consumer, processors.get());
-            });
-
-            TropicraftWorldgenProvider.addBiomes(gen, consumer -> {
-                return new TropicraftBiomes(consumer, features.get(), surfaceBuilders.get(), carvers.get());
-            });
+            gatherWorldgenData(gen);
         }
+    }
+
+    private void gatherWorldgenData(DataGenerator gen) {
+        Supplier<TropicraftConfiguredFeatures> features = TropicraftWorldgenProvider.addConfiguredFeatures(gen, TropicraftConfiguredFeatures::new);
+        Supplier<TropicraftConfiguredSurfaceBuilders> surfaceBuilders = TropicraftWorldgenProvider.addConfiguredSurfaceBuilders(gen, TropicraftConfiguredSurfaceBuilders::new);
+        Supplier<TropicraftConfiguredCarvers> carvers = TropicraftWorldgenProvider.addConfiguredCarvers(gen, TropicraftConfiguredCarvers::new);
+        Supplier<TropicraftProcessorLists> processors = TropicraftWorldgenProvider.addProcessorLists(gen, TropicraftProcessorLists::new);
+        Supplier<TropicraftTemplatePools> templates = TropicraftWorldgenProvider.addTemplatePools(gen, consumer -> new TropicraftTemplatePools(consumer, features.get(), processors.get()));
+        Supplier<TropicraftConfiguredStructures> structures = TropicraftWorldgenProvider.addConfiguredStructures(gen, consumer -> new TropicraftConfiguredStructures(consumer, templates.get()));
+
+        TropicraftWorldgenProvider.addBiomes(gen, consumer -> {
+            return new TropicraftBiomes(consumer, features.get(), structures.get(), carvers.get(), surfaceBuilders.get());
+        });
     }
 }

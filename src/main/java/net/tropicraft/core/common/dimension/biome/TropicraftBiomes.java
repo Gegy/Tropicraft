@@ -7,18 +7,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.*;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.carver.ConfiguredCarver;
-import net.minecraft.world.gen.carver.ICarverConfig;
-import net.minecraft.world.gen.carver.WorldCarver;
-import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.feature.structure.VillageConfig;
-import net.minecraftforge.fml.RegistryObject;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.tropicraft.Constants;
 import net.tropicraft.core.common.data.WorldgenDataConsumer;
 import net.tropicraft.core.common.dimension.carver.TropicraftConfiguredCarvers;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredFeatures;
-import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
+import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredStructures;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftConfiguredSurfaceBuilders;
 import net.tropicraft.core.common.entity.TropicraftEntities;
 
@@ -52,14 +45,24 @@ public final class TropicraftBiomes {
 
 	public final Biome tropics;
 
-	public TropicraftBiomes(WorldgenDataConsumer<Biome> worldgen, TropicraftConfiguredFeatures features, TropicraftConfiguredSurfaceBuilders surfaces, TropicraftConfiguredCarvers carvers) {
+	private final TropicraftConfiguredFeatures features;
+	private final TropicraftConfiguredStructures structures;
+	private final TropicraftConfiguredCarvers carvers;
+	private final TropicraftConfiguredSurfaceBuilders surfaces;
+
+	public TropicraftBiomes(WorldgenDataConsumer<Biome> worldgen, TropicraftConfiguredFeatures features, TropicraftConfiguredStructures structures, TropicraftConfiguredCarvers carvers, TropicraftConfiguredSurfaceBuilders surfaces) {
+		this.features = features;
+		this.structures = structures;
+		this.carvers = carvers;
+		this.surfaces = surfaces;
+
 		Register biomes = new Register(worldgen);
 
-		this.tropics = biomes.register("tropics", createTropicsBiome(features, surfaces, carvers));
+		this.tropics = biomes.register(TROPICS, createTropics());
 	}
 
 	// TODO: how will this work?
-	public static void addFeatures() {
+	/*public static void addFeatures() {
 		for (Biome b : ForgeRegistries.BIOMES.getValues()) {
 			if (b.getBiomeCategory() == Biome.Category.BEACH) {
 				DefaultTropicsFeatures.addPalmTrees(b);
@@ -67,29 +70,24 @@ public final class TropicraftBiomes {
 				DefaultTropicsFeatures.addPineapples(b);
 			}
 		}
-	}
+	}*/
 
-	// TODO: merge default features into configuredfeatures type
-	private static Biome createTropicsBiome(TropicraftConfiguredFeatures features, TropicraftConfiguredSurfaceBuilders surfaces, TropicraftConfiguredCarvers carvers) {
+	private Biome createTropics() {
 		BiomeGenerationSettings.Builder generation = defaultGeneration()
 				.surfaceBuilder(surfaces.tropics);
 
-		defaultFeatures.addCarvers(generation);
+		carvers.addLand(generation);
 
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, features.grapefruitTree);
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, features.orangeTree);
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, features.lemonTree);
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, features.limeTree);
-
-		defaultFeatures.addPalmTrees(generation);
+		features.addFruitTrees(generation);
+		features.addPalmTrees(generation);
 
 		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, features.eih);
 
 		defaultFeatures.addTropicsFlowers(generation);
-		defaultFeatures.addPineapples(generation);
+		features.addPineapples(generation);
 
 		DefaultBiomeFeatures.addDefaultGrass(generation);
-		DefaultBiomeFeatures.withTallGrass(generation);
+		DefaultBiomeFeatures.addSavannaGrass(generation);
 
 		MobSpawnInfo.Builder spawns = defaultSpawns();
 		spawns.addSpawn(EntityClassification.AMBIENT, new MobSpawnInfo.Spawners(TropicraftEntities.FAILGULL.get(), 10, 5, 15));
@@ -108,20 +106,20 @@ public final class TropicraftBiomes {
 				.build();
 	}
 
-	private static BiomeGenerationSettings.Builder defaultGeneration() {
+	private BiomeGenerationSettings.Builder defaultGeneration() {
 		BiomeGenerationSettings.Builder generation = new BiomeGenerationSettings.Builder();
 
-		DefaultBiomeFeatures.withStrongholdAndMineshaft(generation);
-		DefaultBiomeFeatures.withCommonOverworldBlocks(generation);
-		DefaultBiomeFeatures.withOverworldOres(generation);
+		DefaultBiomeFeatures.addDefaultOverworldLandStructures(generation);
+		DefaultBiomeFeatures.addDefaultOres(generation);
+		DefaultBiomeFeatures.addDefaultUndergroundVariety(generation);
 
-		generation.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, TropicraftFeatures.VILLAGE.get().configured(IFeatureConfig.NO_FEATURE_CONFIG));
-		generation.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, TropicraftFeatures.HOME_TREE.get().configured(new VillageConfig(Constants.MODID + ":home_tree/starts", 10)));
+		generation.addStructureStart(structures.homeTree);
+		generation.addStructureStart(structures.koaVillage);
 
 		return generation;
 	}
 
-	private static MobSpawnInfo.Builder defaultSpawns() {
+	private MobSpawnInfo.Builder defaultSpawns() {
 		MobSpawnInfo.Builder spawns = new MobSpawnInfo.Builder();
 
 		spawns.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(EntityType.PARROT, 20, 1, 2));
@@ -137,12 +135,11 @@ public final class TropicraftBiomes {
 		return spawns;
 	}
 
-	private static BiomeAmbience.Builder defaultAmbience() {
+	private BiomeAmbience.Builder defaultAmbience() {
 		return new BiomeAmbience.Builder()
 				.waterColor(TROPICS_WATER_COLOR)
 				.waterFogColor(TROPICS_WATER_FOG_COLOR);
 	}
-
 
 	static final class Register {
 		private final WorldgenDataConsumer<Biome> worldgen;
@@ -151,8 +148,8 @@ public final class TropicraftBiomes {
 			this.worldgen = worldgen;
 		}
 
-		public Biome register(String id, Biome biome) {
-			return this.worldgen.register(new ResourceLocation(Constants.MODID, id), biome);
+		public Biome register(RegistryKey<Biome> id, Biome biome) {
+			return this.worldgen.register(id, biome);
 		}
 	}
 }

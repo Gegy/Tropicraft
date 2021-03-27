@@ -2,9 +2,14 @@ package net.tropicraft.core.common.dimension.feature;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.BiomeGenerationSettings;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.blockplacer.DoublePlantBlockPlacer;
+import net.minecraft.world.gen.blockstateprovider.SimpleBlockStateProvider;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.placement.AtSurfaceWithExtraConfig;
 import net.minecraft.world.gen.placement.Placement;
+import net.minecraft.world.gen.placement.TopSolidRangeConfig;
 import net.minecraftforge.fml.RegistryObject;
 import net.tropicraft.Constants;
 import net.tropicraft.core.common.block.TropicraftBlocks;
@@ -31,6 +36,14 @@ public final class TropicraftConfiguredFeatures {
 	public final ConfiguredFeature<?, ?> rainforestTallTree;
 	public final ConfiguredFeature<?, ?> rainforestVines;
 	public final ConfiguredFeature<?, ?> eih;
+
+	public final ConfiguredFeature<?, ?> pineapplePatch;
+
+	public final ConfiguredFeature<?, ?> azurite;
+	public final ConfiguredFeature<?, ?> eudialyte;
+	public final ConfiguredFeature<?, ?> zircon;
+	public final ConfiguredFeature<?, ?> manganese;
+	public final ConfiguredFeature<?, ?> shaka;
 
 	public final ConfiguredFeature<?, ?> homeTreeBranchSouth;
 	public final ConfiguredFeature<?, ?> homeTreeBranchSouthExact;
@@ -74,6 +87,41 @@ public final class TropicraftConfiguredFeatures {
 						.decorated(Placement.COUNT_EXTRA.configured(new AtSurfaceWithExtraConfig(0, 0.01F, 1)))
 		);
 
+		this.pineapplePatch = features.register("pineapple_patch", Feature.RANDOM_PATCH, f -> {
+			SimpleBlockStateProvider state = new SimpleBlockStateProvider(TropicraftBlocks.PINEAPPLE.get().defaultBlockState());
+			return f.configured(new BlockClusterFeatureConfig.Builder(state, new DoublePlantBlockPlacer())
+					.tries(64)
+					.noProjection()
+					.build()
+			).decorated(Features.Placements.ADD_32).decorated(Features.Placements.HEIGHTMAP_SQUARE);
+		});
+
+		this.azurite = features.register("azurite", Feature.ORE, f -> {
+			return f.configured(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, TropicraftBlocks.AZURITE_ORE.get().defaultBlockState(), 8))
+					.decorated(Placement.RANGE.configured(new TopSolidRangeConfig(100, 0, 128)))
+					.squared().count(3);
+		});
+		this.eudialyte = features.register("eudialyte", Feature.ORE, f -> {
+			return f.configured(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, TropicraftBlocks.EUDIALYTE_ORE.get().defaultBlockState(), 12))
+					.decorated(Placement.RANGE.configured(new TopSolidRangeConfig(100, 0, 128)))
+					.squared().count(10);
+		});
+		this.zircon = features.register("zircon", Feature.ORE, f -> {
+			return f.configured(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, TropicraftBlocks.ZIRCON_ORE.get().defaultBlockState(), 14))
+					.decorated(Placement.RANGE.configured(new TopSolidRangeConfig(100, 0, 128)))
+					.squared().count(15);
+		});
+		this.manganese = features.register("manganese", Feature.ORE, f -> {
+			return f.configured(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, TropicraftBlocks.MANGANESE_ORE.get().defaultBlockState(), 10))
+					.decorated(Placement.RANGE.configured(new TopSolidRangeConfig(32, 0, 32)))
+					.squared().count(8);
+		});
+		this.shaka = features.register("shaka", Feature.ORE, f -> {
+			return f.configured(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, TropicraftBlocks.SHAKA_ORE.get().defaultBlockState(), 8))
+					.decorated(Placement.RANGE.configured(new TopSolidRangeConfig(0, 0, 32)))
+					.squared().count(6);
+		});
+
 		// 0 = south
 		// 90 = east
 		// 180 = north
@@ -96,6 +144,39 @@ public final class TropicraftConfiguredFeatures {
 		this.homeTreeBranchSouthWestExact = features.homeTreeBranch("home_tree/branch/southwest_exact", 315, 315);
 	}
 
+	public void addFruitTrees(BiomeGenerationSettings.Builder generation) {
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.grapefruitTree);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.orangeTree);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.lemonTree);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.limeTree);
+	}
+
+	public void addPalmTrees(BiomeGenerationSettings.Builder generation) {
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.normalPalmTree);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.curvedPalmTree);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.largePalmTree);
+	}
+
+	public void addRainforestPlants(BiomeGenerationSettings.Builder generation) {
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.PATCH_MELON);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.rainforestVines);
+	}
+
+	public void addPineapples(BiomeGenerationSettings.Builder generation) {
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.pineapplePatch);
+	}
+
+	public void addTropicsGems(BiomeGenerationSettings.Builder generation) {
+		generation.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, this.azurite);
+		generation.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, this.eudialyte);
+		generation.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, this.zircon);
+	}
+
+	public void addTropicsMetals(BiomeGenerationSettings.Builder generation) {
+		generation.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, this.manganese);
+		generation.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, this.shaka);
+	}
+
 	static final class Register {
 		private final WorldgenDataConsumer<ConfiguredFeature<?, ?>> worldgen;
 
@@ -103,8 +184,12 @@ public final class TropicraftConfiguredFeatures {
 			this.worldgen = worldgen;
 		}
 
+		public <F extends Feature<?>> ConfiguredFeature<?, ?> register(String id, F feature, Function<F, ConfiguredFeature<?, ?>> configure) {
+			return this.worldgen.register(new ResourceLocation(Constants.MODID, id), configure.apply(feature));
+		}
+
 		public <F extends Feature<?>> ConfiguredFeature<?, ?> register(String id, RegistryObject<F> feature, Function<F, ConfiguredFeature<?, ?>> configure) {
-			return this.worldgen.register(new ResourceLocation(Constants.MODID, id), configure.apply(feature.get()));
+			return this.register(id, feature.get(), configure);
 		}
 
 		public <F extends Feature<NoFeatureConfig>> ConfiguredFeature<?, ?> noConfig(String id, RegistryObject<F> feature, UnaryOperator<ConfiguredFeature<?, ?>> configure) {

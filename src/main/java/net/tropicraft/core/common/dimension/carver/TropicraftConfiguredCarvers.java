@@ -1,6 +1,8 @@
 package net.tropicraft.core.common.dimension.carver;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.BiomeGenerationSettings;
+import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.carver.ICarverConfig;
 import net.minecraft.world.gen.carver.WorldCarver;
@@ -22,6 +24,16 @@ public final class TropicraftConfiguredCarvers {
 		this.canyon = carvers.register("canyon", TropicraftCarvers.CANYON, new ProbabilityConfig(0.02F));
 		this.underwaterCave = carvers.register("underwater_cave", TropicraftCarvers.UNDERWATER_CAVE, new ProbabilityConfig(0.15F));
 		this.underwaterCanyon = carvers.register("underwater_canyon", TropicraftCarvers.UNDERWATER_CANYON, new ProbabilityConfig(0.02F));
+	}
+
+	public void addLand(BiomeGenerationSettings.Builder generation) {
+		generation.addCarver(GenerationStage.Carving.AIR, this.cave);
+		generation.addCarver(GenerationStage.Carving.AIR, this.canyon);
+	}
+
+	public void addUnderwater(BiomeGenerationSettings.Builder generation) {
+		generation.addCarver(GenerationStage.Carving.LIQUID, this.underwaterCave);
+		generation.addCarver(GenerationStage.Carving.LIQUID, this.underwaterCanyon);
 	}
 
 	static final class Register {

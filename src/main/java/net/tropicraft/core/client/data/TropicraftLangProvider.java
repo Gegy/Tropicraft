@@ -442,7 +442,7 @@ public class TropicraftLangProvider extends LanguageProvider {
     }
     
     private void addBiome(RegistryKey<Biome> biome) {
-        ResourceLocation id = biome.getRegistryName();
+        ResourceLocation id = biome.location();
         add("biome." + id.getNamespace() + "." + id.getPath(), Util.toEnglishName(id.getPath()));
     }
     

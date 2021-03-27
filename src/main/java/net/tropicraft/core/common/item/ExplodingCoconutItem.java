@@ -20,7 +20,7 @@ public class ExplodingCoconutItem extends Item {
         // TODO config option
         final boolean canPlayerThrow = player.isCreative() || player.canUseGameMasterBlocks();
         //allow to use anywhere but in the main area of the server
-        final boolean ltOverride = !world.dimension().getRegistryName().toString().equals("tropicraft:tropics");
+        final boolean ltOverride = !world.dimension().location().toString().equals("tropicraft:tropics");
         ItemStack itemstack = player.getItemInHand(hand);
         if (!canPlayerThrow && !ltOverride) {
             if (!world.isClientSide) {
