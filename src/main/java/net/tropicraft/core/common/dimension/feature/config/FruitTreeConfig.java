@@ -10,7 +10,6 @@ import net.tropicraft.core.common.block.TropicraftBlocks;
 
 import java.util.function.Supplier;
 
-// TODO: will this work with forge's block registry?
 public final class FruitTreeConfig implements IFeatureConfig {
 	public static final Codec<FruitTreeConfig> CODEC = RecordCodecBuilder.create(instance -> {
 		return instance.group(

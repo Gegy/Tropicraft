@@ -96,7 +96,6 @@ public class Tropicraft
         MixerRecipes.addMixerRecipes();
         TropicraftTileEntityTypes.TILE_ENTITIES.register(modBus);
         TropicraftEntities.ENTITIES.register(modBus);
-        //TODO 1.15 TropicraftBiomeProviderTypes.BIOME_PROVIDER_TYPES.register(modBus);
         TropicraftCarvers.CARVERS.register(modBus);
         TropicraftFeatures.FEATURES.register(modBus);
         TropicraftFeatures.STRUCTURES.register(modBus);

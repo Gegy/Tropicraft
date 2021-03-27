@@ -7,16 +7,30 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.*;
 import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.blockplacer.DoublePlantBlockPlacer;
+import net.minecraft.world.gen.blockstateprovider.SimpleBlockStateProvider;
+import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
+import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.Features;
+import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.gen.placement.AtSurfaceWithExtraConfig;
+import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilders;
+import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
+import net.minecraftforge.event.world.BiomeLoadingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.tropicraft.Constants;
+import net.tropicraft.core.common.block.TropicraftBlocks;
 import net.tropicraft.core.common.data.WorldgenDataConsumer;
 import net.tropicraft.core.common.dimension.carver.TropicraftConfiguredCarvers;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredFeatures;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredStructures;
+import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftConfiguredSurfaceBuilders;
 import net.tropicraft.core.common.entity.TropicraftEntities;
 
+@Mod.EventBusSubscriber(modid = Constants.MODID)
 public final class TropicraftBiomes {
 	public static final int TROPICS_WATER_COLOR = 0x4eecdf;
 	public static final int TROPICS_WATER_FOG_COLOR = 0x041f33;
@@ -85,6 +99,44 @@ public final class TropicraftBiomes {
 			}
 		}
 	}*/
+
+	@SubscribeEvent
+	public static void onBiomeLoad(BiomeLoadingEvent event) {
+		ResourceLocation name = event.getName();
+		if (name != null && name.getNamespace().equals(Constants.MODID)) {
+			return;
+		}
+
+		Biome.Category category = event.getCategory();
+		BiomeGenerationSettingsBuilder generation = event.getGeneration();
+
+		if (category == Biome.Category.BEACH) {
+			generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+					TropicraftFeatures.NORMAL_PALM_TREE.get().configured(NoFeatureConfig.INSTANCE)
+							.decorated(Features.Placements.HEIGHTMAP_SQUARE)
+							.decorated(Placement.COUNT_EXTRA.configured(new AtSurfaceWithExtraConfig(0, 0.1F, 1)))
+			);
+			generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+					TropicraftFeatures.CURVED_PALM_TREE.get().configured(NoFeatureConfig.INSTANCE)
+							.decorated(Features.Placements.HEIGHTMAP_SQUARE)
+							.decorated(Placement.COUNT_EXTRA.configured(new AtSurfaceWithExtraConfig(0, 0.1F, 1)))
+			);
+			generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+					TropicraftFeatures.LARGE_PALM_TREE.get().configured(NoFeatureConfig.INSTANCE)
+							.decorated(Features.Placements.HEIGHTMAP_SQUARE)
+							.decorated(Placement.COUNT_EXTRA.configured(new AtSurfaceWithExtraConfig(0, 0.1F, 1)))
+			);
+		} else if (category == Biome.Category.JUNGLE) {
+			SimpleBlockStateProvider state = new SimpleBlockStateProvider(TropicraftBlocks.PINEAPPLE.get().defaultBlockState());
+			generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+					Feature.RANDOM_PATCH.configured(new BlockClusterFeatureConfig.Builder(state, new DoublePlantBlockPlacer())
+							.tries(64)
+							.noProjection()
+							.build()
+					).decorated(Features.Placements.ADD_32).decorated(Features.Placements.HEIGHTMAP_SQUARE)
+			);
+		}
+	}
 
 	private Biome createTropics() {
 		BiomeGenerationSettings.Builder generation = defaultGeneration()
