@@ -1,0 +1,34 @@
+{
+  "name": "tropicraft:home_tree/branches/southwest",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 4,
+      "element": {
+        "feature": {
+          "config": {
+            "min_angle": 300.0,
+            "max_angle": 330.0
+          },
+          "type": "tropicraft:home_tree_branch"
+        },
+        "projection": "rigid",
+        "element_type": "minecraft:feature_pool_element"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "feature": {
+          "config": {
+            "min_angle": 315.0,
+            "max_angle": 315.0
+          },
+          "type": "tropicraft:home_tree_branch"
+        },
+        "projection": "rigid",
+        "element_type": "minecraft:feature_pool_element"
+      }
+    }
+  ]
+}

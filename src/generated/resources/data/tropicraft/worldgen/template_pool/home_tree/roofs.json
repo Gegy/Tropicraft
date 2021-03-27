@@ -1,0 +1,21 @@
+{
+  "name": "tropicraft:home_tree/roofs",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "location": "tropicraft:home_tree/roofs/roof_0",
+        "processors": {
+          "processors": [
+            {
+              "processor_type": "tropicraft:air_to_cave_air"
+            }
+          ]
+        },
+        "projection": "rigid",
+        "element_type": "tropicraft:fixed"
+      }
+    }
+  ]
+}

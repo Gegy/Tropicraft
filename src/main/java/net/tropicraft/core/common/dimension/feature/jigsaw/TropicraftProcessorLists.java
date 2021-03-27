@@ -21,7 +21,7 @@ public final class TropicraftProcessorLists {
 	public TropicraftProcessorLists(WorldgenDataConsumer<StructureProcessorList> worldgen) {
 		Register processors = new Register(worldgen);
 
-		StructureSupportsProcessor fenceExtender = new StructureSupportsProcessor(false, ImmutableList.of(TropicraftBlocks.BAMBOO_FENCE.get()));
+		StructureSupportsProcessor fenceExtender = new StructureSupportsProcessor(false, ImmutableList.of(TropicraftBlocks.BAMBOO_FENCE.getId()));
 
 		this.koaTownCenters = processors.register(
 				"koa_village/town_centers",
@@ -41,7 +41,7 @@ public final class TropicraftProcessorLists {
 		this.homeTreeStart = processors.register(
 				"home_tree/start",
 				new AirToCaveAirProcessor(),
-				new StructureSupportsProcessor(true, ImmutableList.of(TropicraftBlocks.MAHOGANY_LOG.get()))
+				new StructureSupportsProcessor(true, ImmutableList.of(TropicraftBlocks.MAHOGANY_LOG.getId()))
 		);
 	}
 

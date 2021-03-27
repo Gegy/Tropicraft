@@ -1,6 +1,7 @@
 package net.tropicraft.core.common.dimension.feature;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
@@ -40,19 +41,20 @@ public class TropicraftFeatures {
 	public static final RegistryObject<RainforestVinesFeature> VINES = register("rainforest_vines", () -> new RainforestVinesFeature(RainforestVinesConfig.CODEC));
 	public static final RegistryObject<UndergroundSeaPickleFeature> UNDERGROUND_SEA_PICKLE = register("underground_sea_pickle", () -> new UndergroundSeaPickleFeature(NoFeatureConfig.CODEC));
 
-	public static final RegistryObject<Structure<VillageConfig>> KOA_VILLAGE = registerStructure("koa_village", () -> new KoaVillageStructure(VillageConfig.CODEC));
-	public static final RegistryObject<Structure<VillageConfig>> HOME_TREE = registerStructure("home_tree", () -> new HomeTreeStructure(VillageConfig.CODEC));
+	public static final RegistryObject<Structure<VillageConfig>> KOA_VILLAGE = registerStructure("koa_village", new KoaVillageStructure(VillageConfig.CODEC), GenerationStage.Decoration.SURFACE_STRUCTURES);
+	public static final RegistryObject<Structure<VillageConfig>> HOME_TREE = registerStructure("home_tree", new HomeTreeStructure(VillageConfig.CODEC), GenerationStage.Decoration.SURFACE_STRUCTURES);
 	public static final RegistryObject<HomeTreeBranchFeature<HomeTreeBranchConfig>> HOME_TREE_BRANCH = register("home_tree_branch", () -> new HomeTreeBranchFeature<>(HomeTreeBranchConfig.CODEC));
 	public static final RegistryObject<CoffeePlantFeature> COFFEE_BUSH = register("coffee_bush", () -> new CoffeePlantFeature(NoFeatureConfig.CODEC));
 
 	public static final PlacementBehaviour KOA_PATH = PlacementBehaviour.create("KOA_PATH", Constants.MODID + ":koa_path",
-            ImmutableList.of(new SmoothingGravityProcessor(Heightmap.Type.WORLD_SURFACE_WG, -1), new SinkInGroundProcessor(), new SteepPathProcessor(), new StructureSupportsProcessor(false, ImmutableList.of(TropicraftBlocks.BAMBOO_FENCE.get()))));
+            ImmutableList.of(new SmoothingGravityProcessor(Heightmap.Type.WORLD_SURFACE_WG, -1), new SinkInGroundProcessor(), new SteepPathProcessor(), new StructureSupportsProcessor(false, ImmutableList.of(TropicraftBlocks.BAMBOO_FENCE.getId()))));
 
     private static <T extends Feature<?>> RegistryObject<T> register(final String name, final Supplier<T> sup) {
         return FEATURES.register(name, sup);
     }
 
-	private static <T extends Structure<?>> RegistryObject<T> registerStructure(final String name, final Supplier<T> sup) {
-		return STRUCTURES.register(name, sup);
+	private static <T extends Structure<?>> RegistryObject<T> registerStructure(final String name, T structure, GenerationStage.Decoration step) {
+    	Structure.STEP.put(structure, step);
+		return STRUCTURES.register(name, () -> structure);
 	}
 }

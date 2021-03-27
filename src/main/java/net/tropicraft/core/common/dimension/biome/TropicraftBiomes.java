@@ -20,6 +20,8 @@ import net.tropicraft.core.common.entity.TropicraftEntities;
 public final class TropicraftBiomes {
 	public static final int TROPICS_WATER_COLOR = 0x4eecdf;
 	public static final int TROPICS_WATER_FOG_COLOR = 0x041f33;
+	public static final int TROPICS_FOG_COLOR = 0xC0D8FF;
+	public static final int TROPICS_SKY_COLOR = BiomeMaker.plainsBiome(false).getSkyColor();
 
 	public static final RegistryKey<Biome> TROPICS_OCEAN = key("tropics_ocean");
 	public static final RegistryKey<Biome> TROPICS = key("tropics");
@@ -300,6 +302,8 @@ public final class TropicraftBiomes {
 
 	private BiomeAmbience.Builder defaultAmbience() {
 		return new BiomeAmbience.Builder()
+				.fogColor(TROPICS_FOG_COLOR)
+				.skyColor(TROPICS_SKY_COLOR)
 				.waterColor(TROPICS_WATER_COLOR)
 				.waterFogColor(TROPICS_WATER_FOG_COLOR);
 	}

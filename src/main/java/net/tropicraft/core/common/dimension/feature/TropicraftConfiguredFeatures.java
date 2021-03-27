@@ -131,7 +131,7 @@ public final class TropicraftConfiguredFeatures {
 		this.coffeeBush = features.noConfig("coffee_bush", TropicraftFeatures.COFFEE_BUSH, feature -> {
 			return feature.decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE).count(5));
 		});
-		this.undergrowth = features.noConfig("undergrowth", TropicraftFeatures.COFFEE_BUSH, feature -> {
+		this.undergrowth = features.noConfig("undergrowth", TropicraftFeatures.UNDERGROWTH, feature -> {
 			return feature.decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE).count(100));
 		});
 

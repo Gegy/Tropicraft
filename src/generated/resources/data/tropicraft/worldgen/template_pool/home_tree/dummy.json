@@ -1,0 +1,36 @@
+{
+  "name": "tropicraft:home_tree/dummy",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "location": "tropicraft:home_tree/dummy",
+        "processors": {
+          "processors": [
+            {
+              "processor_type": "tropicraft:air_to_cave_air"
+            }
+          ]
+        },
+        "projection": "rigid",
+        "element_type": "tropicraft:fixed"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "location": "tropicraft:home_tree/outer_dummy",
+        "processors": {
+          "processors": [
+            {
+              "processor_type": "tropicraft:air_to_cave_air"
+            }
+          ]
+        },
+        "projection": "rigid",
+        "element_type": "tropicraft:fixed"
+      }
+    }
+  ]
+}

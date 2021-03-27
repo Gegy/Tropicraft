@@ -19,7 +19,7 @@ public final class TropicraftConfiguredStructures {
 	public TropicraftConfiguredStructures(WorldgenDataConsumer<StructureFeature<?, ?>> worldgen, TropicraftTemplatePools templatePools) {
 		Register structures = new Register(worldgen);
 
-		this.homeTree = structures.register("home_tree", TropicraftFeatures.HOME_TREE, templatePools.homeTreeStarts, 10);
+		this.homeTree = structures.register("home_tree", TropicraftFeatures.HOME_TREE, templatePools.homeTreeStarts, 7);
 		this.koaVillage = structures.register("koa_village", TropicraftFeatures.KOA_VILLAGE, templatePools.koaTownCenters, 6);
 	}
 

@@ -1,0 +1,33 @@
+{
+  "config": {
+    "start_pool": {
+      "name": "tropicraft:koa_village/town_centers",
+      "fallback": "minecraft:empty",
+      "elements": [
+        {
+          "weight": 1,
+          "element": {
+            "location": "tropicraft:koa_village/town_centers/firepit_01",
+            "processors": {
+              "processors": [
+                {
+                  "states_to_extend": [
+                    "tropicraft:bamboo_fence"
+                  ],
+                  "processor_type": "tropicraft:structure_supports"
+                },
+                {
+                  "processor_type": "tropicraft:structure_void"
+                }
+              ]
+            },
+            "projection": "rigid",
+            "element_type": "minecraft:single_pool_element"
+          }
+        }
+      ]
+    },
+    "size": 6
+  },
+  "type": "tropicraft:koa_village"
+}

@@ -1,0 +1,66 @@
+{
+  "name": "tropicraft:home_tree/trunks/middle",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "location": "tropicraft:home_tree/trunks/middle/trunk_0",
+        "processors": {
+          "processors": [
+            {
+              "processor_type": "tropicraft:air_to_cave_air"
+            }
+          ]
+        },
+        "projection": "rigid",
+        "element_type": "tropicraft:fixed"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "location": "tropicraft:home_tree/trunks/middle/trunk_1",
+        "processors": {
+          "processors": [
+            {
+              "processor_type": "tropicraft:air_to_cave_air"
+            }
+          ]
+        },
+        "projection": "rigid",
+        "element_type": "tropicraft:fixed"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "location": "tropicraft:home_tree/trunks/middle/trunk_1_iguanas",
+        "processors": {
+          "processors": [
+            {
+              "processor_type": "tropicraft:air_to_cave_air"
+            }
+          ]
+        },
+        "projection": "rigid",
+        "element_type": "tropicraft:fixed"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "location": "tropicraft:home_tree/trunks/middle/trunk_1_ashen",
+        "processors": {
+          "processors": [
+            {
+              "processor_type": "tropicraft:air_to_cave_air"
+            }
+          ]
+        },
+        "projection": "rigid",
+        "element_type": "tropicraft:fixed"
+      }
+    }
+  ]
+}

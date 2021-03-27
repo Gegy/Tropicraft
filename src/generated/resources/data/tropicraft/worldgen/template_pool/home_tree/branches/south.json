@@ -1,0 +1,34 @@
+{
+  "name": "tropicraft:home_tree/branches/south",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 4,
+      "element": {
+        "feature": {
+          "config": {
+            "min_angle": -30.0,
+            "max_angle": 30.0
+          },
+          "type": "tropicraft:home_tree_branch"
+        },
+        "projection": "rigid",
+        "element_type": "minecraft:feature_pool_element"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "feature": {
+          "config": {
+            "min_angle": 0.0,
+            "max_angle": 0.0
+          },
+          "type": "tropicraft:home_tree_branch"
+        },
+        "projection": "rigid",
+        "element_type": "minecraft:feature_pool_element"
+      }
+    }
+  ]
+}

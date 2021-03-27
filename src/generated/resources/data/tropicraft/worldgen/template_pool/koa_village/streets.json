@@ -1,0 +1,160 @@
+{
+  "name": "tropicraft:koa_village/streets",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 3,
+      "element": {
+        "location": "tropicraft:koa_village/streets/straight_01",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 4,
+      "element": {
+        "location": "tropicraft:koa_village/streets/straight_02",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 10,
+      "element": {
+        "location": "tropicraft:koa_village/streets/straight_03",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "location": "tropicraft:koa_village/streets/straight_04",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 3,
+      "element": {
+        "location": "tropicraft:koa_village/streets/straight_05",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "location": "tropicraft:koa_village/streets/straight_06",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "location": "tropicraft:koa_village/streets/corner_01",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 4,
+      "element": {
+        "location": "tropicraft:koa_village/streets/corner_02",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 6,
+      "element": {
+        "location": "tropicraft:koa_village/streets/corner_03",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "location": "tropicraft:koa_village/streets/corner_04",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 5,
+      "element": {
+        "location": "tropicraft:koa_village/streets/crossroad_01",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "location": "tropicraft:koa_village/streets/crossroad_02",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "location": "tropicraft:koa_village/streets/crossroad_03",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "location": "tropicraft:koa_village/streets/crossroad_04",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ]
+}

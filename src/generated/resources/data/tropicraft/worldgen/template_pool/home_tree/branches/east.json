@@ -1,0 +1,34 @@
+{
+  "name": "tropicraft:home_tree/branches/east",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 4,
+      "element": {
+        "feature": {
+          "config": {
+            "min_angle": 60.0,
+            "max_angle": 120.0
+          },
+          "type": "tropicraft:home_tree_branch"
+        },
+        "projection": "rigid",
+        "element_type": "minecraft:feature_pool_element"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "feature": {
+          "config": {
+            "min_angle": 90.0,
+            "max_angle": 90.0
+          },
+          "type": "tropicraft:home_tree_branch"
+        },
+        "projection": "rigid",
+        "element_type": "minecraft:feature_pool_element"
+      }
+    }
+  ]
+}

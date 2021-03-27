@@ -23,6 +23,7 @@ import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -41,7 +42,7 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 
 	private R result;
 
-	private TropicraftWorldgenProvider(DataGenerator dataGenerator, String path, Registry<T> registry, Codec<Supplier<T>> codec, EntryGenerator<T, R> entryGenerator) {
+	private TropicraftWorldgenProvider(DataGenerator dataGenerator, String path, @Nullable Registry<T> registry, Codec<Supplier<T>> codec, EntryGenerator<T, R> entryGenerator) {
 		this.root = dataGenerator.getOutputFolder().resolve("data");
 		this.path = path;
 		this.registry = registry;
@@ -100,7 +101,7 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 	public static <R> Supplier<R> addBiomes(DataGenerator dataGenerator, EntryGenerator<Biome, R> entryGenerator) {
 		return add(
 				dataGenerator,
-				"worldgen/biome", WorldGenRegistries.BIOME, Biome.CODEC,
+				"worldgen/biome", null, Biome.CODEC,
 				entryGenerator
 		);
 	}
@@ -123,7 +124,9 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 	@Override
 	public void run(DirectoryCache cache) {
 		this.result = this.entryGenerator.generate((id, entry) -> {
-			Registry.register(this.registry, id, entry);
+			if (this.registry != null) {
+				Registry.register(this.registry, id, entry);
+			}
 
 			Path path = this.root.resolve(id.getNamespace()).resolve(this.path).resolve(id.getPath() + ".json");
 
@@ -151,7 +154,7 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 
 	@Override
 	public String getName() {
-		return "Tropicraft Worldgen";
+		return "Tropicraft Worldgen (" + path + ")";
 	}
 
 	public interface EntryGenerator<T, R> {

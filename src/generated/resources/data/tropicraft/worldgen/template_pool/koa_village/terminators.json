@@ -1,0 +1,17 @@
+{
+  "name": "tropicraft:koa_village/terminators",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "location": "tropicraft:koa_village/terminators/terminator_01",
+        "processors": {
+          "processors": []
+        },
+        "projection": "tropicraft:koa_path",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ]
+}
