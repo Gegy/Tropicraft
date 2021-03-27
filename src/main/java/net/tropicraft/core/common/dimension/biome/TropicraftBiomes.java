@@ -89,17 +89,6 @@ public final class TropicraftBiomes {
 		this.tropicsRiver = biomes.register(TROPICS_RIVER, createTropicsRiver());
 	}
 
-	// TODO: how will this work?
-	/*public static void addFeatures() {
-		for (Biome b : ForgeRegistries.BIOMES.getValues()) {
-			if (b.getBiomeCategory() == Biome.Category.BEACH) {
-				DefaultTropicsFeatures.addPalmTrees(b);
-			} else if (b.getBiomeCategory() == Biome.Category.JUNGLE) {
-				DefaultTropicsFeatures.addPineapples(b);
-			}
-		}
-	}*/
-
 	@SubscribeEvent
 	public static void onBiomeLoad(BiomeLoadingEvent event) {
 		ResourceLocation name = event.getName();
