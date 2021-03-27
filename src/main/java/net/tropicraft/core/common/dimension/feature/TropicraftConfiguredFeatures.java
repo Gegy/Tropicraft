@@ -1,19 +1,26 @@
 package net.tropicraft.core.common.dimension.feature;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.blockplacer.DoublePlantBlockPlacer;
+import net.minecraft.world.gen.blockplacer.SimpleBlockPlacer;
+import net.minecraft.world.gen.blockstateprovider.BlockStateProvider;
 import net.minecraft.world.gen.blockstateprovider.SimpleBlockStateProvider;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.placement.AtSurfaceWithExtraConfig;
+import net.minecraft.world.gen.placement.CaveEdgeConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.gen.placement.TopSolidRangeConfig;
 import net.minecraftforge.fml.RegistryObject;
 import net.tropicraft.Constants;
+import net.tropicraft.core.common.TropicraftTags;
 import net.tropicraft.core.common.block.TropicraftBlocks;
 import net.tropicraft.core.common.data.WorldgenDataConsumer;
+import net.tropicraft.core.common.dimension.feature.block_state_provider.NoiseFromTagBlockStateProvider;
 import net.tropicraft.core.common.dimension.feature.config.FruitTreeConfig;
 import net.tropicraft.core.common.dimension.feature.config.HomeTreeBranchConfig;
 import net.tropicraft.core.common.dimension.feature.config.RainforestVinesConfig;
@@ -38,6 +45,12 @@ public final class TropicraftConfiguredFeatures {
 	public final ConfiguredFeature<?, ?> eih;
 
 	public final ConfiguredFeature<?, ?> pineapplePatch;
+	public final ConfiguredFeature<?, ?> tropicsFlowers;
+	public final ConfiguredFeature<?, ?> irisFlowers;
+
+	public final ConfiguredFeature<?, ?> undergroundSeagrassOnStone;
+	public final ConfiguredFeature<?, ?> undergroundSeagrassOnDirt;
+	public final ConfiguredFeature<?, ?> undergroundSeaPickles;
 
 	public final ConfiguredFeature<?, ?> azurite;
 	public final ConfiguredFeature<?, ?> eudialyte;
@@ -87,13 +100,45 @@ public final class TropicraftConfiguredFeatures {
 						.decorated(Placement.COUNT_EXTRA.configured(new AtSurfaceWithExtraConfig(0, 0.01F, 1)))
 		);
 
-		this.pineapplePatch = features.register("pineapple_patch", Feature.RANDOM_PATCH, f -> {
+		this.pineapplePatch = features.register("pineapple_patch", Feature.RANDOM_PATCH, feature -> {
 			SimpleBlockStateProvider state = new SimpleBlockStateProvider(TropicraftBlocks.PINEAPPLE.get().defaultBlockState());
-			return f.configured(new BlockClusterFeatureConfig.Builder(state, new DoublePlantBlockPlacer())
+			return feature.configured(new BlockClusterFeatureConfig.Builder(state, new DoublePlantBlockPlacer())
 					.tries(64)
 					.noProjection()
 					.build()
 			).decorated(Features.Placements.ADD_32).decorated(Features.Placements.HEIGHTMAP_SQUARE);
+		});
+		this.tropicsFlowers = features.register("tropics_flowers", Feature.FLOWER, feature -> {
+			BlockStateProvider stateProvider = new NoiseFromTagBlockStateProvider(TropicraftTags.Blocks.TROPICS_FLOWERS);
+			BlockClusterFeatureConfig config = new BlockClusterFeatureConfig.Builder(stateProvider, SimpleBlockPlacer.INSTANCE).tries(64).build();
+			return feature.configured(config).decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE)).count(12);
+		});
+		this.irisFlowers = features.register("iris_flowers", Feature.FLOWER, feature -> {
+			BlockStateProvider stateProvider = new SimpleBlockStateProvider(TropicraftBlocks.IRIS.get().defaultBlockState());
+			BlockClusterFeatureConfig config = new BlockClusterFeatureConfig.Builder(stateProvider, new DoublePlantBlockPlacer()).tries(64).noProjection().build();
+			return feature.configured(config).decorated(Features.Placements.ADD_32.decorated(Features.Placements.HEIGHTMAP_SQUARE)).count(10);
+		});
+
+		this.undergroundSeagrassOnStone = features.register("underground_seagrass_on_stone", Feature.SIMPLE_BLOCK, feature -> {
+			BlockWithContextConfig config = new BlockWithContextConfig(
+					Blocks.SEAGRASS.defaultBlockState(),
+					ImmutableList.of(Blocks.STONE.defaultBlockState()),
+					ImmutableList.of(Blocks.WATER.defaultBlockState()),
+					ImmutableList.of(Blocks.WATER.defaultBlockState())
+			);
+			return feature.configured(config).decorated(Placement.CARVING_MASK.configured(new CaveEdgeConfig(GenerationStage.Carving.LIQUID, 0.1F)));
+		});
+		this.undergroundSeagrassOnDirt = features.register("underground_seagrass_on_dirt", Feature.SIMPLE_BLOCK, feature -> {
+			BlockWithContextConfig config = new BlockWithContextConfig(
+					Blocks.SEAGRASS.defaultBlockState(),
+					ImmutableList.of(Blocks.DIRT.defaultBlockState()),
+					ImmutableList.of(Blocks.WATER.defaultBlockState()),
+					ImmutableList.of(Blocks.WATER.defaultBlockState())
+			);
+			return feature.configured(config).decorated(Placement.CARVING_MASK.configured(new CaveEdgeConfig(GenerationStage.Carving.LIQUID, 0.5F)));
+		});
+		this.undergroundSeaPickles = features.noConfig("underground_sea_pickles", TropicraftFeatures.UNDERGROUND_SEA_PICKLE, feature -> {
+			return feature.decorated(Placement.CARVING_MASK.configured(new CaveEdgeConfig(GenerationStage.Carving.LIQUID, 0.05F)));
 		});
 
 		this.azurite = features.register("azurite", Feature.ORE, f -> {
@@ -157,6 +202,13 @@ public final class TropicraftConfiguredFeatures {
 		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.largePalmTree);
 	}
 
+	public void addRainforestTrees(BiomeGenerationSettings.Builder generation) {
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.rainforestUpTree);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.rainforestSmallTualung);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.rainforestLargeTualung);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.rainforestTallTree);
+	}
+
 	public void addRainforestPlants(BiomeGenerationSettings.Builder generation) {
 		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.PATCH_MELON);
 		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.rainforestVines);
@@ -164,6 +216,15 @@ public final class TropicraftConfiguredFeatures {
 
 	public void addPineapples(BiomeGenerationSettings.Builder generation) {
 		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.pineapplePatch);
+	}
+
+	public void addEih(BiomeGenerationSettings.Builder generation) {
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.eih);
+	}
+
+	public void addTropicsFlowers(BiomeGenerationSettings.Builder generation) {
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.tropicsFlowers);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.irisFlowers);
 	}
 
 	public void addTropicsGems(BiomeGenerationSettings.Builder generation) {
@@ -175,6 +236,15 @@ public final class TropicraftConfiguredFeatures {
 	public void addTropicsMetals(BiomeGenerationSettings.Builder generation) {
 		generation.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, this.manganese);
 		generation.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, this.shaka);
+	}
+
+	public void addUndergroundSeagrass(BiomeGenerationSettings.Builder generation) {
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.undergroundSeagrassOnStone);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.undergroundSeagrassOnDirt);
+	}
+
+	public void addUndergroundPickles(BiomeGenerationSettings.Builder generation) {
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.undergroundSeaPickles);
 	}
 
 	static final class Register {

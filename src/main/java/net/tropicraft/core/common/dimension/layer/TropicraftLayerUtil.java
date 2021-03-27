@@ -1,6 +1,5 @@
 package net.tropicraft.core.common.dimension.layer;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
@@ -18,7 +17,6 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLModIdMappingEvent;
 import net.tropicraft.Constants;
 import net.tropicraft.core.common.dimension.biome.TropicraftBiomes;
-import net.tropicraft.core.common.dimension.config.TropicraftGeneratorSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,14 +54,12 @@ public class TropicraftLayerUtil {
         return ret;
     }
 
-    public static Layer[] buildTropicsProcedure(long seed, TropicraftGeneratorSettings settings) {
-        final ImmutableList<IAreaFactory<LazyArea>> immutablelist = buildTropicsProcedure(settings, procedure -> new LazyAreaLayerContext(25, seed, procedure));
-        final Layer noiseLayer = new Layer(immutablelist.get(0));
-        final Layer blockLayer = new Layer(immutablelist.get(1));
-        return new Layer[]{noiseLayer, blockLayer};
+    public static Layer buildTropicsProcedure(long seed) {
+        final IAreaFactory<LazyArea> noiseLayer = buildTropicsProcedure(procedure -> new LazyAreaLayerContext(25, seed, procedure));
+        return new Layer(noiseLayer);
     }
 
-    private static <T extends IArea, C extends IExtendedNoiseRandom<T>> ImmutableList<IAreaFactory<T>> buildTropicsProcedure(final TropicraftGeneratorSettings settings, final LongFunction<C> context) {
+    private static <T extends IArea, C extends IExtendedNoiseRandom<T>> IAreaFactory<T> buildTropicsProcedure(final LongFunction<C> context) {
         IAreaFactory<T> islandLayer = TropicsIslandLayer.INSTANCE.run(context.apply(1));
         IAreaFactory<T> fuzzyZoomLayer = ZoomLayer.FUZZY.run(context.apply(2000), islandLayer);
         IAreaFactory<T> addIslandLayer = TropicraftAddIslandLayer.BASIC_3.run(context.apply(3), fuzzyZoomLayer);
@@ -94,9 +90,7 @@ public class TropicraftLayerUtil {
         biomeLayer = SmoothLayer.INSTANCE.run(context.apply(17L), biomeLayer);
         biomeLayer = TropicraftRiverMixLayer.INSTANCE.run(context.apply(17), biomeLayer, riverLayer);
 
-        final IAreaFactory<T> blockLayer = TropicraftVoronoiZoomLayer.INSTANCE.run(context.apply(10), biomeLayer);
-
-        return ImmutableList.of(biomeLayer, blockLayer);
+        return biomeLayer;
     }
 
     private static <T extends IArea, C extends IExtendedNoiseRandom<T>> IAreaFactory<T> magnify(final long seed, final IAreaTransformer1 zoomLayer, final IAreaFactory<T> layer, final int count, final LongFunction<C> context) {

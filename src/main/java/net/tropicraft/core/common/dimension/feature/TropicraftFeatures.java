@@ -2,7 +2,6 @@ package net.tropicraft.core.common.dimension.feature;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPattern.PlacementBehaviour;
@@ -12,7 +11,6 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.tropicraft.Constants;
-import net.tropicraft.core.common.TropicraftTags;
 import net.tropicraft.core.common.block.TropicraftBlocks;
 import net.tropicraft.core.common.dimension.feature.config.FruitTreeConfig;
 import net.tropicraft.core.common.dimension.feature.config.HomeTreeBranchConfig;
@@ -38,10 +36,9 @@ public class TropicraftFeatures {
 	public static final RegistryObject<RainforestTreeFeature> LARGE_TUALUNG = register("large_tualung", () -> new TualungFeature(NoFeatureConfig.CODEC, 25, 11));
 	public static final RegistryObject<RainforestTreeFeature> TALL_TREE = register("tall_tree", () -> new TallRainforestTreeFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<EIHFeature> EIH = register("eih", () -> new EIHFeature(NoFeatureConfig.CODEC));
-	public static final RegistryObject<TropicsFlowersFeature> TROPICS_FLOWERS = register("tropics_flowers", () -> new TropicsFlowersFeature(BlockClusterFeatureConfig.CODEC, TropicraftTags.Blocks.TROPICS_FLOWERS));
-	public static final RegistryObject<TropicsFlowersFeature> RAINFOREST_FLOWERS = register("rainforest_flowers", () -> new TropicsFlowersFeature(BlockClusterFeatureConfig.CODEC, TropicraftTags.Blocks.RAINFOREST_FLOWERS));
 	public static final RegistryObject<UndergrowthFeature> UNDERGROWTH = register("undergrowth", () -> new UndergrowthFeature(NoFeatureConfig.CODEC));
 	public static final RegistryObject<RainforestVinesFeature> VINES = register("rainforest_vines", () -> new RainforestVinesFeature(RainforestVinesConfig.CODEC));
+	public static final RegistryObject<UndergroundSeaPickleFeature> UNDERGROUND_SEA_PICKLE = register("underground_sea_pickle", () -> new UndergroundSeaPickleFeature(NoFeatureConfig.CODEC));
 
 	public static final RegistryObject<Structure<VillageConfig>> KOA_VILLAGE = registerStructure("koa_village", () -> new KoaVillageStructure(VillageConfig.CODEC));
 	public static final RegistryObject<Structure<VillageConfig>> HOME_TREE = registerStructure("home_tree", () -> new HomeTreeStructure(VillageConfig.CODEC));
