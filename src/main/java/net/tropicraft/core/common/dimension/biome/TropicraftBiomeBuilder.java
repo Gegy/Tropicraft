@@ -10,6 +10,7 @@ import net.minecraft.world.gen.placement.AtSurfaceWithExtraConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.tropicraft.Constants;
 import net.tropicraft.core.common.dimension.config.TropicsBuilderConfigs;
+import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredFeatures;
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftSurfaceBuilders;
 import net.tropicraft.core.common.entity.TropicraftEntities;
@@ -18,21 +19,26 @@ public final class TropicraftBiomeBuilder {
 	public static final int TROPICS_WATER_COLOR = 0x4eecdf;
 	public static final int TROPICS_WATER_FOG_COLOR = 0x041f33;
 
-	public static Biome createTropicsBiome() {
-		// TODO: how to create configured things?
+	private final TropicraftConfiguredFeatures features;
+
+	public TropicraftBiomeBuilder(TropicraftConfiguredFeatures features) {
+		this.features = features;
+	}
+
+	public Biome createTropicsBiome() {
 		BiomeGenerationSettings.Builder generation = defaultGeneration()
 				.surfaceBuilder(TropicraftSurfaceBuilders._TROPICS.configured(TropicsBuilderConfigs.TROPICS_CONFIG.get()));
 
 		DefaultTropicsFeatures.addCarvers(generation);
 
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, TropicraftFeatures.GRAPEFRUIT_TREE.get().configured(IFeatureConfig.NONE).decorated(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, TropicraftFeatures.ORANGE_TREE.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, TropicraftFeatures.LEMON_TREE.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, TropicraftFeatures.LIME_TREE.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.grapefruitTree.decorated(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.orangeTree.decorated(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.lemonTree.decorated(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.limeTree.decorated(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
 
 		DefaultTropicsFeatures.addPalmTrees(generation);
 
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, TropicraftFeatures.EIH.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.01F, 1))));
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.eih.withPlacement(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.01F, 1))));
 
 		DefaultTropicsFeatures.addTropicsFlowers(generation);
 		DefaultTropicsFeatures.addPineapples(generation);
@@ -57,7 +63,7 @@ public final class TropicraftBiomeBuilder {
 				.build();
 	}
 
-	private static BiomeGenerationSettings.Builder defaultGeneration() {
+	private BiomeGenerationSettings.Builder defaultGeneration() {
 		BiomeGenerationSettings.Builder generation = new BiomeGenerationSettings.Builder();
 
 		DefaultBiomeFeatures.withStrongholdAndMineshaft(generation);
@@ -75,7 +81,7 @@ public final class TropicraftBiomeBuilder {
 		return generation;
 	}
 
-	private static MobSpawnInfo.Builder defaultSpawns() {
+	private MobSpawnInfo.Builder defaultSpawns() {
 		MobSpawnInfo.Builder spawns = new MobSpawnInfo.Builder();
 
 		spawns.withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(EntityType.PARROT, 20, 1, 2));
@@ -91,7 +97,7 @@ public final class TropicraftBiomeBuilder {
 		return spawns;
 	}
 
-	private static BiomeAmbience.Builder defaultAmbience() {
+	private BiomeAmbience.Builder defaultAmbience() {
 		return new BiomeAmbience.Builder()
 				.setWaterColor(TROPICS_WATER_COLOR)
 				.setWaterFogColor(TROPICS_WATER_FOG_COLOR);

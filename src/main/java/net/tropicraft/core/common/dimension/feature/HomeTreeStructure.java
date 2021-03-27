@@ -7,6 +7,7 @@ import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -20,9 +21,9 @@ import net.tropicraft.Constants;
 import net.tropicraft.core.common.dimension.feature.jigsaw.NoRotateSingleJigsawPiece;
 import net.tropicraft.core.common.dimension.feature.pools.HomeTreePools;
 
-public class HomeTreeFeature extends JigsawStructure {
-    public HomeTreeFeature(Codec<VillageConfig> codec) {
-        super(codec, 0, true, true);
+public class HomeTreeStructure extends Structure<VillageConfig> {
+    public HomeTreeStructure(Codec<VillageConfig> codec) {
+        super(codec);
         HomeTreePools.init();
     }
 
@@ -49,67 +50,68 @@ public class HomeTreeFeature extends JigsawStructure {
         return Start::new;
     }
 
-    private static final IStructurePieceType TYPE = IStructurePieceType.register(HomeTreePiece::new, Constants.MODID + ":home_tree");
+    private static final IStructurePieceType TYPE = IStructurePieceType.setPieceId(Piece::new, Constants.MODID + ":home_tree");
 
     public static class Start extends StructureStart<VillageConfig> {
-
-        public Start(Structure<?> p_i51110_1_, int p_i51110_2_, int p_i51110_3_, MutableBoundingBox p_i51110_5_, int p_i51110_6_, long p_i51110_7_) {
-            super(p_i51110_1_, p_i51110_2_, p_i51110_3_, p_i51110_5_, p_i51110_6_, p_i51110_7_);
+        public Start(Structure<VillageConfig> structure, int chunkX, int chunkZ, MutableBoundingBox boundingBox, int references, long seed) {
+            super(structure, chunkX, chunkZ, boundingBox, references, seed);
         }
 
-        public void init(ChunkGenerator<?> generator, TemplateManager templateManagerIn, int chunkX, int chunkZ, Biome biomeIn) {
-            final BlockPos pos = new BlockPos(chunkX * 16, -5, chunkZ * 16);
-            VillageConfig config = generator.getStructureConfig(biomeIn, TropicraftFeatures.HOME_TREE.get());
-            HomeTreePools.init();
-            JigsawManager.addPieces(config.startPool, config.size, HomeTreePiece::new, generator, templateManagerIn, pos, this.components, this.rand);
-            this.recalculateStructureSize();
-        }
-        
         @Override
-        protected void recalculateStructureSize() {
-            super.recalculateStructureSize();
+        public void generatePieces(DynamicRegistries registries, ChunkGenerator generator, TemplateManager templates, int chunkX, int chunkZ, Biome biome, VillageConfig config) {
+            BlockPos pos = new BlockPos(chunkX << 4, 0, chunkZ << 4);
+            JigsawManager.addPieces(registries, config, Piece::new, generator, templates, pos, this.pieces, this.random, true, true);
+            this.calculateBoundingBox();
+        }
+
+        @Override
+        protected void calculateBoundingBox() {
+            super.calculateBoundingBox();
             int margin = 24; // Double vanilla's margin
-            this.bounds.minX -= margin;
-            this.bounds.minY -= margin;
-            this.bounds.minZ -= margin;
-            this.bounds.maxX += margin;
-            this.bounds.maxY += margin;
-            this.bounds.maxZ += margin;
-         }
+            this.boundingBox.x0 -= margin;
+            this.boundingBox.y0 -= margin;
+            this.boundingBox.z0 -= margin;
+            this.boundingBox.x1 += margin;
+            this.boundingBox.y1 += margin;
+            this.boundingBox.z1 += margin;
+        }
     }
 
-    public static class HomeTreePiece extends AbstractVillagePiece {
-
-        // TODO: we can't pass through our custom type to AbstractVillagePiece
-        public HomeTreePiece(TemplateManager p_i50890_1_, JigsawPiece p_i50890_2_, BlockPos p_i50890_3_, int p_i50890_4_, Rotation p_i50890_5_, MutableBoundingBox p_i50890_6_) {
-            super(TYPE, p_i50890_1_, p_i50890_2_, p_i50890_3_, p_i50890_4_, p_i50890_5_, p_i50890_6_);
+    public static class Piece extends AbstractVillagePiece {
+        public Piece(TemplateManager templates, JigsawPiece piece, BlockPos pos, int groundLevelDelta, Rotation rotation, MutableBoundingBox bounds) {
+            super(templates, piece, pos, groundLevelDelta, rotation, bounds);
         }
 
-        public HomeTreePiece(TemplateManager p_i50891_1_, CompoundNBT p_i50891_2_) {
-            super(p_i50891_1_, p_i50891_2_, TYPE);
+        public Piece(TemplateManager templates, CompoundNBT data) {
+            super(templates, data);
         }
 
         @Override
         public MutableBoundingBox getBoundingBox() {
-            if (this.jigsawPiece instanceof FeatureJigsawPiece) {
+            if (this.element instanceof FeatureJigsawPiece) {
                 MutableBoundingBox ret = super.getBoundingBox();
                 ret = new MutableBoundingBox(ret);
-                ret.minX -= 32;
-                ret.minY -= 32;
-                ret.minZ -= 32;
-                ret.maxX += 32;
-                ret.maxY += 32;
-                ret.maxZ += 32;
+                ret.x0 -= 32;
+                ret.y0 -= 32;
+                ret.z0 -= 32;
+                ret.x1 += 32;
+                ret.y1 += 32;
+                ret.z1 += 32;
             }
             return super.getBoundingBox();
         }
-        
+
         @Override
         public Rotation getRotation() {
-            if (this.jigsawPiece instanceof NoRotateSingleJigsawPiece) {
+            if (this.element instanceof NoRotateSingleJigsawPiece) {
                 return Rotation.NONE;
             }
             return super.getRotation();
+        }
+
+        @Override
+        public IStructurePieceType getType() {
+            return TYPE;
         }
     }
 }
