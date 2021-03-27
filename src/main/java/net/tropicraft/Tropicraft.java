@@ -41,6 +41,7 @@ import net.tropicraft.core.common.dimension.carver.TropicraftCarvers;
 import net.tropicraft.core.common.dimension.chunk.TropicraftChunkGeneratorTypes;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredFeatures;
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
+import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftConfiguredSurfaceBuilders;
 import net.tropicraft.core.common.drinks.MixerRecipes;
 import net.tropicraft.core.common.entity.TropicraftEntities;
 import net.tropicraft.core.common.item.IColoredItem;
@@ -165,7 +166,8 @@ public class Tropicraft
             gen.addProvider(new TropicraftLootTableProvider(gen));
             gen.addProvider(new TropicraftEntityTypeTagsProvider(gen, existingFileHelper));
 
-            Supplier<TropicraftConfiguredFeatures> configuredFeatures = TropicraftWorldgenProvider.addConfiguredFeatures(gen, Constants.MODID, TropicraftConfiguredFeatures::new);
+            Supplier<TropicraftConfiguredFeatures> features = TropicraftWorldgenProvider.addConfiguredFeatures(gen, Constants.MODID, TropicraftConfiguredFeatures::new);
+            Supplier<TropicraftConfiguredSurfaceBuilders> surfaceBuilders = TropicraftWorldgenProvider.addConfiguredSurfaceBuilders(gen, Constants.MODID, TropicraftConfiguredSurfaceBuilders::new);
         }
     }
 }

@@ -2,7 +2,6 @@ package net.tropicraft.core.common.dimension.biome;
 
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.tropicraft.core.common.dimension.config.TropicsBuilderConfigs;
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftSurfaceBuilders;
 

@@ -6,13 +6,10 @@ import net.minecraft.world.biome.*;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.structure.VillageConfig;
-import net.minecraft.world.gen.placement.AtSurfaceWithExtraConfig;
-import net.minecraft.world.gen.placement.Placement;
 import net.tropicraft.Constants;
-import net.tropicraft.core.common.dimension.config.TropicsBuilderConfigs;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredFeatures;
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
-import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftSurfaceBuilders;
+import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftConfiguredSurfaceBuilders;
 import net.tropicraft.core.common.entity.TropicraftEntities;
 
 public final class TropicraftBiomeBuilder {
@@ -20,28 +17,34 @@ public final class TropicraftBiomeBuilder {
 	public static final int TROPICS_WATER_FOG_COLOR = 0x041f33;
 
 	private final TropicraftConfiguredFeatures features;
+	private final TropicraftConfiguredSurfaceBuilders surfaces;
+	private final DefaultTropicsFeatures defaultFeatures;
 
-	public TropicraftBiomeBuilder(TropicraftConfiguredFeatures features) {
+	public TropicraftBiomeBuilder(TropicraftConfiguredFeatures features, TropicraftConfiguredSurfaceBuilders surfaces) {
 		this.features = features;
+		this.surfaces = surfaces;
+
+		// TODO: merge default features with this?
+		this.defaultFeatures = new DefaultTropicsFeatures(features);
 	}
 
 	public Biome createTropicsBiome() {
 		BiomeGenerationSettings.Builder generation = defaultGeneration()
-				.surfaceBuilder(TropicraftSurfaceBuilders._TROPICS.configured(TropicsBuilderConfigs.TROPICS_CONFIG.get()));
+				.surfaceBuilder(this.surfaces.tropics);
 
-		DefaultTropicsFeatures.addCarvers(generation);
+		this.defaultFeatures.addCarvers(generation);
 
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.grapefruitTree.decorated(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.orangeTree.decorated(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.lemonTree.decorated(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.limeTree.decorated(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.2F, 1))));
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.grapefruitTree);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.orangeTree);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.lemonTree);
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.limeTree);
 
-		DefaultTropicsFeatures.addPalmTrees(generation);
+		this.defaultFeatures.addPalmTrees(generation);
 
-		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.eih.withPlacement(Placement.COUNT_EXTRA_HEIGHTMAP.configure(new AtSurfaceWithExtraConfig(0, 0.01F, 1))));
+		generation.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, this.features.eih);
 
-		DefaultTropicsFeatures.addTropicsFlowers(generation);
-		DefaultTropicsFeatures.addPineapples(generation);
+		this.defaultFeatures.addTropicsFlowers(generation);
+		this.defaultFeatures.addPineapples(generation);
 
 		DefaultBiomeFeatures.addDefaultGrass(generation);
 		DefaultBiomeFeatures.withTallGrass(generation);
@@ -56,10 +59,10 @@ public final class TropicraftBiomeBuilder {
 				.precipitation(Biome.RainType.RAIN)
 				.depth(0.1F).scale(0.1F)
 				.temperature(2.0F).downfall(1.5F)
-				.category(Biome.Category.PLAINS)
-				.withGenerationSettings(generation.build())
-				.withMobSpawnSettings(spawns.copy())
-				.setEffects(defaultAmbience().build())
+				.biomeCategory(Biome.Category.PLAINS)
+				.generationSettings(generation.build())
+				.mobSpawnSettings(spawns.build())
+				.specialEffects(defaultAmbience().build())
 				.build();
 	}
 
@@ -70,13 +73,8 @@ public final class TropicraftBiomeBuilder {
 		DefaultBiomeFeatures.withCommonOverworldBlocks(generation);
 		DefaultBiomeFeatures.withOverworldOres(generation);
 
-		generation.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, TropicraftFeatures.VILLAGE.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
-		generation.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, TropicraftFeatures.HOME_TREE.get().withConfiguration(new VillageConfig(Constants.MODID + ":home_tree/starts", 10)));
-
-		// Add dummy volcano structure for /locate, this only adds a structure start that places nothing
-		generation.withStructure(TropicraftFeatures.VOLCANO.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
-		// Volcano feature to add tile entity to the volcano generation. Checks in each chunk if a volcano is nearby.
-		generation.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, TropicraftFeatures.VOLCANO.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
+		generation.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, TropicraftFeatures.VILLAGE.get().configured(IFeatureConfig.NO_FEATURE_CONFIG));
+		generation.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, TropicraftFeatures.HOME_TREE.get().configured(new VillageConfig(Constants.MODID + ":home_tree/starts", 10)));
 
 		return generation;
 	}
@@ -84,22 +82,22 @@ public final class TropicraftBiomeBuilder {
 	private MobSpawnInfo.Builder defaultSpawns() {
 		MobSpawnInfo.Builder spawns = new MobSpawnInfo.Builder();
 
-		spawns.withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(EntityType.PARROT, 20, 1, 2));
-		spawns.withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.V_MONKEY.get(), 20, 1, 3));
-		spawns.withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.IGUANA.get(), 15, 4, 4));
-		spawns.withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.TROPI_CREEPER.get(), 4, 1, 2));
-		spawns.withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.EIH.get(), 5, 1, 1));
+		spawns.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(EntityType.PARROT, 20, 1, 2));
+		spawns.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.V_MONKEY.get(), 20, 1, 3));
+		spawns.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.IGUANA.get(), 15, 4, 4));
+		spawns.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.TROPI_CREEPER.get(), 4, 1, 2));
+		spawns.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.EIH.get(), 5, 1, 1));
 
-		spawns.withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.TROPI_SKELLY.get(), 8, 2, 4));
-		spawns.withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.TROPI_SPIDER.get(), 8, 2, 2));
-		spawns.withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.ASHEN.get(), 6, 2, 4));
+		spawns.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.TROPI_SKELLY.get(), 8, 2, 4));
+		spawns.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.TROPI_SPIDER.get(), 8, 2, 2));
+		spawns.addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TropicraftEntities.ASHEN.get(), 6, 2, 4));
 
 		return spawns;
 	}
 
 	private BiomeAmbience.Builder defaultAmbience() {
 		return new BiomeAmbience.Builder()
-				.setWaterColor(TROPICS_WATER_COLOR)
-				.setWaterFogColor(TROPICS_WATER_FOG_COLOR);
+				.waterColor(TROPICS_WATER_COLOR)
+				.waterFogColor(TROPICS_WATER_FOG_COLOR);
 	}
 }

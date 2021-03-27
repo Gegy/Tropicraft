@@ -15,11 +15,11 @@ import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
@@ -43,7 +43,7 @@ public class VolcanoGenerator {
 			TropicraftBiomes.TROPICS_OCEAN.getId()
 	);
 
-	private final ISeedReader world;
+	private final long worldSeed;
 
 	private final static int MAX_RADIUS = 65;
 	private final static int MIN_RADIUS = 45;
@@ -67,8 +67,11 @@ public class VolcanoGenerator {
 	private final static Supplier<BlockState> LAVA_BLOCK = () -> Blocks.LAVA.defaultBlockState();
 	private final static Supplier<BlockState> SAND_BLOCK = TropicraftBlocks.VOLCANIC_SAND.lazyMap(Block::defaultBlockState);
 
-	public VolcanoGenerator(ISeedReader world) {
-		this.world = world;
+	private final BiomeProvider biomeSource;
+
+	public VolcanoGenerator(long worldSeed, BiomeProvider biomeSource) {
+		this.worldSeed = worldSeed;
+		this.biomeSource = biomeSource;
 	}
 
 	@SubscribeEvent
@@ -93,7 +96,7 @@ public class VolcanoGenerator {
 	}
 
 	public IChunk generate(int chunkX, int chunkZ, IChunk chunk, SharedSeedRandom random) {
-		BlockPos volcanoCoords = VolcanoGenerator.getVolcanoNear(this.world, chunkX, chunkZ, 0);
+		BlockPos volcanoCoords = VolcanoGenerator.getVolcanoNear(this.biomeSource, this.worldSeed, chunkX, chunkZ, 0);
 
 		if (volcanoCoords == null) {
 			return chunk;
@@ -172,7 +175,7 @@ public class VolcanoGenerator {
 	}
 	
 	private long getPositionSeed(int volcCenterX, int volcCenterZ) {
-        return (long)volcCenterX * 341873128712L + (long)volcCenterZ * 132897987541L + world.getSeed() + (long)4291726;
+        return (long)volcCenterX * 341873128712L + (long)volcCenterZ * 132897987541L + worldSeed + (long)4291726;
 	}
 	
 	private NoiseModule getNoise(long seed) {
@@ -205,7 +208,7 @@ public class VolcanoGenerator {
      */
 	// TODO Fix the above issues
 	public int getVolcanoHeight(int groundHeight, int x, int z) {
-	    BlockPos volcanoCoords = getVolcanoNear(this.world, x >> 4, z >> 4, 0);
+	    BlockPos volcanoCoords = getVolcanoNear(this.biomeSource, this.worldSeed, x >> 4, z >> 4, 0);
 	    if (volcanoCoords == null) {
 	        return -1;
 	    }
@@ -262,23 +265,23 @@ public class VolcanoGenerator {
 	 * Rarity is determined by the numChunks/offsetChunks vars (smaller numbers
 	 * mean more spawning)
 	 */
-	public static int canGenVolcanoAtCoords(ISeedReader world, int i, int j) {
+	public static int canGenVolcanoAtCoords(BiomeProvider biomeSource, long worldSeed, int chunkX, int chunkZ) {
 		byte numChunks = 64; // was 32
 		byte offsetChunks = 16; // was 8
-		int oldi = i;
-		int oldj = j;
+		int oldi = chunkX;
+		int oldj = chunkZ;
 
-		if (i < 0) {
-			i -= numChunks - 1;
+		if (chunkX < 0) {
+			chunkX -= numChunks - 1;
 		}
 
-		if (j < 0) {
-			j -= numChunks - 1;
+		if (chunkZ < 0) {
+			chunkZ -= numChunks - 1;
 		}
 
-		int randX = i / numChunks;
-		int randZ = j / numChunks;
-		long seed = (long)randX * 341873128712L + (long)randZ * 132897987541L + world.getSeed() + (long)4291726;
+		int randX = chunkX / numChunks;
+		int randZ = chunkZ / numChunks;
+		long seed = (long)randX * 341873128712L + (long)randZ * 132897987541L + worldSeed + (long)4291726;
 		Random rand = new Random(seed);
 		randX *= numChunks;
 		randZ *= numChunks;
@@ -286,10 +289,10 @@ public class VolcanoGenerator {
 		randZ += rand.nextInt(numChunks - offsetChunks);
 
 		if (oldi == randX && oldj == randZ) {
-			if(hasAllBiomes(world, oldi * 16 + 8, 0,oldj * 16 + 8, volcanoSpawnBiomesLand)) {
+			if(hasAllBiomes(biomeSource, oldi * 16 + 8, 0,oldj * 16 + 8, volcanoSpawnBiomesLand)) {
 				return SURFACE_BIOME;
 			}
-			if(hasAllBiomes(world, oldi * 16 + 8, 0,oldj * 16 + 8, volcanoSpawnBiomesOcean)) {
+			if(hasAllBiomes(biomeSource, oldi * 16 + 8, 0,oldj * 16 + 8, volcanoSpawnBiomesOcean)) {
 				return OCEAN_BIOME;
 			}
 
@@ -299,12 +302,22 @@ public class VolcanoGenerator {
 		return 0;
 	}
 
+
 	/**
 	 * Returns the coordinates of a volcano if it should be spawned near
 	 * this chunk, otherwise returns null.
 	 * The posY of the returned object should be used as the volcano radius
 	 */
-	public static BlockPos getVolcanoNear(ISeedReader world, int chunkX, int chunkZ, int maxRadius) {
+	public static BlockPos getVolcanoNear(ServerWorld world, int chunkX, int chunkZ, int maxRadius) {
+		return getVolcanoNear(world.getChunkSource().getGenerator().getBiomeSource(), world.getSeed(), chunkX, chunkZ, maxRadius);
+	}
+
+	/**
+	 * Returns the coordinates of a volcano if it should be spawned near
+	 * this chunk, otherwise returns null.
+	 * The posY of the returned object should be used as the volcano radius
+	 */
+	public static BlockPos getVolcanoNear(BiomeProvider biomeSource, long worldSeed, int chunkX, int chunkZ, int maxRadius) {
 		maxRadius = maxRadius + CHUNK_RANGE;
 
 		for (int radius = 0; radius <= maxRadius; radius++) {
@@ -316,7 +329,7 @@ public class VolcanoGenerator {
 						int x = chunkX + offsetX;
 						int z = chunkZ + offsetZ;
 
-						int biome = canGenVolcanoAtCoords(world, x, z);
+						int biome = canGenVolcanoAtCoords(biomeSource, worldSeed, x, z);
 						if (biome != 0) {
 							return new BlockPos((x << 4) + 8, biome, (z << 4) + 8);
 						}
@@ -332,8 +345,8 @@ public class VolcanoGenerator {
 		return biome == SURFACE_BIOME ? 0: OCEAN_HEIGHT_OFFSET;
 	}
 
-	private static boolean hasAllBiomes(IWorldReader world, int centerX, int centerY, int centerZ, Set<ResourceLocation> allowedBiomes) {
-		Biome biome = world.getNoiseBiome(centerX >> 2, centerY >> 2, centerZ >> 2);
+	private static boolean hasAllBiomes(BiomeProvider biomeSource, int centerX, int centerY, int centerZ, Set<ResourceLocation> allowedBiomes) {
+		Biome biome = biomeSource.getNoiseBiome(centerX >> 2, centerY >> 2, centerZ >> 2);
 		return allowedBiomes.contains(biome.getRegistryName());
 	}
 }

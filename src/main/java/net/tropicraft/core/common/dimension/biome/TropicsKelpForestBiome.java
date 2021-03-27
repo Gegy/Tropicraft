@@ -8,8 +8,6 @@ import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.gen.placement.TopSolidWithNoiseConfig;
-import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
-import net.tropicraft.core.common.dimension.config.TropicsBuilderConfigs;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftSurfaceBuilders;
 import net.tropicraft.core.common.entity.TropicraftEntities;
 

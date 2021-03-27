@@ -1,7 +1,6 @@
 package net.tropicraft.core.common.dimension.surfacebuilders;
 
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
-import net.minecraft.world.gen.surfacebuilders.SurfaceBuilderConfig;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
@@ -15,13 +14,8 @@ public class TropicraftSurfaceBuilders {
 
     public static final DeferredRegister<SurfaceBuilder<?>> SURFACE_BUILDERS = DeferredRegister.create(ForgeRegistries.SURFACE_BUILDERS, Constants.MODID);
 
-    public static final TropicsSurfaceBuilder _TROPICS = new TropicsSurfaceBuilder(SurfaceBuilderConfig.CODEC);
-    public static final RegistryObject<TropicsSurfaceBuilder> TROPICS = register(
-            "tropics", () -> _TROPICS);
-    
-    public static final UnderwaterSurfaceBuilder _UNDERWATER = new UnderwaterSurfaceBuilder(SurfaceBuilderConfig.CODEC);
-    public static final RegistryObject<UnderwaterSurfaceBuilder> UNDERWATER = register(
-            "underwater", () -> _UNDERWATER);
+    public static final RegistryObject<TropicsSurfaceBuilder> TROPICS = register("tropics", () -> new TropicsSurfaceBuilder(TropicsSurfaceBuilder.Config.CODEC));
+    public static final RegistryObject<UnderwaterSurfaceBuilder> UNDERWATER = register("underwater", () -> new UnderwaterSurfaceBuilder(UnderwaterSurfaceBuilder.Config.CODEC));
 
     private static <T extends SurfaceBuilder<?>> RegistryObject<T> register(final String name, final Supplier<T> sup) {
         return SURFACE_BUILDERS.register(name, sup);

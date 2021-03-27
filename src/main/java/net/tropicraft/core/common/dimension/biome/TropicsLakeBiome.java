@@ -1,7 +1,6 @@
 package net.tropicraft.core.common.dimension.biome;
 
 import net.minecraft.world.biome.Biome;
-import net.tropicraft.core.common.dimension.config.TropicsBuilderConfigs;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftSurfaceBuilders;
 
 public class TropicsLakeBiome extends TropicraftBiome {

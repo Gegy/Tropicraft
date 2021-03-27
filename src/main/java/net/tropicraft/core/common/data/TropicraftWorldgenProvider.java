@@ -13,6 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -47,9 +48,32 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 			DataGenerator dataGenerator, String namespace,
 			EntryGenerator<ConfiguredFeature<?, ?>, R> entryGenerator
 	) {
-		TropicraftWorldgenProvider<ConfiguredFeature<?, ?>, R> provider = new TropicraftWorldgenProvider<>(
+		return add(
 				dataGenerator,
 				"worldgen/configured_feature", WorldGenRegistries.CONFIGURED_FEATURE, ConfiguredFeature.CODEC,
+				namespace, entryGenerator
+		);
+	}
+
+	public static <R> Supplier<R> addConfiguredSurfaceBuilders(
+			DataGenerator dataGenerator, String namespace,
+			EntryGenerator<ConfiguredSurfaceBuilder<?>, R> entryGenerator
+	) {
+		return add(
+				dataGenerator,
+				"worldgen/configured_surface_builder", WorldGenRegistries.CONFIGURED_SURFACE_BUILDER, ConfiguredSurfaceBuilder.CODEC,
+				namespace, entryGenerator
+		);
+	}
+
+	private static <T, R> Supplier<R> add(
+			DataGenerator dataGenerator,
+			String path, Registry<T> registry, Codec<Supplier<T>> codec,
+			String namespace, EntryGenerator<T, R> entryGenerator
+	) {
+		TropicraftWorldgenProvider<T, R> provider = new TropicraftWorldgenProvider<>(
+				dataGenerator,
+				path, registry, codec,
 				namespace, entryGenerator
 		);
 		dataGenerator.addProvider(provider);
@@ -91,6 +115,6 @@ public final class TropicraftWorldgenProvider<T, R> implements IDataProvider {
 	}
 
 	public interface EntryGenerator<T, R> {
-		R generate(WorldgenEntryConsumer<T> consumer);
+		R generate(WorldgenDataConsumer<T> consumer);
 	}
 }
