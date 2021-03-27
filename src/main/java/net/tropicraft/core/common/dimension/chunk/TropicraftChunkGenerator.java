@@ -2,7 +2,9 @@ package net.tropicraft.core.common.dimension.chunk;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.IChunk;
@@ -13,10 +15,10 @@ import net.minecraft.world.gen.NoiseChunkGenerator;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.tropicraft.Constants;
 
 import java.util.function.Supplier;
 
-// TODO: noise settings to move terrain up; top slide max = 0 instead of -10
 public class TropicraftChunkGenerator extends NoiseChunkGenerator {
     public static final Codec<TropicraftChunkGenerator> CODEC = RecordCodecBuilder.create(instance -> {
         return instance.group(
@@ -33,6 +35,10 @@ public class TropicraftChunkGenerator extends NoiseChunkGenerator {
         super(biomeProvider, seed, settings);
         this.seed = seed;
         this.volcano = new VolcanoGenerator(seed, biomeSource);
+    }
+
+    public static void register() {
+        Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MODID, "tropics"), CODEC);
     }
 
     @Override

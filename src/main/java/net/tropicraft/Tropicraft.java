@@ -40,11 +40,12 @@ import net.tropicraft.core.common.dimension.biome.TropicraftBiomeProvider;
 import net.tropicraft.core.common.dimension.biome.TropicraftBiomes;
 import net.tropicraft.core.common.dimension.carver.TropicraftCarvers;
 import net.tropicraft.core.common.dimension.carver.TropicraftConfiguredCarvers;
+import net.tropicraft.core.common.dimension.chunk.TropicraftChunkGenerator;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredFeatures;
 import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredStructures;
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
 import net.tropicraft.core.common.dimension.feature.block_state_provider.TropicraftBlockStateProviders;
-import net.tropicraft.core.common.dimension.feature.jigsaw.TropicraftProcessorLists;
+import net.tropicraft.core.common.dimension.feature.jigsaw.*;
 import net.tropicraft.core.common.dimension.feature.jigsaw.piece.FixedSingleJigsawPiece;
 import net.tropicraft.core.common.dimension.feature.jigsaw.piece.NoRotateSingleJigsawPiece;
 import net.tropicraft.core.common.dimension.feature.pools.TropicraftTemplatePools;
@@ -102,8 +103,6 @@ public class Tropicraft
         TropicraftSurfaceBuilders.SURFACE_BUILDERS.register(modBus);
         TropicraftBlockStateProviders.BLOCK_STATE_PROVIDERS.register(modBus);
 
-        Reflection.initialize(FixedSingleJigsawPiece.class, NoRotateSingleJigsawPiece.class);
-
         // Hack in our item frame models the way vanilla does
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             StateContainer<Block, BlockState> frameState = new StateContainer.Builder<Block, BlockState>(Blocks.AIR).add(BooleanProperty.create("map")).create(Block::defaultBlockState, BlockState::new);
@@ -151,7 +150,15 @@ public class Tropicraft
         ScubaData.registerCapability();
         TropicraftEntities.registerSpawns();
 
+        TropicraftChunkGenerator.register();
         TropicraftBiomeProvider.register();
+
+        Reflection.initialize(
+                FixedSingleJigsawPiece.class, NoRotateSingleJigsawPiece.class,
+                AdjustBuildingHeightProcessor.class, AirToCaveAirProcessor.class, SinkInGroundProcessor.class,
+                SmoothingGravityProcessor.class, SteepPathProcessor.class, StructureSupportsProcessor.class,
+                StructureVoidProcessor.class
+        );
     }
     
     private void onServerStarting(final FMLServerStartingEvent event) {

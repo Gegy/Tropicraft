@@ -21,6 +21,7 @@ import net.tropicraft.core.common.dimension.feature.jigsaw.SmoothingGravityProce
 import net.tropicraft.core.common.dimension.feature.jigsaw.SteepPathProcessor;
 import net.tropicraft.core.common.dimension.feature.jigsaw.StructureSupportsProcessor;
 
+import java.util.Locale;
 import java.util.function.Supplier;
 
 public class TropicraftFeatures {
@@ -54,7 +55,8 @@ public class TropicraftFeatures {
     }
 
 	private static <T extends Structure<?>> RegistryObject<T> registerStructure(final String name, T structure, GenerationStage.Decoration step) {
-    	Structure.STEP.put(structure, step);
+		Structure.STRUCTURES_REGISTRY.put(name.toLowerCase(Locale.ROOT), structure);
+		Structure.STEP.put(structure, step);
 		return STRUCTURES.register(name, () -> structure);
 	}
 }

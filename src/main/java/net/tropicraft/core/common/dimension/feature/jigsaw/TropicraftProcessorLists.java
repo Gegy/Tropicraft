@@ -7,7 +7,6 @@ import net.minecraft.world.gen.feature.template.StructureProcessorList;
 import net.tropicraft.Constants;
 import net.tropicraft.core.common.block.TropicraftBlocks;
 import net.tropicraft.core.common.data.WorldgenDataConsumer;
-import net.tropicraft.core.common.dimension.feature.StructureVoidProcessor;
 
 import java.util.Arrays;
 

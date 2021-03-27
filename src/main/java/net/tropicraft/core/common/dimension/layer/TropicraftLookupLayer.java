@@ -1,0 +1,29 @@
+package net.tropicraft.core.common.dimension.layer;
+
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.area.IAreaFactory;
+import net.minecraft.world.gen.area.LazyArea;
+import net.minecraft.world.gen.layer.Layer;
+
+public class TropicraftLookupLayer extends Layer {
+	private final LazyArea area;
+
+	public TropicraftLookupLayer(IAreaFactory<LazyArea> areaFactory) {
+		super(() -> null);
+		this.area = areaFactory.make();
+	}
+
+	// the default layer delegated to Forge's registry which isn't populated from dynamic registries
+	@Override
+	public Biome get(Registry<Biome> biomes, int x, int z) {
+		int id = this.area.get(x, z);
+
+		Biome biome = biomes.byId(id);
+		if (biome == null) {
+			throw new IllegalStateException("Unknown biome id emitted by layers: " + id);
+		}
+
+		return biome;
+	}
+}

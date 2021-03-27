@@ -48,7 +48,7 @@ public class TropicraftBiomeProvider extends BiomeProvider {
         this.seed = seed;
         this.biomes = biomes;
 
-        this.noiseLayer = TropicraftLayerUtil.buildTropicsProcedure(seed);
+        this.noiseLayer = TropicraftLayerUtil.buildTropicsProcedure(seed, biomes);
     }
 
     public static void register() {

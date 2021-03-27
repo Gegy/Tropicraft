@@ -66,7 +66,7 @@ public final class TropicraftBiomes {
 		this.tropicsBeach = biomes.register(TROPICS_BEACH, createTropicsBeach());
 		this.rainforestPlains = biomes.register(RAINFOREST_PLAINS, createRainforest(0.25F, 0.1F));
 		this.rainforestHills = biomes.register(RAINFOREST_HILLS, createRainforest(0.45F, 0.425F));
-		this.rainforestMountains = biomes.register(RAINFOREST_ISLAND_MOUNTAINS, createRainforest(0.8F, 0.8F));
+		this.rainforestMountains = biomes.register(RAINFOREST_MOUNTAINS, createRainforest(0.8F, 0.8F));
 		this.rainforestIslandMountains = biomes.register(RAINFOREST_ISLAND_MOUNTAINS, createRainforest(0.1F, 1.2F));
 
 		this.tropicsOcean = biomes.register(TROPICS_OCEAN, createTropicsOcean());
