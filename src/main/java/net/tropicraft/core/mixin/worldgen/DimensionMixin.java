@@ -14,10 +14,10 @@ import java.util.LinkedHashSet;
 
 @Mixin(Dimension.class)
 public class DimensionMixin {
-	@Shadow @Final private static LinkedHashSet<RegistryKey<Dimension>> BUILTIN_ORDER;
+	@Shadow @Final private static LinkedHashSet<RegistryKey<Dimension>> DIMENSION_KEYS;
 
 	@Inject(method = "<clinit>", at = @At("RETURN"), remap = false)
 	private static void init(CallbackInfo ci) {
-		BUILTIN_ORDER.add(TropicraftDimension.DIMENSION);
+		DIMENSION_KEYS.add(TropicraftDimension.DIMENSION);
 	}
 }

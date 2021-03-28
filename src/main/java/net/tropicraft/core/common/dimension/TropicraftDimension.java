@@ -27,18 +27,18 @@ public class TropicraftDimension {
 
 	public static final RegistryKey<World> WORLD = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, ID);
 	public static final RegistryKey<Dimension> DIMENSION = RegistryKey.getOrCreateKey(Registry.DIMENSION_KEY, ID);
-    public static final RegistryKey<DimensionType> DIMENSION_TYPE = RegistryKey.getOrCreateKey(Registry.DIMENSION_TYPE_KEY, ID);
-    public static final RegistryKey<DimensionSettings> DIMENSION_SETTINGS = RegistryKey.getOrCreateKey(Registry.NOISE_SETTINGS_KEY, ID);
+	public static final RegistryKey<DimensionType> DIMENSION_TYPE = RegistryKey.getOrCreateKey(Registry.DIMENSION_TYPE_KEY, ID);
+	public static final RegistryKey<DimensionSettings> DIMENSION_SETTINGS = RegistryKey.getOrCreateKey(Registry.NOISE_SETTINGS_KEY, ID);
 
-    public static ChunkGenerator createGenerator(Registry<Biome> biomeRegistry, Registry<DimensionSettings> dimensionSettingsRegistry, long seed) {
-        Supplier<DimensionSettings> dimensionSettings = () -> {
-        	// fallback to overworld so that we don't crash before our datapack is loaded (horrible workaround)
+	public static ChunkGenerator createGenerator(Registry<Biome> biomeRegistry, Registry<DimensionSettings> dimensionSettingsRegistry, long seed) {
+		Supplier<DimensionSettings> dimensionSettings = () -> {
+			// fallback to overworld so that we don't crash before our datapack is loaded (horrible workaround)
 			DimensionSettings settings = dimensionSettingsRegistry.getValueForKey(DIMENSION_SETTINGS);
 			return settings != null ? settings : dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD);
 		};
-        TropicraftBiomeProvider biomeSource = new TropicraftBiomeProvider(seed, biomeRegistry);
-        return new TropicraftChunkGenerator(biomeSource, seed, dimensionSettings);
-    }
+		TropicraftBiomeProvider biomeSource = new TropicraftBiomeProvider(seed, biomeRegistry);
+		return new TropicraftChunkGenerator(biomeSource, seed, dimensionSettings);
+	}
 
 	public static void teleportPlayer(ServerPlayerEntity player, RegistryKey<World> dimensionType) {
 		if (player.world.getDimensionKey() == dimensionType) {

@@ -9,8 +9,6 @@ import net.tropicraft.core.common.entity.passive.EntityKoaBase;
 import java.util.EnumSet;
 import java.util.List;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
-
 public class EntityAIPlayKoa extends Goal
 {
     private final EntityKoaBase villagerObj;
@@ -60,7 +58,7 @@ public class EntityAIPlayKoa extends Goal
 
             if (this.targetVillager == null)
             {
-                Vector3d vec = RandomPositionGenerator.getLandPos(this.villagerObj, 16, 3);
+                Vector3d vec = RandomPositionGenerator.findRandomTarget(this.villagerObj, 16, 3);
                 return vec != null;
             }
 
@@ -122,7 +120,7 @@ public class EntityAIPlayKoa extends Goal
         }
         else if (this.villagerObj.getNavigator().noPath())
         {
-            Vector3d vec = RandomPositionGenerator.getLandPos(this.villagerObj, 16, 3);
+            Vector3d vec = RandomPositionGenerator.findRandomTarget(this.villagerObj, 16, 3);
             if (vec == null)
             {
                 return;

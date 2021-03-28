@@ -7,8 +7,6 @@ import net.minecraft.util.math.vector.Vector3d;
 
 import java.util.EnumSet;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
-
 public class EntityAIWanderNotLazy extends Goal {
 
     private final CreatureEntity entity;
@@ -51,7 +49,7 @@ public class EntityAIWanderNotLazy extends Goal {
             }
         }
 
-        Vector3d vec = RandomPositionGenerator.getLandPos(this.entity, 10, 7);
+        Vector3d vec = RandomPositionGenerator.findRandomTarget(this.entity, 10, 7);
         if (vec == null)
         {
             return false;

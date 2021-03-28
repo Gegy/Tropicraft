@@ -8,8 +8,6 @@ import net.tropicraft.core.common.entity.hostile.AshenEntity;
 
 import java.util.EnumSet;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
-
 public class AIAshenChaseAndPickupLostMask extends Goal {
 	public AshenEntity ashen;
 	public LivingEntity target;
@@ -39,7 +37,7 @@ public class AIAshenChaseAndPickupLostMask extends Goal {
 			panicTime--;
 
 			if (ashen.world.getGameTime() % 10 == 0) {
-				Vector3d vec3 = RandomPositionGenerator.getLandPos(ashen, 10, 7);
+				Vector3d vec3 = RandomPositionGenerator.findRandomTarget(ashen, 10, 7);
 
 				if (vec3 != null) {
 					ashen.getNavigator().tryMoveToXYZ(vec3.x, vec3.y, vec3.z, speed);

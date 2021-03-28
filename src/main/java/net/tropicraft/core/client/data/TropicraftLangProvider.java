@@ -434,7 +434,7 @@ public class TropicraftLangProvider extends LanguageProvider {
     }
     
     private void add(ItemGroup group, String name) {
-        add(group.getPath(), name);
+        add("itemGroup." + group.getPath(), name);
     }
     
     private void addEntityType(Supplier<? extends EntityType<?>> entity) {

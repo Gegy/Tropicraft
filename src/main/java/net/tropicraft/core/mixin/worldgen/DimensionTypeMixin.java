@@ -23,8 +23,8 @@ import java.util.function.Supplier;
  */
 @Mixin(DimensionType.class)
 public class DimensionTypeMixin {
-	@Inject(method = "defaultDimensions", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
-	private static void defaultDimensions(
+	@Inject(method = "getDefaultSimpleRegistry", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
+	private static void getDefaultSimpleRegistry(
 			Registry<DimensionType> dimensionTypeRegistry,
 			Registry<Biome> biomeRegistry,
 			Registry<DimensionSettings> dimensionSettingsRegistry,
