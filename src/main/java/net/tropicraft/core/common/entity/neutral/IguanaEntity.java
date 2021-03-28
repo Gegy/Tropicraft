@@ -47,19 +47,19 @@ public class IguanaEntity extends TropicraftCreatureEntity {
     }
 
     @Override
-    public void setLastHurtByMob(@Nullable LivingEntity entity) {
-        super.setLastHurtByMob(entity);
+    public void setRevengeTarget(@Nullable LivingEntity entity) {
+        super.setRevengeTarget(entity);
         if (entity != null) {
-            angerTargetUUID = entity.getUUID();
+            angerTargetUUID = entity.getUniqueID();
         }
 
     }
 
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return CreatureEntity.createMobAttributes()
-                .add(Attributes.FOLLOW_RANGE, 35.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.25)
-                .add(Attributes.ATTACK_DAMAGE, 5.0);
+        return CreatureEntity.func_233666_p_()
+                .createMutableAttribute(Attributes.FOLLOW_RANGE, 35.0)
+                .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.25)
+                .createMutableAttribute(Attributes.ATTACK_DAMAGE, 5.0);
     }
 
     @Override
@@ -75,8 +75,8 @@ public class IguanaEntity extends TropicraftCreatureEntity {
     }
 
     @Override
-    public void addAdditionalSaveData(final CompoundNBT compound) {
-        super.addAdditionalSaveData(compound);
+    public void writeAdditional(final CompoundNBT compound) {
+        super.writeAdditional(compound);
         compound.putShort("Anger", (short)angerLevel);
 
         if (angerTargetUUID != null) {
@@ -87,30 +87,30 @@ public class IguanaEntity extends TropicraftCreatureEntity {
     }
 
     @Override
-    public void readAdditionalSaveData(final CompoundNBT compound) {
-        super.readAdditionalSaveData(compound);
+    public void readAdditional(final CompoundNBT compound) {
+        super.readAdditional(compound);
         angerLevel = compound.getShort("Anger");
         String hurtBy = compound.getString("HurtBy");
 
         if (!hurtBy.isEmpty()) {
             angerTargetUUID = UUID.fromString(hurtBy);
-            final PlayerEntity entityplayer = level.getPlayerByUUID(angerTargetUUID);
-            setLastHurtByMob(entityplayer);
+            final PlayerEntity entityplayer = world.getPlayerByUuid(angerTargetUUID);
+            setRevengeTarget(entityplayer);
 
             if (entityplayer != null) {
-                lastHurtByPlayer = entityplayer;
-                lastHurtByPlayerTime = getLastHurtByMobTimestamp();
+                attackingPlayer = entityplayer;
+                recentlyHit = getRevengeTimer();
             }
         }
     }
 
     @Override
-    protected void customServerAiStep() {
+    protected void updateAITasks() {
         ModifiableAttributeInstance attribute = this.getAttribute(Attributes.MOVEMENT_SPEED);
 
         if (this.isAngry()) {
-            if (!this.isBaby() && !attribute.hasModifier(ATTACK_SPEED_BOOST_MODIFIER)) {
-                attribute.addTransientModifier(ATTACK_SPEED_BOOST_MODIFIER);
+            if (!this.isChild() && !attribute.hasModifier(ATTACK_SPEED_BOOST_MODIFIER)) {
+                attribute.applyNonPersistentModifier(ATTACK_SPEED_BOOST_MODIFIER);
             }
 
             --this.angerLevel;
@@ -118,33 +118,33 @@ public class IguanaEntity extends TropicraftCreatureEntity {
             attribute.removeModifier(ATTACK_SPEED_BOOST_MODIFIER);
         }
 
-        if (this.angerLevel > 0 && this.angerTargetUUID != null && this.getLastHurtByMob() == null) {
-            PlayerEntity entityplayer = this.level.getPlayerByUUID(this.angerTargetUUID);
-            this.setLastHurtByMob(entityplayer);
-            this.lastHurtByPlayer = entityplayer;
-            this.lastHurtByPlayerTime = this.getLastHurtByMobTimestamp();
+        if (this.angerLevel > 0 && this.angerTargetUUID != null && this.getRevengeTarget() == null) {
+            PlayerEntity entityplayer = this.world.getPlayerByUuid(this.angerTargetUUID);
+            this.setRevengeTarget(entityplayer);
+            this.attackingPlayer = entityplayer;
+            this.recentlyHit = this.getRevengeTimer();
         }
 
-        super.customServerAiStep();
+        super.updateAITasks();
     }
 
-    public boolean hurt(DamageSource damageSource, float amount) {
+    public boolean attackEntityFrom(DamageSource damageSource, float amount) {
         if (isInvulnerableTo(damageSource)) {
             return false;
         } else {
-            Entity sourceEntity = damageSource.getEntity();
-            if (sourceEntity instanceof PlayerEntity && !((PlayerEntity)sourceEntity).isCreative() && canSee(sourceEntity)) {
+            Entity sourceEntity = damageSource.getTrueSource();
+            if (sourceEntity instanceof PlayerEntity && !((PlayerEntity)sourceEntity).isCreative() && canEntityBeSeen(sourceEntity)) {
                 becomeAngryAt(sourceEntity);
             }
 
-            return super.hurt(damageSource, amount);
+            return super.attackEntityFrom(damageSource, amount);
         }
     }
 
     private boolean becomeAngryAt(Entity target) {
-        angerLevel = 400 + random.nextInt(400);
+        angerLevel = 400 + rand.nextInt(400);
         if (target instanceof LivingEntity) {
-            setLastHurtByMob((LivingEntity)target);
+            setRevengeTarget((LivingEntity)target);
         }
 
         return true;
@@ -174,20 +174,20 @@ public class IguanaEntity extends TropicraftCreatureEntity {
             super(iggy, PlayerEntity.class, true);
         }
 
-        public boolean canUse() {
-            return ((IguanaEntity)this.mob).isAngry() && super.canUse();
+        public boolean shouldExecute() {
+            return ((IguanaEntity)this.goalOwner).isAngry() && super.shouldExecute();
         }
     }
 
     static class HurtByAggressorGoal extends HurtByTargetGoal {
         public HurtByAggressorGoal(IguanaEntity iguana) {
             super(iguana);
-            this.setAlertOthers(IguanaEntity.class);
+            this.setCallsForHelp(IguanaEntity.class);
         }
 
-        protected void alertOther(MobEntity mob, LivingEntity target) {
-            if (mob instanceof IguanaEntity && this.mob.canSee(target) && ((IguanaEntity)mob).becomeAngryAt(target)) {
-                mob.setTarget(target);
+        protected void setAttackTarget(MobEntity mob, LivingEntity target) {
+            if (mob instanceof IguanaEntity && this.goalOwner.canEntityBeSeen(target) && ((IguanaEntity)mob).becomeAngryAt(target)) {
+                mob.setAttackTarget(target);
             }
 
         }

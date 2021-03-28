@@ -18,17 +18,17 @@ public class TropicsSurfaceBuilder extends SurfaceBuilder<TropicsSurfaceBuilder.
     }
 
 	@Override
-    public void apply(Random random, IChunk chunk, Biome biome, int x, int z, int startHeight, double noise, BlockState defaultBlock, BlockState defaultFluid, int seaLevel, long seed, Config config) {
+    public void buildSurface(Random random, IChunk chunk, Biome biome, int x, int z, int startHeight, double noise, BlockState defaultBlock, BlockState defaultFluid, int seaLevel, long seed, Config config) {
         SurfaceBuilderConfig selectedConfig = config.land;
     	if (noise > 1.5) {
-        	if (chunk.getHeight(Heightmap.Type.OCEAN_FLOOR_WG, x, z) + 1 >= seaLevel) {
+        	if (chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, x, z) + 1 >= seaLevel) {
         		selectedConfig = config.sandy;
         	} else {
             	selectedConfig = config.sandyUnderwater;
             }
         }
 
-    	SurfaceBuilder.DEFAULT.apply(random, chunk, biome, x, z, startHeight, noise, defaultBlock, defaultFluid, seaLevel, seed, selectedConfig);
+    	SurfaceBuilder.DEFAULT.buildSurface(random, chunk, biome, x, z, startHeight, noise, defaultBlock, defaultFluid, seaLevel, seed, selectedConfig);
     }
 
 	public static final class Config implements ISurfaceBuilderConfig {
@@ -51,13 +51,13 @@ public class TropicsSurfaceBuilder extends SurfaceBuilder<TropicsSurfaceBuilder.
 		}
 
 		@Override
-		public BlockState getTopMaterial() {
-			return this.land.getTopMaterial();
+		public BlockState getTop() {
+			return this.land.getTop();
 		}
 
 		@Override
-		public BlockState getUnderMaterial() {
-			return this.land.getUnderMaterial();
+		public BlockState getUnder() {
+			return this.land.getUnder();
 		}
 	}
 }

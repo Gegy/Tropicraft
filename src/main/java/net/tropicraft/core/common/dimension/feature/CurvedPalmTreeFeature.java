@@ -31,8 +31,8 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
     }
 
     @Override
-    public boolean place(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
-        pos = pos.immutable();
+    public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+        pos = pos.toImmutable();
 
         final int height = 9 + rand.nextInt(3);
 
@@ -44,7 +44,7 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
             return false;
         }
 
-        if (!getSapling().canSurvive(getSapling().defaultBlockState(), world, pos)) {
+        if (!getSapling().isValidPosition(getSapling().getDefaultState(), world, pos)) {
             return false;
         }
 
@@ -58,7 +58,7 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
         for (int xx = 0; xx < 4; xx++) {
             for (int yy = 0; yy < height; yy++) {
                 final BlockPos posWithDir = getPosWithDir(xx, yy + y, 0);
-                if (!isAir(world, posWithDir)) {
+                if (!isAirAt(world, posWithDir)) {
                     return false;
                 }
             }
@@ -68,7 +68,7 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
         for (int xx = 0; xx < 9; xx++) {
             for (int zz = 0; zz < 9; zz++) {
                 for (int yy = height - 3; yy < height + 4; yy++) {
-                    if (!isAir(world, getPosWithDir(xx + TOP_OFFSET, yy + y, zz))) {
+                    if (!isAirAt(world, getPosWithDir(xx + TOP_OFFSET, yy + y, zz))) {
                         return false;
                     }
                 }
@@ -194,7 +194,7 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
     }
 
     private static boolean isWater(IWorldGenerationReader world, BlockPos pos) {
-        return world.isStateAtPosition(pos, state -> state.is(Blocks.WATER));
+        return world.hasBlockState(pos, state -> state.matchesBlock(Blocks.WATER));
     }
 
     private int pickDirection(final IWorldGenerationReader world, final Random rand, int x, int z) {
@@ -237,16 +237,16 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
     private void placeBlockWithDir(final IWorldWriter world, int x, int y, int z, BlockState state) {
         switch (dir) {
             case 2:
-                setBlock(world, pos(this.originX + x, y, this.originZ + z), state);
+                setBlockState(world, pos(this.originX + x, y, this.originZ + z), state);
                 return;
             case 0:
-                setBlock(world, pos(this.originX + z, y, this.originZ - x), state);
+                setBlockState(world, pos(this.originX + z, y, this.originZ - x), state);
                 return;
             case 3:
-                setBlock(world, pos(this.originX - x, y, this.originZ - z), state);
+                setBlockState(world, pos(this.originX - x, y, this.originZ - z), state);
                 return;
             case 1:
-                setBlock(world, pos(this.originX - z, y, this.originZ + x), state);
+                setBlockState(world, pos(this.originX - z, y, this.originZ + x), state);
         }
     }
 

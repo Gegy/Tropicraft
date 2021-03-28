@@ -11,7 +11,7 @@ public class UmbrellaRenderer extends FurnitureRenderer<UmbrellaEntity> {
 
     public UmbrellaRenderer(EntityRendererManager rendererManager) {
         super(rendererManager, "umbrella", new UmbrellaModel(), 4);
-        this.shadowRadius = 2.5f;
+        this.shadowSize = 2.5f;
     }
 
     //TODO
@@ -49,7 +49,7 @@ public class UmbrellaRenderer extends FurnitureRenderer<UmbrellaEntity> {
 
     @Nullable
     @Override
-    public ResourceLocation getTextureLocation(final UmbrellaEntity umbrella) {
+    public ResourceLocation getEntityTexture(final UmbrellaEntity umbrella) {
         return null;
     }
 }

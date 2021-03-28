@@ -16,10 +16,10 @@ public class TropicraftLookupLayer extends Layer {
 
 	// the default layer delegated to Forge's registry which isn't populated from dynamic registries
 	@Override
-	public Biome get(Registry<Biome> biomes, int x, int z) {
-		int id = this.area.get(x, z);
+	public Biome func_242936_a(Registry<Biome> biomes, int x, int z) {
+		int id = this.area.getValue(x, z);
 
-		Biome biome = biomes.byId(id);
+		Biome biome = biomes.getByValue(id);
 		if (biome == null) {
 			throw new IllegalStateException("Unknown biome id emitted by layers: " + id);
 		}

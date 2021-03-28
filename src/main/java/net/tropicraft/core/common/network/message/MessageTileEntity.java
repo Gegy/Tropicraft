@@ -28,7 +28,7 @@ public abstract class MessageTileEntity<T extends TileEntity> implements Tropicr
 	protected MessageTileEntity() {}
 
 	protected MessageTileEntity(T tile) {
-		pos = tile.getBlockPos().asLong();
+		pos = tile.getPos().toLong();
 	}
 
 	protected static void encode(final MessageTileEntity<?> message, PacketBuffer buf) {
@@ -44,20 +44,20 @@ public abstract class MessageTileEntity<T extends TileEntity> implements Tropicr
 	}
 
 	public BlockPos getPos() {
-		return BlockPos.of(pos);
+		return BlockPos.fromLong(pos);
 	}
 
 	protected T getClientTileEntity() {
-		return getTileEntity(DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> Minecraft.getInstance().level));
+		return getTileEntity(DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> Minecraft.getInstance().world));
 	}
 
 	@SuppressWarnings("unchecked")
 	protected T getTileEntity(World worldObj) {
 		// Sanity check, and prevent malicious packets from loading chunks
-		if (worldObj == null || !worldObj.hasChunkAt(getPos())) {
+		if (worldObj == null || !worldObj.isBlockLoaded(getPos())) {
 			return null;
 		}
-		TileEntity te = worldObj.getBlockEntity(getPos());
+		TileEntity te = worldObj.getTileEntity(getPos());
 		if (te == null) {
 			return null;
 		}

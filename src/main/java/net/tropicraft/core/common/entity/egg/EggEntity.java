@@ -17,41 +17,41 @@ import net.minecraft.world.World;
 
 public abstract class EggEntity extends LivingEntity {
 
-	private static final DataParameter<Integer> HATCH_DELAY = EntityDataManager.defineId(EggEntity.class, DataSerializers.INT);
+	private static final DataParameter<Integer> HATCH_DELAY = EntityDataManager.createKey(EggEntity.class, DataSerializers.VARINT);
 
     public double rotationRand;
    
     public EggEntity(final EntityType<? extends EggEntity> type, World w) {
         super(type, w);
         rotationRand = 0;
-        noCulling = true;
+        ignoreFrustumCheck = true;
        
-        yRot = random.nextInt(360);
+        rotationYaw = rand.nextInt(360);
     }
 
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH, 2.0);
+        return LivingEntity.registerAttributes().createMutableAttribute(Attributes.MAX_HEALTH, 2.0);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundNBT compound) {
-        tickCount = compound.getInt("ticks");
+    public void readAdditional(CompoundNBT compound) {
+        ticksExisted = compound.getInt("ticks");
         setHatchDelay(compound.getInt("hatchDelay"));
-        super.readAdditionalSaveData(compound);
+        super.readAdditional(compound);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundNBT compound) {
-        compound.putInt("ticks", tickCount);
+    public void writeAdditional(CompoundNBT compound) {
+        compound.putInt("ticks", ticksExisted);
         compound.putInt("hatchDelay", getHatchDelay());
-        super.addAdditionalSaveData(compound);
+        super.writeAdditional(compound);
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-		entityData.define(HATCH_DELAY, 0);
-		setHatchDelay(-60 + random.nextInt(120));
+    protected void registerData() {
+        super.registerData();
+		dataManager.register(HATCH_DELAY, 0);
+		setHatchDelay(-60 + rand.nextInt(120));
 	}
 
     public abstract boolean shouldEggRenderFlat();
@@ -78,30 +78,30 @@ public abstract class EggEntity extends LivingEntity {
     public abstract int getPreHatchMovement();
     
     public int getRandomHatchDelay() {
-        return this.getEntityData().get(HATCH_DELAY);
+        return this.getDataManager().get(HATCH_DELAY);
     }
      
     public boolean isHatching() {
-        return this.tickCount > (getHatchTime() + getRandomHatchDelay());
+        return this.ticksExisted > (getHatchTime() + getRandomHatchDelay());
     }
     
     public boolean isNearHatching() {
-        return this.tickCount > (getHatchTime() + getRandomHatchDelay()) - getPreHatchMovement();
+        return this.ticksExisted > (getHatchTime() + getRandomHatchDelay()) - getPreHatchMovement();
     }
 
     @Override
-    public void aiStep() {
-        super.aiStep();
+    public void livingTick() {
+        super.livingTick();
         
         if (isNearHatching()) {
-            rotationRand += 0.1707F * level.random.nextFloat();
+            rotationRand += 0.1707F * world.rand.nextFloat();
             
             // Hatch time!
-            if (tickCount >= this.getHatchTime()) {
-                if (!level.isClientSide) {
+            if (ticksExisted >= this.getHatchTime()) {
+                if (!world.isRemote) {
                     final Entity ent = onHatch();
-                    ent.moveTo(getX(), getY(), getZ(), 0.0F, 0.0F);
-                    level.addFreshEntity(ent);
+                    ent.setLocationAndAngles(getPosX(), getPosY(), getPosZ(), 0.0F, 0.0F);
+                    world.addEntity(ent);
                     remove();
                 }
             }
@@ -109,29 +109,29 @@ public abstract class EggEntity extends LivingEntity {
     }
 	
 	public void setHatchDelay(int i) {
-		this.getEntityData().set(HATCH_DELAY, -60 + random.nextInt(120));
+		this.getDataManager().set(HATCH_DELAY, -60 + rand.nextInt(120));
 	}
 	
 	public int getHatchDelay() {
-		return this.getEntityData().get(HATCH_DELAY);
+		return this.getDataManager().get(HATCH_DELAY);
 	}
 
     @Override
-    public Iterable<ItemStack> getArmorSlots() {
+    public Iterable<ItemStack> getArmorInventoryList() {
         return ImmutableList.of();
     }
 
     @Override
-    public ItemStack getItemBySlot(EquipmentSlotType slotIn) {
+    public ItemStack getItemStackFromSlot(EquipmentSlotType slotIn) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public void setItemSlot(EquipmentSlotType slotIn, ItemStack stack) {
+    public void setItemStackToSlot(EquipmentSlotType slotIn, ItemStack stack) {
     }
 
     @Override
-    public HandSide getMainArm() {
+    public HandSide getPrimaryHand() {
         return HandSide.LEFT;
     }
 }

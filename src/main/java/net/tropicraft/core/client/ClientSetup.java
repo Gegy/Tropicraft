@@ -52,13 +52,13 @@ import net.tropicraft.core.common.entity.TropicraftEntities;
 public class ClientSetup {
 
     public static void setupBlockRenderLayers() {
-        RenderType renderType = RenderType.cutout();
+        RenderType renderType = RenderType.getCutout();
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.AIR_COMPRESSOR.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.COCONUT.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.DRINK_MIXER.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.SIFTER.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.TIKI_TORCH.get(), renderType);
-        TropicraftBlocks.FLOWERS.forEach((key, value) -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.cutout()));
+        TropicraftBlocks.FLOWERS.forEach((key, value) -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.getCutout()));
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.PINEAPPLE.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.IRIS.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.COFFEE_BUSH.get(), renderType);
@@ -74,11 +74,11 @@ public class ClientSetup {
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.BAMBOO_DOOR.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.BAMBOO_LADDER.get(), renderType);
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.BAMBOO_FLOWER_POT.get(), renderType);
-        TropicraftBlocks.BAMBOO_POTTED_TROPICS_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.cutout()));
-        TropicraftBlocks.BAMBOO_POTTED_VANILLA_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.cutout()));
-        TropicraftBlocks.VANILLA_POTTED_TROPICS_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.cutout()));
+        TropicraftBlocks.BAMBOO_POTTED_TROPICS_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.getCutout()));
+        TropicraftBlocks.BAMBOO_POTTED_VANILLA_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.getCutout()));
+        TropicraftBlocks.VANILLA_POTTED_TROPICS_PLANTS.forEach(value -> RenderTypeLookup.setRenderLayer(value.get(), RenderType.getCutout()));
 
-        renderType = RenderType.cutoutMipped();
+        renderType = RenderType.getCutoutMipped();
         RenderTypeLookup.setRenderLayer(TropicraftBlocks.THATCH_STAIRS_FUZZY.get(), renderType);
     }
 
@@ -129,14 +129,14 @@ public class ClientSetup {
     }
 
     public static void setupDimensionRenderInfo() {
-        DimensionRenderInfo.EFFECTS.put(TropicraftDimension.WORLD.location(), new DimensionRenderInfo(192.0F, true, DimensionRenderInfo.FogType.NORMAL, false, false) {
+        DimensionRenderInfo.field_239208_a_.put(TropicraftDimension.WORLD.getLocation(), new DimensionRenderInfo(192.0F, true, DimensionRenderInfo.FogType.NORMAL, false, false) {
             @Override
-            public Vector3d getBrightnessDependentFogColor(Vector3d color, float brightness) {
-                return color.multiply(brightness * 0.94F + 0.06F, brightness * 0.94F + 0.06F, brightness * 0.91F + 0.09F);
+            public Vector3d func_230494_a_(Vector3d color, float brightness) {
+                return color.mul(brightness * 0.94F + 0.06F, brightness * 0.94F + 0.06F, brightness * 0.91F + 0.09F);
             }
 
             @Override
-            public boolean isFoggyAt(int x, int z) {
+            public boolean func_230493_a_(int x, int z) {
                 return false;
             }
         });

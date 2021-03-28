@@ -26,7 +26,7 @@ public class TropicraftBlockTagsProvider extends BlockTagsProvider {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void addTags() {
+    protected void registerTags() {
         // Filling vanilla tags
         
         createAndAppend(TropicraftTags.Blocks.SAND, BlockTags.SAND,
@@ -96,17 +96,17 @@ public class TropicraftBlockTagsProvider extends BlockTagsProvider {
 
     @SafeVarargs
     private final void createTag(INamedTag<Block> tag, Supplier<? extends Block>... blocks) {
-        tag(tag).add(resolveAll(Block[]::new, blocks));
+        getOrCreateBuilder(tag).add(resolveAll(Block[]::new, blocks));
     }
     
     @SafeVarargs
     private final void appendToTag(INamedTag<Block> tag, INamedTag<Block>... toAppend) {
-        tag(tag).addTags(toAppend);
+        getOrCreateBuilder(tag).addTags(toAppend);
     }
     
     @SafeVarargs
     private final void extendTag(INamedTag<Block> tag, INamedTag<Block> toExtend, Supplier<? extends Block>... blocks) {
-        tag(tag).addTag(toExtend).add(resolveAll(Block[]::new, blocks));
+        getOrCreateBuilder(tag).addTag(toExtend).add(resolveAll(Block[]::new, blocks));
     }
     
     @SafeVarargs

@@ -10,6 +10,8 @@ import net.minecraft.world.World;
 import net.tropicraft.core.common.dimension.TropicraftDimension;
 import net.tropicraft.core.common.entity.projectile.ExplodingCoconutEntity;
 
+import net.minecraft.item.Item.Properties;
+
 public class ExplodingCoconutItem extends Item {
 
     public ExplodingCoconutItem(Properties properties) {
@@ -17,15 +19,15 @@ public class ExplodingCoconutItem extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         // TODO config option
-        final boolean canPlayerThrow = player.isCreative() || player.canUseGameMasterBlocks();
+        final boolean canPlayerThrow = player.isCreative() || player.canUseCommandBlock();
         //allow to use anywhere but in the main area of the server
-        final boolean ltOverride = world.dimension() != TropicraftDimension.WORLD;
-        ItemStack itemstack = player.getItemInHand(hand);
+        final boolean ltOverride = world.getDimensionKey() != TropicraftDimension.WORLD;
+        ItemStack itemstack = player.getHeldItem(hand);
         if (!canPlayerThrow && !ltOverride) {
-            if (!world.isClientSide) {
-                player.displayClientMessage(new TranslationTextComponent("tropicraft.coconutBombWarning"), false);
+            if (!world.isRemote) {
+                player.sendStatusMessage(new TranslationTextComponent("tropicraft.coconutBombWarning"), false);
             }
             return new ActionResult<>(ActionResultType.PASS, itemstack);
         }
@@ -33,15 +35,15 @@ public class ExplodingCoconutItem extends Item {
         if (!player.isCreative()) {
             itemstack.shrink(1);
         }
-        world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
-        if (!world.isClientSide) {
+        world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+        if (!world.isRemote) {
             ExplodingCoconutEntity snowballentity = new ExplodingCoconutEntity(world, player);
             snowballentity.setItem(itemstack);
-            snowballentity.shootFromRotation(player, player.xRot, player.yRot, 0.0F, 1.5F, 1.0F);
-            world.addFreshEntity(snowballentity);
+            snowballentity.setDirectionAndMovement(player, player.rotationPitch, player.rotationYaw, 0.0F, 1.5F, 1.0F);
+            world.addEntity(snowballentity);
         }
 
-        player.awardStat(Stats.ITEM_USED.get(this));
+        player.addStat(Stats.ITEM_USED.get(this));
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 }

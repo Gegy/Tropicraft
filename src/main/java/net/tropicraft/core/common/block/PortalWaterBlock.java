@@ -12,6 +12,8 @@ import net.tropicraft.core.common.dimension.TropicraftDimension;
 
 import java.util.Random;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class PortalWaterBlock extends FlowingFluidBlock {
 
     public PortalWaterBlock(Properties builder) {
@@ -19,9 +21,9 @@ public class PortalWaterBlock extends FlowingFluidBlock {
     }
     
     @Override
-    public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
-        super.entityInside(state, worldIn, pos, entityIn);
-        if (!worldIn.isClientSide && entityIn instanceof ServerPlayerEntity && entityIn.getPortalWaitTime() <= 0 && !entityIn.isPassenger() && !entityIn.isPassenger() && entityIn.canChangeDimensions()) {
+    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
+        super.onEntityCollision(state, worldIn, pos, entityIn);
+        if (!worldIn.isRemote && entityIn instanceof ServerPlayerEntity && entityIn.getMaxInPortalTime() <= 0 && !entityIn.isPassenger() && !entityIn.isPassenger() && entityIn.canChangeDimension()) {
             TropicraftDimension.teleportPlayer((ServerPlayerEntity) entityIn, TropicraftDimension.WORLD);
         }
     }

@@ -17,7 +17,7 @@ public class TropiSkellyRenderer extends BipedRenderer<TropiSkellyEntity, TropiS
     public TropiSkellyRenderer(EntityRendererManager rendererManager) {
         super(rendererManager, new TropiSkellyModel(), 0.5F);
 
-        layers.clear();
+        layerRenderers.clear();
 
         addLayer(new HeadLayer<>(this));
         addLayer(new ElytraLayer<>(this));
@@ -25,7 +25,7 @@ public class TropiSkellyRenderer extends BipedRenderer<TropiSkellyEntity, TropiS
     }
 
     @Override
-    public ResourceLocation getTextureLocation(TropiSkellyEntity entity) {
+    public ResourceLocation getEntityTexture(TropiSkellyEntity entity) {
         return TEXTURE;
     }
 }

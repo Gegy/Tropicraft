@@ -44,7 +44,7 @@ public class TropicraftTags {
         public static final INamedTag<Block> BONGOS = modTag("bongos");
 
         static INamedTag<Block> tag(String modid, String name) {
-            return tag(BlockTags::bind, modid, name);
+            return tag(BlockTags::makeWrapperTag, modid, name);
         }
 
         static INamedTag<Block> modTag(String name) {
@@ -105,7 +105,7 @@ public class TropicraftTags {
         public static final INamedTag<Item> ASHEN_MASKS = modTag("ashen_masks");
 
         static INamedTag<Item> tag(String modid, String name) {
-            return tag(ItemTags::bind, modid, name);
+            return tag(ItemTags::makeWrapperTag, modid, name);
         }
 
         static INamedTag<Item> modTag(String name) {

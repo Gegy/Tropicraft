@@ -18,30 +18,30 @@ public class AshenMaskRenderer extends EntityRenderer<AshenMaskEntity> {
 
 	public AshenMaskRenderer(final EntityRendererManager manager) {
 		super(manager);
-		shadowRadius = 0.5F;
-		shadowStrength  = 0.5f;
+		shadowSize = 0.5F;
+		shadowOpaque  = 0.5f;
 		mask = new TropicraftSpecialRenderHelper();
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(final AshenMaskEntity entity) {
+	public ResourceLocation getEntityTexture(final AshenMaskEntity entity) {
 		return TropicraftRenderUtils.getTextureEntity("ashen/mask");
 	}
 
 	@Override
 	public void render(AshenMaskEntity entity, float entityYaw, float partialTicks, MatrixStack stack, IRenderTypeBuffer buffer, int packedLightIn) {
-		stack.pushPose();
+		stack.push();
 
-		IVertexBuilder ivertexbuilder = buffer.getBuffer(RenderType.entityCutout(getTextureLocation(entity)));
+		IVertexBuilder ivertexbuilder = buffer.getBuffer(RenderType.getEntityCutout(getEntityTexture(entity)));
 	//	mask.render(stack, ivertexbuilder, packedLightIn, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 //		GlStateManager.pushMatrix();
 	//	bindEntityTexture(entity);
 
-		stack.mulPose(Vector3f.XN.rotationDegrees(90));
+		stack.rotate(Vector3f.XN.rotationDegrees(90));
 
 		mask.renderMask(stack, ivertexbuilder, entity.getMaskType(), packedLightIn, OverlayTexture.NO_OVERLAY);
 
-		stack.popPose();
+		stack.pop();
 	}
 
 }

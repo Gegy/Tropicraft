@@ -13,6 +13,8 @@ import net.tropicraft.core.client.entity.model.PlayerHeadpieceRenderer;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.item.Item.Properties;
+
 public class NigelStacheItem extends ArmorItem {
 
     public NigelStacheItem(final Properties properties) {

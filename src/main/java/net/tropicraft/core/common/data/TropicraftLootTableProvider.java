@@ -172,9 +172,9 @@ public class TropicraftLootTableProvider extends LootTableProvider {
             
             // Misc remaining blocks
             doubleBlock(TropicraftBlocks.IRIS);
-            add(TropicraftBlocks.PINEAPPLE.get(), b -> droppingChunks(b, TropicraftItems.PINEAPPLE_CUBES,
-                BlockStateProperty.hasBlockStateProperties(b).setProperties(
-                        StatePropertiesPredicate.Builder.properties().hasProperty(
+            registerLootTable(TropicraftBlocks.PINEAPPLE.get(), b -> droppingChunks(b, TropicraftItems.PINEAPPLE_CUBES,
+                BlockStateProperty.builder(b).fromProperties(
+                        StatePropertiesPredicate.Builder.newBuilder().withProp(
                                 DoublePlantBlock.HALF, DoubleBlockHalf.UPPER))));
             
             dropsSelf(TropicraftBlocks.SMALL_BONGO_DRUM);
@@ -188,93 +188,93 @@ public class TropicraftLootTableProvider extends LootTableProvider {
             dropsSelf(TropicraftBlocks.DRINK_MIXER);
             dropsSelf(TropicraftBlocks.AIR_COMPRESSOR);
 
-            add(TropicraftBlocks.TIKI_TORCH.get(), b -> createSinglePropConditionTable(b, TikiTorchBlock.SECTION, TikiTorchBlock.TorchSection.UPPER));
+            registerLootTable(TropicraftBlocks.TIKI_TORCH.get(), b -> droppingWhen(b, TikiTorchBlock.SECTION, TikiTorchBlock.TorchSection.UPPER));
             
-            add(TropicraftBlocks.COCONUT.get(), b -> droppingChunks(b, TropicraftItems.COCONUT_CHUNK));
+            registerLootTable(TropicraftBlocks.COCONUT.get(), b -> droppingChunks(b, TropicraftItems.COCONUT_CHUNK));
             
             dropsSelf(TropicraftBlocks.BAMBOO_FLOWER_POT);
-            TropicraftBlocks.ALL_POTTED_PLANTS.forEach(ro -> add(ro.get(), b -> droppingFlowerPotAndFlower((FlowerPotBlock) b)));
+            TropicraftBlocks.ALL_POTTED_PLANTS.forEach(ro -> registerLootTable(ro.get(), b -> droppingFlowerPotAndFlower((FlowerPotBlock) b)));
 
-            add(TropicraftBlocks.COFFEE_BUSH.get(), dropNumberOfItems(TropicraftBlocks.COFFEE_BUSH.get(), TropicraftItems.RAW_COFFEE_BEAN, 1, 3));
+            registerLootTable(TropicraftBlocks.COFFEE_BUSH.get(), dropNumberOfItems(TropicraftBlocks.COFFEE_BUSH.get(), TropicraftItems.RAW_COFFEE_BEAN, 1, 3));
         }
         
         private void dropsSelf(Supplier<? extends Block> block) {
-            dropSelf(block.get());
+            registerDropSelfLootTable(block.get());
         }
         
         private void dropsOreItem(Supplier<? extends Block> block, Supplier<? extends IItemProvider> item) {
-            add(block.get(), b -> createOreDrop(b, item.get().asItem()));
+            registerLootTable(block.get(), b -> droppingItemWithFortune(b, item.get().asItem()));
         }
         
         private void slab(Supplier<? extends SlabBlock> block) {
-            add(block.get(), BlockLootTables::createSlabItemTable);
+            registerLootTable(block.get(), BlockLootTables::droppingSlab);
         }
 
         private void leaves(Supplier<? extends LeavesBlock> block, Supplier<? extends SaplingBlock> sapling, float[] rates) {
-            add(block.get(), b -> createLeavesDrops(b, sapling.get(), rates));
+            registerLootTable(block.get(), b -> droppingWithChancesAndSticks(b, sapling.get(), rates));
         }
         
         private void leavesNoSapling(Supplier<? extends LeavesBlock> block) {
-            add(block.get(), Blocks::droppingWithSticks);
+            registerLootTable(block.get(), Blocks::droppingWithSticks);
         }
         
         private void fruitLeaves(Supplier<? extends LeavesBlock> block, Supplier<? extends SaplingBlock> sapling, Supplier<? extends IItemProvider> fruit) {
-            add(block.get(), b -> droppingWithChancesSticksAndFruit(b, sapling.get(), fruit.get(), FRUIT_SAPLING_RATES));
+            registerLootTable(block.get(), b -> droppingWithChancesSticksAndFruit(b, sapling.get(), fruit.get(), FRUIT_SAPLING_RATES));
         }
         
         protected static LootTable.Builder onlyWithSilkTouchOrShears(Block block) {
-            return LootTable.lootTable().withPool(LootPool.lootPool().when(HAS_SHEARS_OR_SILK_TOUCH).setRolls(ConstantRange.exactly(1)).add(ItemLootEntry.lootTableItem(block)));
+            return LootTable.builder().addLootPool(LootPool.builder().acceptCondition(SILK_TOUCH_OR_SHEARS).rolls(ConstantRange.of(1)).addEntry(ItemLootEntry.builder(block)));
         }
         
         protected static LootTable.Builder droppingWithSticks(Block block) {
-            return onlyWithSilkTouchOrShears(block).withPool(LootPool.lootPool()
-                        .setRolls(ConstantRange.exactly(1))
-                        .when(HAS_NO_SHEARS_OR_SILK_TOUCH)
-                        .add(applyExplosionDecay(block, ItemLootEntry.lootTableItem(Items.STICK)
-                                .apply(SetCount.setCount(RandomValueRange.between(1.0F, 2.0F))))
-                                .when(TableBonus.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F))));
+            return onlyWithSilkTouchOrShears(block).addLootPool(LootPool.builder()
+                        .rolls(ConstantRange.of(1))
+                        .acceptCondition(NOT_SILK_TOUCH_OR_SHEARS)
+                        .addEntry(withExplosionDecay(block, ItemLootEntry.builder(Items.STICK)
+                                .acceptFunction(SetCount.builder(RandomValueRange.of(1.0F, 2.0F))))
+                                .acceptCondition(TableBonus.builder(Enchantments.FORTUNE, 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F))));
         }
         
         protected static LootTable.Builder droppingWithChancesSticksAndFruit(Block block, Block sapling, IItemProvider fruit, float[] chances) {
-            return createLeavesDrops(block, sapling, chances)
-                    .withPool(LootPool.lootPool().setRolls(ConstantRange.exactly(1))
-                            .when(HAS_NO_SHEARS_OR_SILK_TOUCH)
-                            .add(applyExplosionDecay(block, ItemLootEntry.lootTableItem(fruit))));
+            return droppingWithChancesAndSticks(block, sapling, chances)
+                    .addLootPool(LootPool.builder().rolls(ConstantRange.of(1))
+                            .acceptCondition(NOT_SILK_TOUCH_OR_SHEARS)
+                            .addEntry(withExplosionDecay(block, ItemLootEntry.builder(fruit))));
         }
         
         private void doubleBlock(Supplier<? extends Block> block) {
-            add(block.get(), b -> createSinglePropConditionTable(b, DoorBlock.HALF, DoubleBlockHalf.LOWER));
+            registerLootTable(block.get(), b -> droppingWhen(b, DoorBlock.HALF, DoubleBlockHalf.LOWER));
         }
 
         // Same as droppingAndFlowerPot but with variable flower pot item
         protected static LootTable.Builder droppingFlowerPotAndFlower(FlowerPotBlock fullPot) {
-            return LootTable.lootTable().withPool(applyExplosionCondition(fullPot.getEmptyPot(), LootPool.lootPool()
-                            .setRolls(ConstantRange.exactly(1))
-                            .add(ItemLootEntry.lootTableItem(fullPot.getEmptyPot()))))
-                    .withPool(applyExplosionCondition(fullPot.getContent(), LootPool.lootPool()
-                            .setRolls(ConstantRange.exactly(1))
-                            .add(ItemLootEntry.lootTableItem(fullPot.getContent()))));
+            return LootTable.builder().addLootPool(withSurvivesExplosion(fullPot.getEmptyPot(), LootPool.builder()
+                            .rolls(ConstantRange.of(1))
+                            .addEntry(ItemLootEntry.builder(fullPot.getEmptyPot()))))
+                    .addLootPool(withSurvivesExplosion(fullPot.getFlower(), LootPool.builder()
+                            .rolls(ConstantRange.of(1))
+                            .addEntry(ItemLootEntry.builder(fullPot.getFlower()))));
         }
         
         private static LootPool.Builder droppingChunksPool(Block block, Supplier<? extends IItemProvider> chunk) {
-            return LootPool.lootPool().add(ItemLootEntry.lootTableItem(chunk.get())
-                    .when(MatchTool.toolMatches(ItemPredicate.Builder.item().of(TropicraftTags.Items.SWORDS)))
-                    .apply(SetCount.setCount(RandomValueRange.between(1.0F, 4.0F)))
-                    .otherwise(applyExplosionCondition(block, ItemLootEntry.lootTableItem(block))));
+            return LootPool.builder().addEntry(ItemLootEntry.builder(chunk.get())
+                    .acceptCondition(MatchTool.builder(ItemPredicate.Builder.create().tag(TropicraftTags.Items.SWORDS)))
+                    .acceptFunction(SetCount.builder(RandomValueRange.of(1.0F, 4.0F)))
+                    .alternatively(withSurvivesExplosion(block, ItemLootEntry.builder(block))));
         }
         
         protected static LootTable.Builder droppingChunks(Block block, Supplier<? extends IItemProvider> chunk) {
-            return LootTable.lootTable().withPool(droppingChunksPool(block, chunk));
+            return LootTable.builder().addLootPool(droppingChunksPool(block, chunk));
         }
         
         protected static LootTable.Builder droppingChunks(Block block, Supplier<? extends IItemProvider> chunk, ILootCondition.IBuilder condition) {
-            return LootTable.lootTable().withPool(droppingChunksPool(block, chunk).when(condition));
+            return LootTable.builder().addLootPool(droppingChunksPool(block, chunk).acceptCondition(condition));
         }
 
         private static LootTable.Builder dropNumberOfItems(Block block, Supplier<? extends IItemProvider> drop, final int minDrops, final int maxDrops) {
-            return LootTable.lootTable().withPool(applyExplosionCondition(block, LootPool.lootPool()
-            		.add(ItemLootEntry.lootTableItem(drop.get()))
-                    	.apply(SetCount.setCount(RandomValueRange.between(minDrops, maxDrops)))));
+            return LootTable.builder().addLootPool(withSurvivesExplosion(block, LootPool.builder()
+            		.addEntry(ItemLootEntry.builder(drop.get()))
+                    	.acceptFunction(SetCount.builder(RandomValueRange.of(minDrops, maxDrops)))));
         }
         
         @Override

@@ -45,54 +45,54 @@ public class TropiSkellyEntity extends MonsterEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!this.level.isClientSide && this.level.getDifficulty() == Difficulty.PEACEFUL) {
+        if (!this.world.isRemote && this.world.getDifficulty() == Difficulty.PEACEFUL) {
             this.remove();
         }
     }
 
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return MonsterEntity.createMonsterAttributes()
-                .add(Attributes.MOVEMENT_SPEED, 0.23)
-                .add(Attributes.ARMOR, 2.0)
-                .add(Attributes.ATTACK_DAMAGE, 2.5)
-                .add(Attributes.FOLLOW_RANGE, 35.0);
+        return MonsterEntity.func_234295_eP_()
+                .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.23)
+                .createMutableAttribute(Attributes.ARMOR, 2.0)
+                .createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.5)
+                .createMutableAttribute(Attributes.FOLLOW_RANGE, 35.0);
     }
 
     @Override
     @Nullable
-    public ILivingEntityData finalizeSpawn(IServerWorld p_213386_1_, DifficultyInstance p_213386_2_, SpawnReason p_213386_3_, @Nullable ILivingEntityData p_213386_4_, @Nullable CompoundNBT p_213386_5_) {
-        this.setItemInHand(Hand.MAIN_HAND, new ItemStack(TropicraftItems.BAMBOO_SPEAR.get()));
-        return super.finalizeSpawn(p_213386_1_, p_213386_2_, p_213386_3_, p_213386_4_, p_213386_5_);
+    public ILivingEntityData onInitialSpawn(IServerWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
+        this.setHeldItem(Hand.MAIN_HAND, new ItemStack(TropicraftItems.BAMBOO_SPEAR.get()));
+        return super.onInitialSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
     }
 
     private boolean isValidLightLevel() {
-        BlockPos blockpos = new BlockPos(getX(), getBoundingBox().minY, getZ());
-        if (level.getBrightness(LightType.SKY, blockpos) > random.nextInt(32)) {
+        BlockPos blockpos = new BlockPos(getPosX(), getBoundingBox().minY, getPosZ());
+        if (world.getLightFor(LightType.SKY, blockpos) > rand.nextInt(32)) {
             return false;
         } else {
-            int i = level.isThundering() ? level.getMaxLocalRawBrightness(blockpos, 10) : level.getMaxLocalRawBrightness(blockpos);
-            return i <= random.nextInt(8);
+            int i = world.isThundering() ? world.getNeighborAwareLightSubtracted(blockpos, 10) : world.getLight(blockpos);
+            return i <= rand.nextInt(8);
         }
     }
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.SKELETON_AMBIENT;
+        return SoundEvents.ENTITY_SKELETON_AMBIENT;
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
-        return SoundEvents.SKELETON_HURT;
+        return SoundEvents.ENTITY_SKELETON_HURT;
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.SKELETON_DEATH;
+        return SoundEvents.ENTITY_SKELETON_DEATH;
     }
 
     @Override
-    public boolean checkSpawnRules(IWorld worldIn, SpawnReason spawnReasonIn) {
-        return worldIn.getDifficulty() != Difficulty.PEACEFUL && this.isValidLightLevel() && super.checkSpawnRules(worldIn, spawnReasonIn);
+    public boolean canSpawn(IWorld worldIn, SpawnReason spawnReasonIn) {
+        return worldIn.getDifficulty() != Difficulty.PEACEFUL && this.isValidLightLevel() && super.canSpawn(worldIn, spawnReasonIn);
     }
 
     @Override

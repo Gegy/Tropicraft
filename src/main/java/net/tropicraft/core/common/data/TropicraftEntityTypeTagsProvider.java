@@ -20,7 +20,7 @@ public class TropicraftEntityTypeTagsProvider extends EntityTypeTagsProvider {
     }
 
     @Override
-    protected void addTags() {
+    protected void registerTags() {
         appendToTag(EntityTypeTags.BEEHIVE_INHABITORS, TropicraftEntities.TROPI_BEE);
     }
 
@@ -31,7 +31,7 @@ public class TropicraftEntityTypeTagsProvider extends EntityTypeTagsProvider {
 
     @SafeVarargs
     private final void appendToTag(INamedTag<EntityType<?>> tag, Supplier<? extends EntityType<?>>... types) {
-        tag(tag).add(resolveAll(EntityType<?>[]::new, types));
+        getOrCreateBuilder(tag).add(resolveAll(EntityType<?>[]::new, types));
     }
 
     @Override

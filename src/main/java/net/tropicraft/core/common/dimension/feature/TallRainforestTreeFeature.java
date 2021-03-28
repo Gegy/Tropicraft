@@ -24,12 +24,12 @@ public class TallRainforestTreeFeature extends RainforestTreeFeature {
     }
 
     private boolean isSoil(IWorld world, BlockPos pos) {
-        return getSapling().canSurvive(getSapling().defaultBlockState(), world, pos);
+        return getSapling().isValidPosition(getSapling().getDefaultState(), world, pos);
     }
 
     @Override
-    public boolean place(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
-        pos = pos.immutable();
+    public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+        pos = pos.toImmutable();
         int i = pos.getX(); int j = pos.getY(); int k = pos.getZ();
         final int height = rand.nextInt(15) + 15;
 
@@ -41,31 +41,31 @@ public class TallRainforestTreeFeature extends RainforestTreeFeature {
             return false;
         }
 
-        if (!isSoil(world, pos.below())) {
+        if (!isSoil(world, pos.down())) {
             return false;
         }
 
-        if (!isSoil(world, pos.east().below())) {
+        if (!isSoil(world, pos.east().down())) {
             return false;
         }
 
-        if (!isSoil(world, pos.west().below())) {
+        if (!isSoil(world, pos.west().down())) {
             return false;
         }
 
-        if (!isSoil(world, pos.north().below())) {
+        if (!isSoil(world, pos.north().down())) {
             return false;
         }
 
-        if (!isSoil(world, pos.south().below())) {
+        if (!isSoil(world, pos.south().down())) {
             return false;
         }
 
-        setState(world, new BlockPos(i, j, k), Blocks.DIRT.defaultBlockState());
-        setState(world, new BlockPos(i - 1, j, k), Blocks.DIRT.defaultBlockState());
-        setState(world, new BlockPos(i + 1, j, k), Blocks.DIRT.defaultBlockState());
-        setState(world, new BlockPos(i, j, k - 1), Blocks.DIRT.defaultBlockState());
-        setState(world, new BlockPos(i, j, k + 1), Blocks.DIRT.defaultBlockState());
+        setState(world, new BlockPos(i, j, k), Blocks.DIRT.getDefaultState());
+        setState(world, new BlockPos(i - 1, j, k), Blocks.DIRT.getDefaultState());
+        setState(world, new BlockPos(i + 1, j, k), Blocks.DIRT.getDefaultState());
+        setState(world, new BlockPos(i, j, k - 1), Blocks.DIRT.getDefaultState());
+        setState(world, new BlockPos(i, j, k + 1), Blocks.DIRT.getDefaultState());
 
         for (int y = j; y < j + height; y++) {
             placeLog(world, i, y, k);

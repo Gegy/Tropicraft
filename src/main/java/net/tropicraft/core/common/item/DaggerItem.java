@@ -19,19 +19,21 @@ import net.minecraft.item.UseAction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import net.minecraft.item.Item.Properties;
+
 public class DaggerItem extends Item {
 
     private final IItemTier tier;
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     public DaggerItem(IItemTier tier, Properties properties) {
-        super(properties.defaultDurability(tier.getUses()));
+        super(properties.defaultMaxDamage(tier.getMaxUses()));
         this.tier = tier;
 
         this.defaultModifiers = ImmutableMultimap.<Attribute, AttributeModifier>builder()
                 .putAll(super.getAttributeModifiers(EquipmentSlotType.MAINHAND, new ItemStack(this)))
-                .put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", (double) tier.getAttackDamageBonus() + 2.5D, AttributeModifier.Operation.ADDITION))
-                .put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", 0, AttributeModifier.Operation.ADDITION))
+                .put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double) tier.getAttackDamage() + 2.5D, AttributeModifier.Operation.ADDITION))
+                .put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", 0, AttributeModifier.Operation.ADDITION))
                 .build();
     }
 
@@ -43,25 +45,25 @@ public class DaggerItem extends Item {
             return 15.0F;
         } else {
             Material material = state.getMaterial();
-            return material != Material.PLANT && material != Material.REPLACEABLE_PLANT && material != Material.CORAL && material != Material.LEAVES && material != Material.VEGETABLE ? 1.0F : 1.5F;
+            return material != Material.PLANTS && material != Material.TALL_PLANTS && material != Material.CORAL && material != Material.LEAVES && material != Material.GOURD ? 1.0F : 1.5F;
         }
     }
 
     @Override
-    public boolean canAttackBlock(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+    public boolean canPlayerBreakBlockWhileHolding(BlockState state, World world, BlockPos pos, PlayerEntity player) {
         return !player.isCreative();
     }
 
     @Override
-    public boolean hurtEnemy(ItemStack itemStack, LivingEntity attacker, LivingEntity target) {
-        itemStack.hurtAndBreak(1, target, (e) -> {
-            e.broadcastBreakEvent(EquipmentSlotType.MAINHAND);
+    public boolean hitEntity(ItemStack itemStack, LivingEntity attacker, LivingEntity target) {
+        itemStack.damageItem(1, target, (e) -> {
+            e.sendBreakAnimation(EquipmentSlotType.MAINHAND);
         });
         return true;
     }
 
     @Override
-    public UseAction getUseAnimation(ItemStack itemstack) {
+    public UseAction getUseAction(ItemStack itemstack) {
         return UseAction.BLOCK;
     }
 
@@ -71,7 +73,7 @@ public class DaggerItem extends Item {
     }
 
     @Override
-    public boolean isCorrectToolForDrops(BlockState state) {
+    public boolean canHarvestBlock(BlockState state) {
         return state.getBlock() == Blocks.COBWEB;
     }
 

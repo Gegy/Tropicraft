@@ -30,7 +30,7 @@ public abstract class RainforestTreeFeature extends Feature<NoFeatureConfig> {
     }
 
     private void setBlockStateInternally(IWorldWriter world, BlockPos pos, BlockState state) {
-        world.setBlock(pos, state, 19);
+        world.setBlockState(pos, state, 19);
     }
 
     protected SaplingBlock getSapling() {
@@ -38,11 +38,11 @@ public abstract class RainforestTreeFeature extends Feature<NoFeatureConfig> {
     }
 
     protected final BlockState getLeaf() {
-        return TropicraftBlocks.KAPOK_LEAVES.get().defaultBlockState();
+        return TropicraftBlocks.KAPOK_LEAVES.get().getDefaultState();
     }
     
     protected final BlockState getLog() {
-        return TropicraftBlocks.MAHOGANY_LOG.get().defaultBlockState();
+        return TropicraftBlocks.MAHOGANY_LOG.get().getDefaultState();
     }
 
     protected void placeLeaf(final IWorldGenerationReader world, int x, int y, int z) {
@@ -66,8 +66,8 @@ public abstract class RainforestTreeFeature extends Feature<NoFeatureConfig> {
             }
 
             final BlockPos pos = new BlockPos(i, j, k);
-            if (isAir(world, pos)) {
-                setBlockStateInternally(world, pos, Blocks.VINE.defaultBlockState());
+            if (isAirAt(world, pos)) {
+                setBlockStateInternally(world, pos, Blocks.VINE.getDefaultState());
                 break;
             }
 
@@ -78,8 +78,8 @@ public abstract class RainforestTreeFeature extends Feature<NoFeatureConfig> {
 
         for (int y = j - 1; y > j - length; y--) {
             final BlockPos vinePos = new BlockPos(i, y, k);
-            if (isAir(world, vinePos)) {
-                setBlockStateInternally(world, vinePos, Blocks.VINE.defaultBlockState());
+            if (isAirAt(world, vinePos)) {
+                setBlockStateInternally(world, vinePos, Blocks.VINE.getDefaultState());
             } else {
                 return true;
             }
@@ -156,8 +156,8 @@ public abstract class RainforestTreeFeature extends Feature<NoFeatureConfig> {
                 double d = (i - x) * (i - x) + (k - z) * (k - z);
                 if (d <= outerRadius * outerRadius && d >= innerRadius * innerRadius) {
                     BlockPos pos2 = new BlockPos(i, y, k);
-                    if (isAir(world, pos2) || solid) {
-                        if (world.setBlock(pos2, state, Constants.BlockFlags.DEFAULT)) {
+                    if (isAirAt(world, pos2) || solid) {
+                        if (world.setBlockState(pos2, state, Constants.BlockFlags.DEFAULT)) {
                             hasGenned = true;
                         }
                     }

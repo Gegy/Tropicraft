@@ -39,7 +39,7 @@ public class LavaBallEntity extends Entity
 	public LavaBallEntity(EntityType<? extends LavaBallEntity> type,World world, double i, double j, double k, double motX, double motY, double motZ) {
 		super(type, world);
 		setFire = false;
-		moveTo(i, j, k, 0, 0);
+		setLocationAndAngles(i, j, k, 0, 0);
 		accelerationX = motX;
 		accelerationY = motY;
 		accelerationZ = motZ;
@@ -57,28 +57,28 @@ public class LavaBallEntity extends Entity
 	}
 
 	@Override
-    public boolean isPickable() {
+    public boolean canBeCollidedWith() {
 		return true;
 	}
 
 	@Override
-    public boolean isPushable() {
+    public boolean canBePushed() {
 		return true;
 	}
 
 	@OnlyIn(Dist.CLIENT)
 	public void supahDrip() {
-		float x = (float) getX();
-		float y = (float) getY();
-		float z = (float) getZ();
+		float x = (float) getPosX();
+		float y = (float) getPosY();
+		float z = (float) getPosZ();
 
-		if (level.isClientSide) {
-			level.addParticle(ParticleTypes.LAVA, x, y, z, this.getDeltaMovement().x, -1.5F, this.getDeltaMovement().z);
+		if (world.isRemote) {
+			world.addParticle(ParticleTypes.LAVA, x, y, z, this.getMotion().x, -1.5F, this.getMotion().z);
 		}
 	}
 
 	@Override
-	protected void defineSynchedData()
+	protected void registerData()
 	{
 
 	}
@@ -97,9 +97,9 @@ public class LavaBallEntity extends Entity
 			this.remove();
 		}
 
-		double motionX = this.getDeltaMovement().x;
-		double motionY = this.getDeltaMovement().y;
-		double motionZ = this.getDeltaMovement().z;
+		double motionX = this.getMotion().x;
+		double motionY = this.getMotion().y;
+		double motionZ = this.getMotion().z;
 
 		if (size < 1) {
 			size += .025;
@@ -114,57 +114,57 @@ public class LavaBallEntity extends Entity
 
 		if (!onGround) {
 			motionY -=.05F;
-			if (level.isClientSide) {
-				for (int i = 0; i < 5 + random.nextInt(3); i++){
+			if (world.isRemote) {
+				for (int i = 0; i < 5 + rand.nextInt(3); i++){
 					supahDrip();
 				}
 			}
 		}
 
-		if (horizontalCollision) {
+		if (collidedHorizontally) {
 			motionZ = 0;
 			motionX = 0;
 		}
 
 		//TODO: Note below, these used to be tempLavaMoving - maybe they still need to be?
-		int thisX = (int)Math.floor(getX());
-		int thisY = (int)Math.floor(getY());
-		int thisZ = (int)Math.floor(getZ());
+		int thisX = (int)Math.floor(getPosX());
+		int thisY = (int)Math.floor(getPosY());
+		int thisZ = (int)Math.floor(getPosZ());
 
 		BlockPos posCurrent = new BlockPos(thisX, thisY, thisZ);
-		BlockPos posBelow = posCurrent.below();
-		BlockState stateBelow = level.getBlockState(posBelow);
+		BlockPos posBelow = posCurrent.down();
+		BlockState stateBelow = world.getBlockState(posBelow);
 
-		if (!level.isEmptyBlock(posBelow) && stateBelow.getMaterial() != Material.LAVA && !held) {
+		if (!world.isAirBlock(posBelow) && stateBelow.getMaterial() != Material.LAVA && !held) {
 			if (setFire) {
-				level.setBlock(posCurrent, Blocks.LAVA.defaultBlockState(), 3);
+				world.setBlockState(posCurrent, Blocks.LAVA.getDefaultState(), 3);
 				this.remove();
 			}
 
 			if (!setFire) {
-				if (level.isEmptyBlock(posCurrent.west())) {
-					level.setBlock(posCurrent.west(), Blocks.LAVA.defaultBlockState(), 2);
+				if (world.isAirBlock(posCurrent.west())) {
+					world.setBlockState(posCurrent.west(), Blocks.LAVA.getDefaultState(), 2);
 				}
 
-				if (level.isEmptyBlock(posCurrent.east())) {
-					level.setBlock(posCurrent.east(), Blocks.LAVA.defaultBlockState(), 2);
+				if (world.isAirBlock(posCurrent.east())) {
+					world.setBlockState(posCurrent.east(), Blocks.LAVA.getDefaultState(), 2);
 				}
 
-				if (level.isEmptyBlock(posCurrent.south())) {
-					level.setBlock(posCurrent.south(), Blocks.LAVA.defaultBlockState(), 2);
+				if (world.isAirBlock(posCurrent.south())) {
+					world.setBlockState(posCurrent.south(), Blocks.LAVA.getDefaultState(), 2);
 				}
 
-				if (level.isEmptyBlock(posCurrent.north())) {
-					level.setBlock(posCurrent.north(), Blocks.LAVA.defaultBlockState(), 2);
+				if (world.isAirBlock(posCurrent.north())) {
+					world.setBlockState(posCurrent.north(), Blocks.LAVA.getDefaultState(), 2);
 				}
 
-				level.setBlock(posCurrent, Blocks.LAVA.defaultBlockState(), 3);
+				world.setBlockState(posCurrent, Blocks.LAVA.getDefaultState(), 3);
 				setFire = true;
 			}
 		}
 
 		Vector3d motion = new Vector3d(motionX + this.accelerationX, motionY + this.accelerationY, motionZ + this.accelerationZ);
-		this.setDeltaMovement(motion);
+		this.setMotion(motion);
 
 		this.move(MoverType.SELF, motion);
 	}
@@ -176,17 +176,17 @@ public class LavaBallEntity extends Entity
 	}*/
 
 	@Override
-	protected void readAdditionalSaveData(CompoundNBT nbt) {
+	protected void readAdditional(CompoundNBT nbt) {
 		this.lifeTimer = nbt.getInt("lifeTimer");
 	}
 
 	@Override
-	protected void addAdditionalSaveData(CompoundNBT nbt) {
+	protected void writeAdditional(CompoundNBT nbt) {
 		nbt.putInt("lifeTimer", this.lifeTimer);
 	}
 
 	@Override
-	public IPacket<?> getAddEntityPacket() {
+	public IPacket<?> createSpawnPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 

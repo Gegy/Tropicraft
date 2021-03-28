@@ -16,34 +16,34 @@ public class MonkeySitInChairGoal extends Goal {
 
     public MonkeySitInChairGoal(VMonkeyEntity monkey) {
         this.entity = monkey;
-        setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
+        setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
     }
 
     private Optional<ChairEntity> getNearestEmptyChair() {
-        List<ChairEntity> list = entity.level.getEntitiesOfClass(ChairEntity.class, entity.getBoundingBox().inflate(32D));
-        return list.stream().filter(chair -> !chair.isInvisible() && !chair.isVehicle()).findFirst();
+        List<ChairEntity> list = entity.world.getEntitiesWithinAABB(ChairEntity.class, entity.getBoundingBox().grow(32D));
+        return list.stream().filter(chair -> !chair.isInvisible() && !chair.isBeingRidden()).findFirst();
     }
 
     private boolean isOwnerNear() {
-        return entity != null && entity.getOwner() != null && entity.getOwner().distanceToSqr(entity) < 32D;
+        return entity != null && entity.getOwner() != null && entity.getOwner().getDistanceSq(entity) < 32D;
     }
 
     private boolean isOwnerNearAndSitting() {
-        Entity ridingEntity = entity.getOwner().getVehicle();
+        Entity ridingEntity = entity.getOwner().getRidingEntity();
         return isOwnerNear() && ridingEntity instanceof ChairEntity;
     }
 
     @Override
-    public void stop() {
+    public void resetTask() {
         entity.stopRiding();
-        entity.setOrderedToSit(false);
+        entity.setSitting(false);
         // TODO - no longer needed?
         // entity.resetRideCooldown();
     }
 
     @Override
-    public boolean canUse() {
-        if (entity == null || !entity.isTame() || entity.getOwner() == null) {
+    public boolean shouldExecute() {
+        if (entity == null || !entity.isTamed() || entity.getOwner() == null) {
             return false;
         }
         return hasNearbyEmptyChair() && isOwnerNearAndSitting();
@@ -57,7 +57,7 @@ public class MonkeySitInChairGoal extends Goal {
      * Returns whether an in-progress EntityAIBase should continue executing
      */
     @Override
-    public boolean canContinueToUse() {
+    public boolean shouldContinueExecuting() {
         return isOwnerNearAndSitting();
     }
 
@@ -65,10 +65,10 @@ public class MonkeySitInChairGoal extends Goal {
      * Execute a one shot task or start executing a continuous task
      */
     @Override
-    public void start() {
+    public void startExecuting() {
         final Optional<ChairEntity> nearbyChair = getNearestEmptyChair();
         if (nearbyChair.isPresent()) {
-            entity.setOrderedToSit(true);
+            entity.setSitting(true);
             entity.startRiding(nearbyChair.get());
         }
     }

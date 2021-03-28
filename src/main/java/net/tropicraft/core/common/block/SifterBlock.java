@@ -17,6 +17,8 @@ import net.tropicraft.core.common.block.tileentity.SifterTileEntity;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class SifterBlock extends Block implements ITileEntityProvider {
 
     public SifterBlock(final Properties properties) {
@@ -24,17 +26,17 @@ public class SifterBlock extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
-        final ItemStack stack = player.getItemInHand(hand);
+    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
+        final ItemStack stack = player.getHeldItem(hand);
 
         // TODO use item tag
-        final boolean isSandInHand = Block.byItem(stack.getItem()).defaultBlockState().getMaterial() == Material.SAND;
+        final boolean isSandInHand = Block.getBlockFromItem(stack.getItem()).getDefaultState().getMaterial() == Material.SAND;
         if (!isSandInHand) {
             return ActionResultType.PASS;
         }
 
-        if (!world.isClientSide) {
-            final SifterTileEntity sifter = (SifterTileEntity) world.getBlockEntity(pos);
+        if (!world.isRemote) {
+            final SifterTileEntity sifter = (SifterTileEntity) world.getTileEntity(pos);
             if (sifter != null && !stack.isEmpty() && !sifter.isSifting()) {
                 final ItemStack addItem;
                 if (!player.isCreative()) {
@@ -54,7 +56,7 @@ public class SifterBlock extends Block implements ITileEntityProvider {
 
     @Nullable
     @Override
-    public TileEntity newBlockEntity(final IBlockReader world) {
+    public TileEntity createNewTileEntity(final IBlockReader world) {
         return new SifterTileEntity();
     }
 }

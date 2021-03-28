@@ -30,7 +30,7 @@ public class TropicraftItemTagsProvider extends ItemTagsProvider {
     }
 
     @Override
-    protected void addTags() {
+    protected void registerTags() {
         // Add forge tags for our ores
         addItemsToTag(AZURITE_ORE, TropicraftBlocks.AZURITE_ORE);
         addItemsToTag(EUDIALYTE_ORE, TropicraftBlocks.EUDIALYTE_ORE);
@@ -101,12 +101,12 @@ public class TropicraftItemTagsProvider extends ItemTagsProvider {
 
     @SafeVarargs
     private final void addItemsToTag(INamedTag<Item> tag, Supplier<? extends IItemProvider>... items) {
-        tag(tag).add(Arrays.stream(items).map(Supplier::get).map(IItemProvider::asItem).toArray(Item[]::new));
+        getOrCreateBuilder(tag).add(Arrays.stream(items).map(Supplier::get).map(IItemProvider::asItem).toArray(Item[]::new));
     }
     
     @SafeVarargs
     private final void appendToTag(INamedTag<Item> tag, INamedTag<Item>... toAppend) {
-        tag(tag).addTags(toAppend);
+        getOrCreateBuilder(tag).addTags(toAppend);
     }
 
     @Override

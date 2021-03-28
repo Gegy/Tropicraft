@@ -19,43 +19,43 @@ public class SardineEntity extends AbstractGroupFishEntity implements IAtlasFish
     }
 
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AbstractFishEntity.createAttributes()
-                .add(Attributes.MAX_HEALTH, 5.0);
+        return AbstractFishEntity.func_234176_m_()
+                .createMutableAttribute(Attributes.MAX_HEALTH, 5.0);
     }
 
     @Override
-    protected ActionResultType mobInteract(PlayerEntity player, Hand hand) {
+    protected ActionResultType getEntityInteractionResult(PlayerEntity player, Hand hand) {
         return ActionResultType.PASS;
     }
 
     @Override
-    public int getMaxSchoolSize() {
+    public int getMaxGroupSize() {
         return 20;
     }
 
     @Override
-    protected ItemStack getBucketItemStack() {
+    protected ItemStack getFishBucket() {
         return ItemStack.EMPTY;
     }
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.SALMON_AMBIENT;
+        return SoundEvents.ENTITY_SALMON_AMBIENT;
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.SALMON_DEATH;
+        return SoundEvents.ENTITY_SALMON_DEATH;
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource p_184601_1_) {
-        return SoundEvents.SALMON_HURT;
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        return SoundEvents.ENTITY_SALMON_HURT;
     }
 
     @Override
     protected SoundEvent getFlopSound() {
-        return SoundEvents.SALMON_FLOP;
+        return SoundEvents.ENTITY_SALMON_FLOP;
     }
 
     @Override

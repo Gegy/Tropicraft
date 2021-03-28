@@ -23,8 +23,8 @@ public class SimpleItemStackRenderer<T extends TileEntity> extends ItemStackTile
     }
 
     @Override
-    public void renderByItem(ItemStack stack, ItemCameraTransforms.TransformType transform, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay) {
-        T te = this.te.get();
+    public void func_239207_a_(ItemStack stack, ItemCameraTransforms.TransformType transform, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay) {
+        T te = this.te.getValue();
         TileEntityRendererDispatcher.instance.getRenderer(te).render(te, 0, matrixStack, buffer, combinedLight, combinedOverlay);
     }
 }

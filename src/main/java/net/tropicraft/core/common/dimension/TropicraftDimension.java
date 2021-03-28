@@ -25,15 +25,15 @@ import java.util.function.Supplier;
 public class TropicraftDimension {
 	public static final ResourceLocation ID = new ResourceLocation(Constants.MODID, "tropics");
 
-	public static final RegistryKey<World> WORLD = RegistryKey.create(Registry.DIMENSION_REGISTRY, ID);
-	public static final RegistryKey<Dimension> DIMENSION = RegistryKey.create(Registry.LEVEL_STEM_REGISTRY, ID);
-    public static final RegistryKey<DimensionType> DIMENSION_TYPE = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, ID);
-    public static final RegistryKey<DimensionSettings> DIMENSION_SETTINGS = RegistryKey.create(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY, ID);
+	public static final RegistryKey<World> WORLD = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, ID);
+	public static final RegistryKey<Dimension> DIMENSION = RegistryKey.getOrCreateKey(Registry.DIMENSION_KEY, ID);
+    public static final RegistryKey<DimensionType> DIMENSION_TYPE = RegistryKey.getOrCreateKey(Registry.DIMENSION_TYPE_KEY, ID);
+    public static final RegistryKey<DimensionSettings> DIMENSION_SETTINGS = RegistryKey.getOrCreateKey(Registry.NOISE_SETTINGS_KEY, ID);
 
     public static ChunkGenerator createGenerator(Registry<Biome> biomeRegistry, Registry<DimensionSettings> dimensionSettingsRegistry, long seed) {
         Supplier<DimensionSettings> dimensionSettings = () -> {
         	// fallback to overworld so that we don't crash before our datapack is loaded (horrible workaround)
-			DimensionSettings settings = dimensionSettingsRegistry.get(DIMENSION_SETTINGS);
+			DimensionSettings settings = dimensionSettingsRegistry.getValueForKey(DIMENSION_SETTINGS);
 			return settings != null ? settings : dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD);
 		};
         TropicraftBiomeProvider biomeSource = new TropicraftBiomeProvider(seed, biomeRegistry);
@@ -41,7 +41,7 @@ public class TropicraftDimension {
     }
 
 	public static void teleportPlayer(ServerPlayerEntity player, RegistryKey<World> dimensionType) {
-		if (player.level.dimension() == dimensionType) {
+		if (player.world.getDimensionKey() == dimensionType) {
 			teleportPlayerNoPortal(player, World.OVERWORLD);
 		} else {
 			teleportPlayerNoPortal(player, dimensionType);
@@ -59,14 +59,14 @@ public class TropicraftDimension {
 	public static void teleportPlayerNoPortal(ServerPlayerEntity player, RegistryKey<World> destination) {
 		if (!ForgeHooks.onTravelToDimension(player, destination)) return;
 
-		ServerWorld world = player.server.getLevel(destination);
+		ServerWorld world = player.server.getWorld(destination);
 
-		int x = MathHelper.floor(player.getX());
-		int z = MathHelper.floor(player.getZ());
+		int x = MathHelper.floor(player.getPosX());
+		int z = MathHelper.floor(player.getPosZ());
 
 		Chunk chunk = world.getChunk(x >> 4, z >> 4);
-		int topY = chunk.getHeight(Heightmap.Type.WORLD_SURFACE, x & 15, z & 15);
-		player.teleportTo(world, x + 0.5, topY + 1.0, z + 0.5, player.yRot, player.xRot);
+		int topY = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE, x & 15, z & 15);
+		player.teleport(world, x + 0.5, topY + 1.0, z + 0.5, player.rotationYaw, player.rotationPitch);
 
 		BasicEventHooks.firePlayerChangedDimensionEvent(player, destination, destination);
 	}

@@ -33,48 +33,48 @@ public class StarfishEntity extends EchinodermEntity implements IEntityAdditiona
 	public static final float BABY_YOFFSET = 0.03125f;
 	public static final float ADULT_YOFFSET = 0.03125f;
 
-	private static final DataParameter<Byte> DATA_STARFISH_TYPE = EntityDataManager.defineId(StarfishEntity.class, DataSerializers.BYTE);
+	private static final DataParameter<Byte> DATA_STARFISH_TYPE = EntityDataManager.createKey(StarfishEntity.class, DataSerializers.BYTE);
 
 	public StarfishEntity(final EntityType<? extends StarfishEntity> type, World world) {
 		super(type, world);
-		xpReward = 5;
+		experienceValue = 5;
 	}
 
 	@Override
 	@Nullable
-	public ILivingEntityData finalizeSpawn(IServerWorld world, DifficultyInstance difficultyInstance, SpawnReason spawnReason, @Nullable ILivingEntityData entityData, @Nullable CompoundNBT nbt) {
-		setStarfishType(StarfishType.values()[random.nextInt(StarfishType.values().length)]);
-		return super.finalizeSpawn(world, difficultyInstance, spawnReason, entityData, nbt);
+	public ILivingEntityData onInitialSpawn(IServerWorld world, DifficultyInstance difficultyInstance, SpawnReason spawnReason, @Nullable ILivingEntityData entityData, @Nullable CompoundNBT nbt) {
+		setStarfishType(StarfishType.values()[rand.nextInt(StarfishType.values().length)]);
+		return super.onInitialSpawn(world, difficultyInstance, spawnReason, entityData, nbt);
 	}
 
 	@Override
-	public void defineSynchedData() {
-		super.defineSynchedData();
-		getEntityData().define(DATA_STARFISH_TYPE, (byte) 0);
+	public void registerData() {
+		super.registerData();
+		getDataManager().register(DATA_STARFISH_TYPE, (byte) 0);
 	}
 
 	public static AttributeModifierMap.MutableAttribute createAttributes() {
-		return WaterMobEntity.createMobAttributes()
-				.add(Attributes.MAX_HEALTH, 10.0);
+		return WaterMobEntity.func_233666_p_()
+				.createMutableAttribute(Attributes.MAX_HEALTH, 10.0);
 	}
 	
 	public StarfishType getStarfishType() {
-		return StarfishType.values()[entityData.get(DATA_STARFISH_TYPE)];
+		return StarfishType.values()[dataManager.get(DATA_STARFISH_TYPE)];
 	}
 	
 	public void setStarfishType(StarfishType starfishType) {
-		entityData.set(DATA_STARFISH_TYPE, (byte) starfishType.ordinal());
+		dataManager.set(DATA_STARFISH_TYPE, (byte) starfishType.ordinal());
 	}
 	
 	@Override
-	public void addAdditionalSaveData(CompoundNBT nbt) {
-		super.addAdditionalSaveData(nbt);
+	public void writeAdditional(CompoundNBT nbt) {
+		super.writeAdditional(nbt);
 		nbt.putByte("StarfishType", (byte) getStarfishType().ordinal());
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundNBT nbt) {
-		super.readAdditionalSaveData(nbt);
+	public void readAdditional(CompoundNBT nbt) {
+		super.readAdditional(nbt);
 		if (nbt.contains("StarfishType")) {
 			setStarfishType(StarfishType.values()[nbt.getByte("StarfishType")]);
 		} else {
@@ -94,7 +94,7 @@ public class StarfishEntity extends EchinodermEntity implements IEntityAdditiona
 
 	@Override
 	public EggEntity createEgg() {
-		StarfishEggEntity entity = new StarfishEggEntity(TropicraftEntities.STARFISH_EGG.get(), level);
+		StarfishEggEntity entity = new StarfishEggEntity(TropicraftEntities.STARFISH_EGG.get(), world);
 		entity.setStarfishType(getStarfishType());
 		return entity;
 	}
@@ -135,11 +135,11 @@ public class StarfishEntity extends EchinodermEntity implements IEntityAdditiona
 	}
 	
 	@Override
-	public void die(DamageSource d) {
-		super.die(d);
+	public void onDeath(DamageSource d) {
+		super.onDeath(d);
 		// TODO replace with loot table
-		if (!level.isClientSide) {
-			spawnAtLocation(new ItemStack(TropicraftItems.STARFISH.get()), 0);
+		if (!world.isRemote) {
+			entityDropItem(new ItemStack(TropicraftItems.STARFISH.get()), 0);
 		}
 	}
 

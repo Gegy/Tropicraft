@@ -22,20 +22,20 @@ public class AshenRenderer extends MobRenderer<AshenEntity, AshenModel> {
 
         addLayer(new AshenMaskLayer(this));
         AshenHeldItemLayer<AshenEntity, AshenModel> layer = new AshenHeldItemLayer<>(this);
-        layer.setAshenModel(model);
+        layer.setAshenModel(entityModel);
         addLayer(layer);
-        shadowStrength = 0.5f;
-        shadowRadius = 0.3f;
+        shadowOpaque = 0.5f;
+        shadowSize = 0.3f;
     }
 
     @Override
     public void render(AshenEntity entityAshen, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-        model.actionState = entityAshen.getActionState();
-        if (entityAshen.getTarget() != null && entityAshen.distanceTo(entityAshen.getTarget()) < 5.0F && !entityAshen.swinging) {
-            model.swinging = true;
+        entityModel.actionState = entityAshen.getActionState();
+        if (entityAshen.getAttackTarget() != null && entityAshen.getDistance(entityAshen.getAttackTarget()) < 5.0F && !entityAshen.isSwingInProgress) {
+            entityModel.swinging = true;
         } else {
-            if (entityAshen.swinging && entityAshen.swingTime > 6) {
-                model.swinging = false;
+            if (entityAshen.isSwingInProgress && entityAshen.swingProgressInt > 6) {
+                entityModel.swinging = false;
             }
         }
         super.render(entityAshen, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
@@ -43,7 +43,7 @@ public class AshenRenderer extends MobRenderer<AshenEntity, AshenModel> {
 
     @Nullable
     @Override
-    public ResourceLocation getTextureLocation(AshenEntity ashenEntity) {
+    public ResourceLocation getEntityTexture(AshenEntity ashenEntity) {
         return ASHEN_TEXTURE_LOCATION;
     }
 }

@@ -10,7 +10,7 @@ public class BeachFloatRenderer extends FurnitureRenderer<BeachFloatEntity> {
 
     public BeachFloatRenderer(EntityRendererManager rendererManager) {
         super(rendererManager, "beach_float", new BeachFloatModel());
-        shadowRadius = .5F;
+        shadowSize = .5F;
     }
     
     @Override
@@ -20,7 +20,7 @@ public class BeachFloatRenderer extends FurnitureRenderer<BeachFloatEntity> {
     
     @Override
     protected void setupTransforms(MatrixStack stack) {
-        stack.mulPose(Vector3f.YP.rotationDegrees(-180));
+        stack.rotate(Vector3f.YP.rotationDegrees(-180));
     }
     
     @Override

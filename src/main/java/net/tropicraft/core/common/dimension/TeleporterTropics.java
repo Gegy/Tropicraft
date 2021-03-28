@@ -92,18 +92,18 @@ public class TeleporterTropics extends Teleporter {
     // TODO uh, yeah. need this later at some point.
 //    @Override
 //    @Nullable
-//    public BlockPattern.PortalInfo func_222272_a(BlockPos entityPos, Vector3d movement, Direction dir, double p_222272_4_, double p_222272_6_, boolean keepTrying) {
+//    public BlockPattern.PortalInfo func_222272_a(BlockPos entityPos, Vector3d movement, Direction dir, double x, double y, boolean keepTrying) {
 //
 //    }
 
     @Override
-    public boolean placeInPortal(Entity p_222268_1_, float p_222268_2_) {
+    public boolean placeInPortal(Entity entity, float yaw) {
         // TODO Auto-generated method stub
-        return super.placeInPortal(p_222268_1_, p_222268_2_);
+        return super.placeInPortal(entity, yaw);
     }
 
     @Override
-    public PortalInfo placeInExistingPortal(BlockPos p_222272_1_, Vector3d p_222272_2_, Direction directionIn, double posX, double posZ, boolean isPlayer) {
+    public PortalInfo placeInExistingPortal(BlockPos pos, Vector3d motion, Direction directionIn, double posX, double posZ, boolean isPlayer) {
         int searchArea = 148;
         double closestPortal = -1D;
         int foundX = 0;
@@ -144,7 +144,7 @@ public class TeleporterTropics extends Teleporter {
                                 pos = pos.below();
                             }
 
-                            double distY = y + 0.5D - p_222272_1_.getY();
+                            double distY = y + 0.5D - pos.getY();
                             double distance = distX * distX + distY * distY + distZ * distZ;
                             if (closestPortal < 0.0D || distance < closestPortal)
                             {
@@ -241,7 +241,7 @@ public class TeleporterTropics extends Teleporter {
  //               }
   //          }
 
-            return new PortalInfo(new Vector3d(newLocX, newLocY + 2, newLocZ), p_222272_2_, directionIn.getHorizontalIndex());
+            return new PortalInfo(new Vector3d(newLocX, newLocY + 2, newLocZ), motion, directionIn.getHorizontalIndex());
         } else {
             return null;
         }

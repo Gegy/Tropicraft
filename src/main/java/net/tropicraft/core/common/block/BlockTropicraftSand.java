@@ -28,11 +28,11 @@ public class BlockTropicraftSand extends FallingBlock {
 
     public BlockTropicraftSand(final Properties properties) {
         super(properties);
-        this.registerDefaultState(this.defaultBlockState().setValue(UNDERWATER, false));
+        this.setDefaultState(this.getDefaultState().with(UNDERWATER, false));
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         builder.add(UNDERWATER);
     }
     
@@ -42,7 +42,7 @@ public class BlockTropicraftSand extends FallingBlock {
     }
 
     @Override
-    public void stepOn(final World world, final BlockPos pos, final Entity entity) {
+    public void onEntityWalk(final World world, final BlockPos pos, final Entity entity) {
         final BlockState state = world.getBlockState(pos);
 
         // If not black sands
@@ -52,34 +52,34 @@ public class BlockTropicraftSand extends FallingBlock {
 
         if (entity instanceof LivingEntity) {
             final LivingEntity living = (LivingEntity)entity;
-            final ItemStack stack = living.getItemBySlot(EquipmentSlotType.FEET);
+            final ItemStack stack = living.getItemStackFromSlot(EquipmentSlotType.FEET);
 
             // If entity isn't wearing anything on their feetsies
             if (stack.isEmpty()) {
-                living.hurt(DamageSource.LAVA, 0.5F);
+                living.attackEntityFrom(DamageSource.LAVA, 0.5F);
             }
         } else {
-            entity.hurt(DamageSource.LAVA, 0.5F);
+            entity.attackEntityFrom(DamageSource.LAVA, 0.5F);
         }
     }
 
     @Override
     public BlockState getStateForPlacement(final BlockItemUseContext context) {
-        final FluidState upState = context.getLevel().getFluidState(context.getClickedPos().above());
+        final FluidState upState = context.getWorld().getFluidState(context.getPos().up());
         boolean waterAbove = false;
         if (!upState.isEmpty()) {
             waterAbove = true;
         }
-        return this.defaultBlockState().setValue(UNDERWATER, waterAbove);
+        return this.getDefaultState().with(UNDERWATER, waterAbove);
     }
 
     @Override
     @Deprecated
     public void neighborChanged(final BlockState state, final World world, final BlockPos pos, final Block block, final BlockPos pos2, boolean isMoving) {
-        final FluidState upState = world.getFluidState(pos.above());
-        boolean underwater = upState.getType().isSame(Fluids.WATER);
-        if (underwater != state.getValue(UNDERWATER)) {
-            world.setBlock(pos, state.setValue(UNDERWATER, underwater), Constants.BlockFlags.BLOCK_UPDATE);
+        final FluidState upState = world.getFluidState(pos.up());
+        boolean underwater = upState.getFluid().isEquivalentTo(Fluids.WATER);
+        if (underwater != state.get(UNDERWATER)) {
+            world.setBlockState(pos, state.with(UNDERWATER, underwater), Constants.BlockFlags.BLOCK_UPDATE);
         }
         super.neighborChanged(state, world, pos, block, pos2, isMoving);
     }

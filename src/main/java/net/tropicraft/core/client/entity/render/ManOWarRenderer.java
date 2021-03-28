@@ -16,7 +16,7 @@ public class ManOWarRenderer extends MobRenderer<ManOWarEntity, ManOWarModel> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(ManOWarEntity entity) {
+    public ResourceLocation getEntityTexture(ManOWarEntity entity) {
         return TropicraftRenderUtils.getTextureEntity("manowar");
     }
 }

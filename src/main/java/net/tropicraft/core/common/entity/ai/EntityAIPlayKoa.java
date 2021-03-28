@@ -9,6 +9,8 @@ import net.tropicraft.core.common.entity.passive.EntityKoaBase;
 import java.util.EnumSet;
 import java.util.List;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class EntityAIPlayKoa extends Goal
 {
     private final EntityKoaBase villagerObj;
@@ -20,33 +22,33 @@ public class EntityAIPlayKoa extends Goal
     {
         this.villagerObj = villagerObjIn;
         this.speed = speedIn;
-        this.setFlags(EnumSet.of(Flag.MOVE));
+        this.setMutexFlags(EnumSet.of(Flag.MOVE));
     }
 
     /**
      * Returns whether the EntityAIBase should begin execution.
      */
     @Override
-    public boolean canUse()
+    public boolean shouldExecute()
     {
-        if (this.villagerObj.getAge() >= 0)
+        if (this.villagerObj.getGrowingAge() >= 0)
         {
             return false;
         }
-        else if (this.villagerObj.getRandom().nextInt(200) != 0)
+        else if (this.villagerObj.getRNG().nextInt(200) != 0)
         {
             return false;
         }
         else
         {
-            List<EntityKoaBase> list = this.villagerObj.level.getEntitiesOfClass(EntityKoaBase.class, this.villagerObj.getBoundingBox().inflate(6.0D, 3.0D, 6.0D));
+            List<EntityKoaBase> list = this.villagerObj.world.getEntitiesWithinAABB(EntityKoaBase.class, this.villagerObj.getBoundingBox().grow(6.0D, 3.0D, 6.0D));
             double d0 = Double.MAX_VALUE;
 
             for (EntityKoaBase entityvillager : list)
             {
-                if (entityvillager != this.villagerObj && !entityvillager.isPlaying() && entityvillager.getAge() < 0)
+                if (entityvillager != this.villagerObj && !entityvillager.isPlaying() && entityvillager.getGrowingAge() < 0)
                 {
-                    double d1 = entityvillager.distanceToSqr(this.villagerObj);
+                    double d1 = entityvillager.getDistanceSq(this.villagerObj);
 
                     if (d1 <= d0)
                     {
@@ -70,7 +72,7 @@ public class EntityAIPlayKoa extends Goal
      * Returns whether an in-progress EntityAIBase should continue executing
      */
     @Override
-    public boolean canContinueToUse()
+    public boolean shouldContinueExecuting()
     {
         return this.playTime > 0;
     }
@@ -79,7 +81,7 @@ public class EntityAIPlayKoa extends Goal
      * Execute a one shot task or start executing a continuous task
      */
     @Override
-    public void start()
+    public void startExecuting()
     {
         if (this.targetVillager != null)
         {
@@ -93,7 +95,7 @@ public class EntityAIPlayKoa extends Goal
      * Resets the task
      */
     @Override
-    public void stop()
+    public void resetTask()
     {
         this.villagerObj.setPlaying(false);
         this.targetVillager = null;
@@ -107,18 +109,18 @@ public class EntityAIPlayKoa extends Goal
     {
         --this.playTime;
 
-        if (villagerObj.isOnGround() && villagerObj.level.random.nextInt(30) == 0) {
-            this.villagerObj.getJumpControl().jump();
+        if (villagerObj.isOnGround() && villagerObj.world.rand.nextInt(30) == 0) {
+            this.villagerObj.getJumpController().setJumping();
         }
 
         if (this.targetVillager != null)
         {
-            if (this.villagerObj.distanceToSqr(this.targetVillager) > 4.0D)
+            if (this.villagerObj.getDistanceSq(this.targetVillager) > 4.0D)
             {
-                this.villagerObj.getNavigation().moveTo(this.targetVillager, this.speed);
+                this.villagerObj.getNavigator().tryMoveToEntityLiving(this.targetVillager, this.speed);
             }
         }
-        else if (this.villagerObj.getNavigation().isDone())
+        else if (this.villagerObj.getNavigator().noPath())
         {
             Vector3d vec = RandomPositionGenerator.getLandPos(this.villagerObj, 16, 3);
             if (vec == null)
@@ -126,7 +128,7 @@ public class EntityAIPlayKoa extends Goal
                 return;
             }
 
-            this.villagerObj.getNavigation().moveTo(vec.x, vec.y, vec.z, this.speed);
+            this.villagerObj.getNavigator().tryMoveToXYZ(vec.x, vec.y, vec.z, this.speed);
         }
     }
 }

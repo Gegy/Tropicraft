@@ -18,8 +18,8 @@ public class LargePalmTreeFeature extends PalmTreeFeature {
     }
 
     @Override
-    public boolean place(ISeedReader world, ChunkGenerator generator, Random random, BlockPos pos, NoFeatureConfig config) {
-        pos = pos.immutable();
+    public boolean generate(ISeedReader world, ChunkGenerator generator, Random random, BlockPos pos, NoFeatureConfig config) {
+        pos = pos.toImmutable();
 
         int height = random.nextInt(7) + 7;
 
@@ -31,7 +31,7 @@ public class LargePalmTreeFeature extends PalmTreeFeature {
             return false;
         }
 
-        if (!getSapling().canSurvive(getSapling().defaultBlockState(), world, pos)) {
+        if (!getSapling().isValidPosition(getSapling().getDefaultState(), world, pos)) {
             return false;
         }
 
@@ -171,7 +171,7 @@ public class LargePalmTreeFeature extends PalmTreeFeature {
         placeLeaf(world, i + 0, j + height + 3, k + 5);
 
         for (int c = 0; c < 4; c++) {
-            spawnCoconuts(world, new BlockPos(i, j + height + 1, k).relative(Direction.from2DDataValue(i)), random, 2, getLeaf());
+            spawnCoconuts(world, new BlockPos(i, j + height + 1, k).offset(Direction.byHorizontalIndex(i)), random, 2, getLeaf());
         }
 
         return true;

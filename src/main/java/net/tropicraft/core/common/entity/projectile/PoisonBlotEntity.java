@@ -22,20 +22,20 @@ public class PoisonBlotEntity extends ThrowableEntity {
     }
 
     @Override
-    protected void onHit(RayTraceResult result) {
+    protected void onImpact(RayTraceResult result) {
         if (result.getType() == RayTraceResult.Type.ENTITY) {
             final Entity entity = ((EntityRayTraceResult) result).getEntity();
 
             if (entity instanceof PlayerEntity) {
                 PlayerEntity player = (PlayerEntity) entity;
-                player.addEffect(new EffectInstance(Effects.POISON, 12 * 20, 0));
+                player.addPotionEffect(new EffectInstance(Effects.POISON, 12 * 20, 0));
                 remove();
             }
         }
     }
 
     @Override
-    protected void defineSynchedData() {
+    protected void registerData() {
 
     }
 }

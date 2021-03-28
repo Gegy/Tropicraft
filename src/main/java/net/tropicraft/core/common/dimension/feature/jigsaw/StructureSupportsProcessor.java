@@ -51,18 +51,18 @@ public class StructureSupportsProcessor extends CheatyStructureProcessor {
             }
             if (originalInfo.pos.getY() == 0) {
                 // Don't generate blocks underneath solid land
-                if (!canReplaceLand && !canPassThrough(world, pos.above())) {
+                if (!canReplaceLand && !canPassThrough(world, pos.up())) {
                     return null;
                 }
-                BlockPos fencePos = pos.below();
+                BlockPos fencePos = pos.down();
                 // Extend blocks at the bottom of a structure down to the ground
                 while (canPassThrough(world, fencePos)) {
                     BlockState state = blockInfo.state;
                     if (state.hasProperty(BlockStateProperties.WATERLOGGED)) {
-                        state = state.setValue(FenceBlock.WATERLOGGED, world.getBlockState(fencePos).getBlock() == Blocks.WATER);
+                        state = state.with(FenceBlock.WATERLOGGED, world.getBlockState(fencePos).getBlock() == Blocks.WATER);
                     }
                     setBlockState(world, fencePos, state);
-                    fencePos = fencePos.below();
+                    fencePos = fencePos.down();
                 }
             }
         }
@@ -70,7 +70,7 @@ public class StructureSupportsProcessor extends CheatyStructureProcessor {
     }
     
     protected boolean canPassThrough(IWorldReader world, BlockPos pos) {
-        return isAirOrWater(world, pos) || world.getHeightmapPos(Type.WORLD_SURFACE_WG, pos).getY() < pos.getY();
+        return isAirOrWater(world, pos) || world.getHeight(Type.WORLD_SURFACE_WG, pos).getY() < pos.getY();
     }
 
     @Override

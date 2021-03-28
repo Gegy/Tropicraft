@@ -25,50 +25,50 @@ import javax.annotation.Nullable;
 
 public class MarlinEntity extends AbstractFishEntity {
 
-    private static final DataParameter<String> TEXTURE_NAME = EntityDataManager.defineId(MarlinEntity.class, DataSerializers.STRING);
+    private static final DataParameter<String> TEXTURE_NAME = EntityDataManager.createKey(MarlinEntity.class, DataSerializers.STRING);
 
     public MarlinEntity(EntityType<? extends AbstractFishEntity> type, World world) {
         super(type, world);
-        xpReward = 5;
+        experienceValue = 5;
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        entityData.define(TEXTURE_NAME, "marlin");
+    protected void registerData() {
+        super.registerData();
+        dataManager.register(TEXTURE_NAME, "marlin");
     }
 
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AbstractFishEntity.createAttributes()
-                .add(Attributes.MAX_HEALTH, 5.0);
+        return AbstractFishEntity.func_234176_m_()
+                .createMutableAttribute(Attributes.MAX_HEALTH, 5.0);
     }
     
 	@Override
-    protected ActionResultType mobInteract(PlayerEntity player, Hand hand) {
+    protected ActionResultType getEntityInteractionResult(PlayerEntity player, Hand hand) {
         return ActionResultType.PASS;
     }
 
     @Override
     @Nullable
-    public ILivingEntityData finalizeSpawn(IServerWorld world, DifficultyInstance difficultyInstance, SpawnReason spawnReason, @Nullable ILivingEntityData entityData, @Nullable CompoundNBT nbt) {
-        setTexture(random.nextInt(50) == 0 ? "purple_marlin" : "marlin");
-        return super.finalizeSpawn(world, difficultyInstance, spawnReason, entityData, nbt);
+    public ILivingEntityData onInitialSpawn(IServerWorld world, DifficultyInstance difficultyInstance, SpawnReason spawnReason, @Nullable ILivingEntityData entityData, @Nullable CompoundNBT nbt) {
+        setTexture(rand.nextInt(50) == 0 ? "purple_marlin" : "marlin");
+        return super.onInitialSpawn(world, difficultyInstance, spawnReason, entityData, nbt);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundNBT nbt) {
-        super.addAdditionalSaveData(nbt);
+    public void writeAdditional(CompoundNBT nbt) {
+        super.writeAdditional(nbt);
         nbt.putString("Texture", getTexture());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundNBT nbt) {
-        super.readAdditionalSaveData(nbt);
+    public void readAdditional(CompoundNBT nbt) {
+        super.readAdditional(nbt);
         setTexture(nbt.getString("Texture"));
     }
 
     @Override
-    protected ItemStack getBucketItemStack() {
+    protected ItemStack getFishBucket() {
         return ItemStack.EMPTY;
     }
 
@@ -78,11 +78,11 @@ public class MarlinEntity extends AbstractFishEntity {
     }
 
     public void setTexture(final String textureName) {
-        getEntityData().set(TEXTURE_NAME, textureName);
+        getDataManager().set(TEXTURE_NAME, textureName);
     }
 
     public String getTexture() {
-        return getEntityData().get(TEXTURE_NAME);
+        return getDataManager().get(TEXTURE_NAME);
     }
 
     @Override

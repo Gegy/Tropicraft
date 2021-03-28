@@ -27,22 +27,22 @@ public abstract class MachineRenderer<T extends TileEntity & IMachineTile> exten
 
 	@Override
     public void render(T te, float partialTicks, MatrixStack stack, IRenderTypeBuffer buffer, int combinedLightIn, int combinedOverlayIn) {
-		stack.pushPose();
+		stack.push();
 		stack.translate(0.5f, 1.5f, 0.5f);
-		stack.mulPose(Vector3f.XP.rotationDegrees(180));
+		stack.rotate(Vector3f.XP.rotationDegrees(180));
 		//stack.rotate(Vector3f.ZP.rotationDegrees(180));
 
-		if (te == null || te.getLevel() == null) {
-			stack.mulPose(Vector3f.YP.rotationDegrees(-90));
+		if (te == null || te.getWorld() == null) {
+			stack.rotate(Vector3f.YP.rotationDegrees(-90));
 		} else {
-		    BlockState state = te.getLevel().getBlockState(te.getBlockPos());
+		    BlockState state = te.getWorld().getBlockState(te.getPos());
 		    Direction facing;
 		    if (state.getBlock() != this.block) {
 		        facing = Direction.NORTH;
 		    } else {
 		        facing = te.getDirection(state);
 		    }
-			stack.mulPose(Vector3f.YP.rotationDegrees(facing.toYRot() + 90));
+			stack.rotate(Vector3f.YP.rotationDegrees(facing.getHorizontalAngle() + 90));
 		}
 
 		if (te != null && te.isActive()) {
@@ -60,14 +60,14 @@ public abstract class MachineRenderer<T extends TileEntity & IMachineTile> exten
 		}
 
 		//GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		stack.popPose();
+		stack.pop();
 	}
 
 	protected abstract RenderMaterial getMaterial();
 	
 	protected void animationTransform(T te, MatrixStack stack, float partialTicks) {
         float angle = MathHelper.sin((float) (25f * 2f * Math.PI * te.getProgress(partialTicks))) * 15f;
-        stack.mulPose(Vector3f.YP.rotationDegrees(angle));
+        stack.rotate(Vector3f.YP.rotationDegrees(angle));
 	}
 	
 	protected abstract void renderIngredients(final T te, final MatrixStack stack, final IRenderTypeBuffer buffer, int packedLightIn, int combinedOverlayIn);

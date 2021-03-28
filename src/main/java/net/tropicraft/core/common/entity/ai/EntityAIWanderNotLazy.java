@@ -7,6 +7,8 @@ import net.minecraft.util.math.vector.Vector3d;
 
 import java.util.EnumSet;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class EntityAIWanderNotLazy extends Goal {
 
     private final CreatureEntity entity;
@@ -27,14 +29,14 @@ public class EntityAIWanderNotLazy extends Goal {
         this.entity = creatureIn;
         this.speed = speedIn;
         this.executionChance = chance;
-        this.setFlags(EnumSet.of(Flag.MOVE));
+        this.setMutexFlags(EnumSet.of(Flag.MOVE));
     }
 
     /**
      * Returns whether the EntityAIBase should begin execution.
      */
     @Override
-    public boolean canUse()
+    public boolean shouldExecute()
     {
         if (!this.mustUpdate)
         {
@@ -43,7 +45,7 @@ public class EntityAIWanderNotLazy extends Goal {
                 return false;
             }*/
 
-            if (this.entity.getRandom().nextInt(this.executionChance) != 0)
+            if (this.entity.getRNG().nextInt(this.executionChance) != 0)
             {
                 return false;
             }
@@ -68,18 +70,18 @@ public class EntityAIWanderNotLazy extends Goal {
      * Returns whether an in-progress EntityAIBase should continue executing
      */
     @Override
-    public boolean canContinueToUse()
+    public boolean shouldContinueExecuting()
     {
-        return !this.entity.getNavigation().isDone();
+        return !this.entity.getNavigator().noPath();
     }
 
     /**
      * Execute a one shot task or start executing a continuous task
      */
     @Override
-    public void start()
+    public void startExecuting()
     {
-        this.entity.getNavigation().moveTo(this.xPosition, this.yPosition, this.zPosition, this.speed);
+        this.entity.getNavigator().tryMoveToXYZ(this.xPosition, this.yPosition, this.zPosition, this.speed);
     }
 
     /**

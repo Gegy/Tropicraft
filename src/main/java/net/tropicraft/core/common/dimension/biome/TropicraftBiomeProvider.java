@@ -22,7 +22,7 @@ public class TropicraftBiomeProvider extends BiomeProvider {
     public static final Codec<TropicraftBiomeProvider> CODEC = RecordCodecBuilder.create(instance -> {
         return instance.group(
                 Codec.LONG.fieldOf("seed").stable().forGetter(b -> b.seed),
-                RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter(b -> b.biomes)
+                RegistryLookupCodec.getLookUpCodec(Registry.BIOME_KEY).forGetter(b -> b.biomes)
         ).apply(instance, instance.stable(TropicraftBiomeProvider::new));
     });
 
@@ -44,7 +44,7 @@ public class TropicraftBiomeProvider extends BiomeProvider {
     private final Layer noiseLayer;
 
     public TropicraftBiomeProvider(long seed, Registry<Biome> biomes) {
-        super(POSSIBLE_BIOMES.stream().map(biomes::get).filter(Objects::nonNull).map(biome -> () -> biome));
+        super(POSSIBLE_BIOMES.stream().map(biomes::getValueForKey).filter(Objects::nonNull).map(biome -> () -> biome));
 
         this.seed = seed;
         this.biomes = biomes;
@@ -53,22 +53,22 @@ public class TropicraftBiomeProvider extends BiomeProvider {
     }
 
     public static void register() {
-        Registry.register(Registry.BIOME_SOURCE, new ResourceLocation(Constants.MODID, "tropics"), CODEC);
+        Registry.register(Registry.BIOME_PROVIDER_CODEC, new ResourceLocation(Constants.MODID, "tropics"), CODEC);
     }
 
     @Override
-    protected Codec<? extends BiomeProvider> codec() {
+    protected Codec<? extends BiomeProvider> getBiomeProviderCodec() {
         return CODEC;
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public BiomeProvider withSeed(long seed) {
+    public BiomeProvider getBiomeProvider(long seed) {
         return new TropicraftBiomeProvider(seed, biomes);
     }
 
     @Override
     public Biome getNoiseBiome(int x, int y, int z) {
-        return noiseLayer.get(biomes, x, z);
+        return noiseLayer.func_242936_a(biomes, x, z);
     }
 }

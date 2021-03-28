@@ -44,41 +44,41 @@ public class SeaUrchinEntity extends EchinodermEntity {
     }
 
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return WaterMobEntity.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 10.0);
+        return WaterMobEntity.func_233666_p_()
+                .createMutableAttribute(Attributes.MAX_HEALTH, 10.0);
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amt) {
-        if (source.getMsgId().equals("player")) {
-            Entity ent = source.getEntity();
+    public boolean attackEntityFrom(DamageSource source, float amt) {
+        if (source.getDamageType().equals("player")) {
+            Entity ent = source.getTrueSource();
 
             if (ent instanceof PlayerEntity) {
                 PlayerEntity player = (PlayerEntity) ent;
 
-                if (player.getMainHandItem().isEmpty()) {
-                    player.hurt(DamageSource.mobAttack(this), 2);
+                if (player.getHeldItemMainhand().isEmpty()) {
+                    player.attackEntityFrom(DamageSource.causeMobDamage(this), 2);
                 }
             }
         }
 
-        return super.hurt(source, amt);
+        return super.attackEntityFrom(source, amt);
     }
 
     @Override
-    public void push(Entity ent) {
-        super.push(ent);
+    public void applyEntityCollision(Entity ent) {
+        super.applyEntityCollision(ent);
 
-        if (!level.isClientSide) {
+        if (!world.isRemote) {
             if (ent instanceof LivingEntity && !(ent instanceof SeaUrchinEntity) && !(ent instanceof SeaUrchinEggEntity)) {
-                ent.hurt(DamageSource.mobAttack(this), 2);
+                ent.attackEntityFrom(DamageSource.causeMobDamage(this), 2);
             }
         }
     }
 
     @Override
     public EggEntity createEgg() {
-        return new SeaUrchinEggEntity(TropicraftEntities.SEA_URCHIN_EGG_ENTITY.get(), level);
+        return new SeaUrchinEggEntity(TropicraftEntities.SEA_URCHIN_EGG_ENTITY.get(), world);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class SeaUrchinEntity extends EchinodermEntity {
     }
 
     @Override
-    public IPacket<?> getAddEntityPacket() {
+    public IPacket<?> createSpawnPacket() {
         return new SSpawnMobPacket(this);
     }
 

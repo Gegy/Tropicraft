@@ -43,13 +43,13 @@ public class TikiTorchBlock extends Block {
         }
 
         @Override
-        public String getSerializedName() {
+        public String getString() {
             return this.name().toLowerCase(Locale.ROOT);
         }
 
         @Override
         public String toString() {
-            return this.getSerializedName();
+            return this.getString();
         }
     };
 
@@ -60,18 +60,18 @@ public class TikiTorchBlock extends Block {
 
     public TikiTorchBlock(Block.Properties properties) {
         super(properties);
-        this.registerDefaultState(defaultBlockState().setValue(SECTION, TorchSection.UPPER));
+        this.setDefaultState(getDefaultState().with(SECTION, TorchSection.UPPER));
     }
     
     @Override
-    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
+    protected void fillStateContainer(Builder<Block, BlockState> builder) {
+        super.fillStateContainer(builder);
         builder.add(SECTION);
     }
     
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        TorchSection section = state.getValue(SECTION);
+        TorchSection section = state.get(SECTION);
 
         if (section == TorchSection.UPPER) {
             return TOP_SHAPE;
@@ -82,58 +82,58 @@ public class TikiTorchBlock extends Block {
 
     @Override
     @Deprecated
-    public boolean canSurvive(BlockState state, IWorldReader world, BlockPos pos) {
-        if (canSupportCenter(world, pos.below(), Direction.UP)) { // can block underneath support torch
+    public boolean isValidPosition(BlockState state, IWorldReader world, BlockPos pos) {
+        if (hasEnoughSolidSide(world, pos.down(), Direction.UP)) { // can block underneath support torch
             return true;
         } else { // if not, is the block underneath a lower 2/3 tiki torch segment?
-            BlockState blockstate = world.getBlockState(pos.below());
-            return (blockstate.getBlock() == this && blockstate.getValue(SECTION) != TorchSection.UPPER) && super.canSurvive(state, world, pos);
+            BlockState blockstate = world.getBlockState(pos.down());
+            return (blockstate.getBlock() == this && blockstate.get(SECTION) != TorchSection.UPPER) && super.isValidPosition(state, world, pos);
         }
     }
 
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context) {
-        BlockPos blockpos = context.getClickedPos();
-        if (placeShortTorchOn(context.getLevel().getBlockState(blockpos.below()))) {
-        	return defaultBlockState().setValue(SECTION, TorchSection.UPPER);
+        BlockPos blockpos = context.getPos();
+        if (placeShortTorchOn(context.getWorld().getBlockState(blockpos.down()))) {
+        	return getDefaultState().with(SECTION, TorchSection.UPPER);
         }
-        BlockState ret = defaultBlockState().setValue(SECTION, TorchSection.LOWER);
-        return blockpos.getY() < context.getLevel().getHeight() - 1 &&
-        		context.getLevel().getBlockState(blockpos.above()).canBeReplaced(context) &&
-        		context.getLevel().getBlockState(blockpos.above(2)).canBeReplaced(context) ? ret : null;
+        BlockState ret = getDefaultState().with(SECTION, TorchSection.LOWER);
+        return blockpos.getY() < context.getWorld().func_234938_ad_() - 1 &&
+        		context.getWorld().getBlockState(blockpos.up()).isReplaceable(context) &&
+        		context.getWorld().getBlockState(blockpos.up(2)).isReplaceable(context) ? ret : null;
     }
     
     @Override
     @Deprecated
-    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-        return facing.getAxis() == Axis.Y && !this.canSurvive(stateIn, worldIn, currentPos) ? Blocks.AIR.defaultBlockState() : super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+    public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+        return facing.getAxis() == Axis.Y && !this.isValidPosition(stateIn, worldIn, currentPos) ? Blocks.AIR.getDefaultState() : super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
 	}
 
     @Override
-    public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        TorchSection section = state.getValue(SECTION);
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        TorchSection section = state.get(SECTION);
 
         if (section == TorchSection.UPPER) return;
 
-        worldIn.setBlock(pos.above(), this.defaultBlockState().setValue(SECTION, TorchSection.MIDDLE), Constants.BlockFlags.DEFAULT);
-        worldIn.setBlock(pos.above(2), this.defaultBlockState().setValue(SECTION, TorchSection.UPPER), Constants.BlockFlags.DEFAULT);  
+        worldIn.setBlockState(pos.up(), this.getDefaultState().with(SECTION, TorchSection.MIDDLE), Constants.BlockFlags.DEFAULT);
+        worldIn.setBlockState(pos.up(2), this.getDefaultState().with(SECTION, TorchSection.UPPER), Constants.BlockFlags.DEFAULT);  
     }
     
     private boolean placeShortTorchOn(BlockState state) {
     	// Only place top block if it's on a fence/wall
-    	return state.getBlock().is(BlockTags.FENCES) || state.getBlock().is(BlockTags.WALLS);
+    	return state.getBlock().isIn(BlockTags.FENCES) || state.getBlock().isIn(BlockTags.WALLS);
     }
 
     @Override
-    public void playerDestroy(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
-        TorchSection section = state.getValue(SECTION);
-        BlockPos base = pos.below(section.height);
+    public void harvestBlock(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
+        TorchSection section = state.get(SECTION);
+        BlockPos base = pos.down(section.height);
 		for (TorchSection otherSection : TorchSection.values()) {
-			BlockPos pos2 = base.above(otherSection.height);
+			BlockPos pos2 = base.up(otherSection.height);
 			BlockState state2 = world.getBlockState(pos2);
-			if (state2.getBlock() == this && state2.getValue(SECTION) == otherSection) {
-				super.playerDestroy(world, player, pos2, state2, te, stack);
-		        world.setBlock(pos2, world.getFluidState(pos2).createLegacyBlock(), world.isClientSide ? 11 : 3);
+			if (state2.getBlock() == this && state2.get(SECTION) == otherSection) {
+				super.harvestBlock(world, player, pos2, state2, te, stack);
+		        world.setBlockState(pos2, world.getFluidState(pos2).getBlockState(), world.isRemote ? 11 : 3);
 			}
 		}
 	}
@@ -141,16 +141,16 @@ public class TikiTorchBlock extends Block {
 	@Override
 	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
 		boolean ret = false;
-		TorchSection section = state.getValue(SECTION);
-		BlockPos base = pos.below(section.height);
+		TorchSection section = state.get(SECTION);
+		BlockPos base = pos.down(section.height);
 		for (TorchSection otherSection : TorchSection.values()) {
-			BlockPos pos2 = base.above(otherSection.height);
+			BlockPos pos2 = base.up(otherSection.height);
 			BlockState state2 = world.getBlockState(pos2);
-			if (state2.getBlock() == this && state2.getValue(SECTION) == otherSection) {
+			if (state2.getBlock() == this && state2.get(SECTION) == otherSection) {
 				if (player.isCreative()) {
 					ret |= super.removedByPlayer(state2, world, pos2, player, willHarvest, fluid);
 				} else {
-					this.playerWillDestroy(world, pos2, state2, player);
+					this.onBlockHarvested(world, pos2, state2, player);
 					ret = true;
 				}
 			}
@@ -160,7 +160,7 @@ public class TikiTorchBlock extends Block {
 
     @Override
     public void animateTick(BlockState state, World world, BlockPos pos, Random rand) {
-        boolean isTop = state.getValue(SECTION) == TorchSection.UPPER;
+        boolean isTop = state.get(SECTION) == TorchSection.UPPER;
         if (isTop) {
             double d = pos.getX() + 0.5F;
             double d1 = pos.getY() + 0.7F;

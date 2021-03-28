@@ -26,14 +26,14 @@ import net.tropicraft.core.common.sound.Sounds;
 
 public class EIHEntity extends TropicraftCreatureEntity {
 
-    private static final DataParameter<Byte> STATE = EntityDataManager.defineId(EIHEntity.class, DataSerializers.BYTE);
+    private static final DataParameter<Byte> STATE = EntityDataManager.createKey(EIHEntity.class, DataSerializers.BYTE);
     public int FLAG_SLEEP = 1 << 0;
     public int FLAG_AWARE = 1 << 1;
     public int FLAG_ANGRY = 1 << 2;
 
     public EIHEntity(EntityType<? extends CreatureEntity> type, World world) {
         super(type, world);
-        xpReward = 10;
+        experienceValue = 10;
     }
 
     @Override
@@ -42,25 +42,25 @@ public class EIHEntity extends TropicraftCreatureEntity {
     }
 
     @Override
-    public void defineSynchedData() {
-        super.defineSynchedData();
-        getEntityData().define(STATE, (byte) 0);
+    public void registerData() {
+        super.registerData();
+        getDataManager().register(STATE, (byte) 0);
     }
 
     public byte getState() {
-        return getEntityData().get(STATE);
+        return getDataManager().get(STATE);
     }
 
     private void setState(final byte state) {
-        getEntityData().set(STATE, state);
+        getDataManager().set(STATE, state);
     }
 
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return CreatureEntity.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 40.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.25)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 100.0)
-                .add(Attributes.ATTACK_DAMAGE, 7.0);
+        return CreatureEntity.func_233666_p_()
+                .createMutableAttribute(Attributes.MAX_HEALTH, 40.0)
+                .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.25)
+                .createMutableAttribute(Attributes.KNOCKBACK_RESISTANCE, 100.0)
+                .createMutableAttribute(Attributes.ATTACK_DAMAGE, 7.0);
     }
 
     @Override
@@ -68,9 +68,9 @@ public class EIHEntity extends TropicraftCreatureEntity {
         goalSelector.addGoal(0, new SwimGoal(this));
         goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, false) {
             @Override
-            public boolean canUse() {
+            public boolean shouldExecute() {
                 if (!isAngry()) return false;
-                return super.canUse();
+                return super.shouldExecute();
             }
         });
 
@@ -80,9 +80,9 @@ public class EIHEntity extends TropicraftCreatureEntity {
 
         goalSelector.addGoal(5, new WaterAvoidingRandomWalkingGoal(this, 0.8D) {
             @Override
-            public boolean canUse() {
+            public boolean shouldExecute() {
                 if (!isAngry()) return false;
-                return super.canUse();
+                return super.shouldExecute();
             }
         });
 
@@ -94,19 +94,19 @@ public class EIHEntity extends TropicraftCreatureEntity {
     }
 
     @Override
-    public void addAdditionalSaveData(final CompoundNBT compound) {
-        super.addAdditionalSaveData(compound);
+    public void writeAdditional(final CompoundNBT compound) {
+        super.writeAdditional(compound);
         compound.putByte("State", getState());
     }
 
     @Override
-    public void readAdditionalSaveData(final CompoundNBT compound) {
-        super.readAdditionalSaveData(compound);
+    public void readAdditional(final CompoundNBT compound) {
+        super.readAdditional(compound);
         setState(compound.getByte("State"));
     }
 
     @Override
-    public int getMaxSpawnClusterSize() {
+    public int getMaxSpawnedInChunk() {
         return 1;
     }
 
@@ -115,36 +115,36 @@ public class EIHEntity extends TropicraftCreatureEntity {
         super.baseTick();
 
         if (isAsleep()) {
-            setDeltaMovement(Vector3d.ZERO);
+            setMotion(Vector3d.ZERO);
         }
 
         if (!isAsleep()) {
-            yRotO = yRot;
-            xRotO = xRot;
+            prevRotationYaw = rotationYaw;
+            prevRotationPitch = rotationPitch;
         }
 
-        if (tickCount % 20 == 0) {
-            final LivingEntity attackTarget = getTarget();
+        if (ticksExisted % 20 == 0) {
+            final LivingEntity attackTarget = getAttackTarget();
             if (attackTarget == null) {
-                final PlayerEntity closestPlayer = level.getNearestPlayer(this, 10);
-                if (closestPlayer != null && !closestPlayer.abilities.instabuild && !closestPlayer.isSpectator()) {
-                    setTarget(closestPlayer);
+                final PlayerEntity closestPlayer = world.getClosestPlayer(this, 10);
+                if (closestPlayer != null && !closestPlayer.abilities.isCreativeMode && !closestPlayer.isSpectator()) {
+                    setAttackTarget(closestPlayer);
                 }
-            } else if (distanceTo(attackTarget) > 16) {
-                setTarget(null);
+            } else if (getDistance(attackTarget) > 16) {
+                setAttackTarget(null);
                 setAwake(false);
                 setImmobile(true);
                 setAngry(false);
             }
 
-            if (attackTarget != null && !isPathFinding() && !isAngry()) {
+            if (attackTarget != null && !hasPath() && !isAngry()) {
                 if (attackTarget instanceof PlayerEntity) {
                     final PlayerEntity player = (PlayerEntity) attackTarget;
-                    if (!player.abilities.instabuild && !player.isSpectator()) {
-                        final float distance = distanceTo(player);
+                    if (!player.abilities.isCreativeMode && !player.isSpectator()) {
+                        final float distance = getDistance(player);
                         if (distance < 10F) {
                             setAwake(true);
-                            final ItemStack itemstack = player.inventory.getSelected();
+                            final ItemStack itemstack = player.inventory.getCurrentItem();
 
                             if (!itemstack.isEmpty()) {
                                 if (isAware() && itemstack.getItem() == TropicraftBlocks.CHUNK.get().asItem()) {
@@ -154,7 +154,7 @@ public class EIHEntity extends TropicraftCreatureEntity {
                             }
                         }
 
-                        if (distanceTo(player) < 3 && level.getDifficulty() != Difficulty.PEACEFUL) {
+                        if (getDistance(player) < 3 && world.getDifficulty() != Difficulty.PEACEFUL) {
                             setAwake(false);
                             setImmobile(false);
                             setAngry(true);
@@ -163,14 +163,14 @@ public class EIHEntity extends TropicraftCreatureEntity {
                         setImmobile(true);
                         setAngry(false);
                         setAwake(false);
-                        setDeltaMovement(0D, -.1D, 0D);
-                        setRot(yRotO, xRotO);
+                        setMotion(0D, -.1D, 0D);
+                        setRotation(prevRotationYaw, prevRotationPitch);
                     }
                 }
             }
 
             if (isAsleep()) {
-                setRot(yRotO, xRotO);
+                setRotation(prevRotationYaw, prevRotationPitch);
             } else {
                 setAwake(false);
             }
@@ -203,22 +203,22 @@ public class EIHEntity extends TropicraftCreatureEntity {
 
     public void setEIHFlag(int id, boolean flag) {
         if (flag) {
-            this.entityData.set(STATE, (byte)(this.entityData.get(STATE) | id));
+            this.dataManager.set(STATE, (byte)(this.dataManager.get(STATE) | id));
         } else {
-            this.entityData.set(STATE, (byte)(this.entityData.get(STATE) & ~id));
+            this.dataManager.set(STATE, (byte)(this.dataManager.get(STATE) & ~id));
         }
     }
 
     private boolean getEIHFlag(int id) {
-        return (this.entityData.get(STATE) & id) != 0;
+        return (this.dataManager.get(STATE) & id) != 0;
     }
 
     @Override
     protected SoundEvent getAmbientSound() {
         if (isAware()) {
-            return random.nextInt(10) == 0 ? Sounds.HEAD_MED : null;
+            return rand.nextInt(10) == 0 ? Sounds.HEAD_MED : null;
         } else if (isAngry()) {
-            return random.nextInt(10) == 0 ? Sounds.HEAD_SHORT : null;
+            return rand.nextInt(10) == 0 ? Sounds.HEAD_SHORT : null;
         } else {
             return null;
         }
@@ -240,22 +240,22 @@ public class EIHEntity extends TropicraftCreatureEntity {
     }
 
     @Override
-    public boolean hurt(final DamageSource source, final float amount) {
+    public boolean attackEntityFrom(final DamageSource source, final float amount) {
         if (source.equals(DamageSource.OUT_OF_WORLD)) {
-            return super.hurt(source, amount);
+            return super.attackEntityFrom(source, amount);
         }
 
-        if (source.getDirectEntity() instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) source.getDirectEntity();
-            if (player.abilities.instabuild || player.isSpectator()) {
-                return super.hurt(source, amount);
+        if (source.getImmediateSource() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) source.getImmediateSource();
+            if (player.abilities.isCreativeMode || player.isSpectator()) {
+                return super.attackEntityFrom(source, amount);
             }
-            ItemStack heldItem = player.getMainHandItem();
+            ItemStack heldItem = player.getHeldItemMainhand();
             if (!heldItem.isEmpty() && heldItem.getItem().getHarvestLevel(heldItem, ToolType.PICKAXE, player, null) >= 1) {
-                return super.hurt(source, amount);
+                return super.attackEntityFrom(source, amount);
             } else {
-                playSound(Sounds.HEAD_LAUGHING, getSoundVolume(), getVoicePitch());
-                setLastHurtByMob(player);
+                playSound(Sounds.HEAD_LAUGHING, getSoundVolume(), getSoundPitch());
+                setRevengeTarget(player);
             }
 
             setAngry(true);
@@ -270,8 +270,8 @@ public class EIHEntity extends TropicraftCreatureEntity {
             super(eih, PlayerEntity.class, true);
         }
 
-        public boolean canUse() {
-            return ((EIHEntity) mob).isAngry() && super.canUse();
+        public boolean shouldExecute() {
+            return ((EIHEntity) goalOwner).isAngry() && super.shouldExecute();
         }
     }
 }

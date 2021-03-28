@@ -20,7 +20,7 @@ import net.tropicraft.core.common.item.TropicraftItems;
 
 public class AshenMaskEntity extends Entity {
 
-    private static final DataParameter<Byte> MASK_TYPE = EntityDataManager.defineId(AshenEntity.class, DataSerializers.BYTE);
+    private static final DataParameter<Byte> MASK_TYPE = EntityDataManager.createKey(AshenEntity.class, DataSerializers.BYTE);
     public static final int MAX_TICKS_ALIVE = 24000;
 
     public AshenMaskEntity(EntityType<?> type, World world) {
@@ -28,74 +28,74 @@ public class AshenMaskEntity extends Entity {
     }
 
     public void dropItemStack() {
-        spawnAtLocation(new ItemStack(TropicraftItems.ASHEN_MASKS.get(AshenMasks.VALUES[getMaskType()]).get()), 1.0F);
+        entityDropItem(new ItemStack(TropicraftItems.ASHEN_MASKS.get(AshenMasks.VALUES[getMaskType()]).get()), 1.0F);
     }
 
     @Override
-    public boolean isPickable() {
+    public boolean canBeCollidedWith() {
         return true;
     }
 
     @Override
-    public boolean isPushable() {
+    public boolean canBePushed() {
         return false;
     }
 
     @Override
-    protected void defineSynchedData() {
-        entityData.define(MASK_TYPE, (byte) 0);
+    protected void registerData() {
+        dataManager.register(MASK_TYPE, (byte) 0);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundNBT nbt) {
+    protected void readAdditional(CompoundNBT nbt) {
         setMaskType(nbt.getByte("MaskType"));
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundNBT nbt) {
+    protected void writeAdditional(CompoundNBT nbt) {
         nbt.putByte("MaskType", getMaskType());
     }
 
     public void setMaskType(byte type) {
-        entityData.set(MASK_TYPE, type);
+        dataManager.set(MASK_TYPE, type);
     }
 
     public byte getMaskType() {
-        return entityData.get(MASK_TYPE);
+        return dataManager.get(MASK_TYPE);
     }
 
     @Override
     public void tick() {
-        if (!level.isClientSide) {
+        if (!world.isRemote) {
             // Remove masks that have been on the ground abandoned for over a day
-            if (tickCount >= MAX_TICKS_ALIVE) {
+            if (ticksExisted >= MAX_TICKS_ALIVE) {
                 remove();
             }
         }
 
-        final Vector3d motion = getDeltaMovement();
+        final Vector3d motion = getMotion();
 
         if (onGround) {
-            setDeltaMovement(motion.multiply(0.5, 0, 0.5));
+            setMotion(motion.mul(0.5, 0, 0.5));
         }
 
         if (isInWater()) {
-            setDeltaMovement(motion.x * 0.95f, 0.02f, motion.z * 0.95f);
+            setMotion(motion.x * 0.95f, 0.02f, motion.z * 0.95f);
         } else {
-            setDeltaMovement(motion.subtract(0, 0.05f, 0));
+            setMotion(motion.subtract(0, 0.05f, 0));
         }
 
         move(MoverType.SELF, motion);
     }
 
     @Override
-    public boolean hurt(DamageSource damageSource, float par2) {
+    public boolean attackEntityFrom(DamageSource damageSource, float par2) {
         if (isInvulnerableTo(damageSource)) {
             return false;
         } else {
-            if (isAlive() && !level.isClientSide) {
+            if (isAlive() && !world.isRemote) {
                 remove();
-                markHurt();
+                markVelocityChanged();
                 dropItemStack();
             }
 
@@ -104,7 +104,7 @@ public class AshenMaskEntity extends Entity {
     }
 
     @Override
-    public IPacket<?> getAddEntityPacket() {
+    public IPacket<?> createSpawnPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 

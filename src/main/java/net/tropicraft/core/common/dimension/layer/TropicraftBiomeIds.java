@@ -29,7 +29,7 @@ public final class TropicraftBiomeIds {
 	}
 
 	private static int getId(Registry<Biome> biomes, RegistryKey<Biome> key) {
-		return biomes.getId(biomes.get(key));
+		return biomes.getId(biomes.getValueForKey(key));
 	}
 
 	public boolean isOcean(final int biome) {

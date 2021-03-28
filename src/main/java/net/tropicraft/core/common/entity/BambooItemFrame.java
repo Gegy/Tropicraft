@@ -27,33 +27,33 @@ public class BambooItemFrame extends ItemFrameEntity implements IEntityAdditiona
 	protected BambooItemFrame(final EntityType<? extends BambooItemFrame> type, final World world, final BlockPos pos,
 			final Direction direction) {
 		super(type, world);
-		this.pos = pos;
-		this.setDirection(direction);
+		this.hangingPosition = pos;
+		this.updateFacingWithBoundingBox(direction);
 	}
 	
 	@Override
-	protected void dropItem(Entity entityIn, boolean dropSelf) {
-		super.dropItem(entityIn, false);
+	protected void dropItemOrSelf(Entity entityIn, boolean dropSelf) {
+		super.dropItemOrSelf(entityIn, false);
 		if (dropSelf) {
-			this.spawnAtLocation(TropicraftItems.BAMBOO_ITEM_FRAME.get());
+			this.entityDropItem(TropicraftItems.BAMBOO_ITEM_FRAME.get());
 		}
 	}
 
 	@Override
-	public IPacket<?> getAddEntityPacket() {
+	public IPacket<?> createSpawnPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     @Override
     public void writeSpawnData(PacketBuffer buffer) {
-        buffer.writeBlockPos(this.pos);
-        buffer.writeByte(direction.get3DDataValue());
+        buffer.writeBlockPos(this.hangingPosition);
+        buffer.writeByte(facingDirection.getIndex());
     }
 
     @Override
     public void readSpawnData(PacketBuffer additionalData) {
-        this.pos = additionalData.readBlockPos();
-        setDirection(Direction.from3DDataValue(additionalData.readByte()));
+        this.hangingPosition = additionalData.readBlockPos();
+        updateFacingWithBoundingBox(Direction.byIndex(additionalData.readByte()));
     }
 
 	@Override

@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.minecraft.item.Item.Properties;
+
 public class CocktailItem extends Item implements IColoredItem {
 
 	private static final int DEFAULT_COLOR = 0xf3be36;
@@ -43,7 +45,7 @@ public class CocktailItem extends Item implements IColoredItem {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
 		Drink drink = getDrink(stack);
 
 		if (drink == Drink.COCKTAIL && stack.hasTag() && stack.getTag().contains("Ingredients")) {
@@ -181,12 +183,12 @@ public class CocktailItem extends Item implements IColoredItem {
 	}
 
 	@Override
-	public UseAction getUseAnimation(ItemStack stack) {
+	public UseAction getUseAction(ItemStack stack) {
 		return UseAction.DRINK;
 	}
 
 	public ItemStack onFoodEaten(ItemStack itemstack, World world, PlayerEntity player) {
-		world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_BURP, SoundCategory.PLAYERS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
+		world.playSound(player, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 0.5F, world.rand.nextFloat() * 0.1F + 0.9F);
 
 		for (Ingredient ingredient: getIngredients(itemstack)) {
 			ingredient.onDrink(player);
@@ -206,14 +208,14 @@ public class CocktailItem extends Item implements IColoredItem {
 	 * the Item before the action is complete.
 	 */
 	@Override
-	public ItemStack finishUsingItem(@Nonnull ItemStack stack, @Nonnull World worldIn, @Nonnull LivingEntity entityLiving) {
+	public ItemStack onItemUseFinish(@Nonnull ItemStack stack, @Nonnull World worldIn, @Nonnull LivingEntity entityLiving) {
 		if (entityLiving instanceof PlayerEntity) {
 			final PlayerEntity player = (PlayerEntity) entityLiving;
 			onFoodEaten(stack, worldIn, player);
 
 			Drink drink = getDrink(stack);
 
-			if (worldIn.isRainingAt(player.blockPosition()) && drink == Drink.PINA_COLADA) {
+			if (worldIn.isRainingAt(player.getPosition()) && drink == Drink.PINA_COLADA) {
 				// TODO advancements player.addStat(AchievementRegistry.drinkPinaColada);
 			}
 		}
@@ -222,15 +224,15 @@ public class CocktailItem extends Item implements IColoredItem {
 	}
 
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
-	    ItemStack stack = playerIn.getItemInHand(hand);
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
+	    ItemStack stack = playerIn.getHeldItem(hand);
 		Drink drink = getDrink(stack);
 
 		if (drink == null) {
 			return new ActionResult<>(ActionResultType.FAIL, stack);
 		}
 
-		playerIn.startUsingItem(hand);
+		playerIn.setActiveHand(hand);
 
 		return new ActionResult<>(ActionResultType.SUCCESS, stack);
 	}
@@ -242,12 +244,12 @@ public class CocktailItem extends Item implements IColoredItem {
 	}
 	
 	@Override
-	public ITextComponent getName(ItemStack stack) {
+	public ITextComponent getDisplayName(ItemStack stack) {
 		Drink drink = getDrink(stack);
 		if (drink != null) {
-			return super.getName(stack).copy().withStyle(drink.textFormatting).withStyle(TextFormatting.BOLD);
+			return super.getDisplayName(stack).deepCopy().mergeStyle(drink.textFormatting).mergeStyle(TextFormatting.BOLD);
 		}
-		return super.getName(stack);
+		return super.getDisplayName(stack);
 	}
 
 	public Drink getDrink() {

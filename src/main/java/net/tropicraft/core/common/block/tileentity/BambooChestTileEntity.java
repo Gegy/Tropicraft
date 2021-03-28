@@ -27,14 +27,14 @@ public class BambooChestTileEntity extends ChestTileEntity {
     }
 
     @Override
-    public void load(BlockState blockState, CompoundNBT compound) {
-        super.load(blockState, compound);
+    public void read(BlockState blockState, CompoundNBT compound) {
+        super.read(blockState, compound);
         unbreakable = compound.getBoolean("unbreakable");
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT compound) {
-        super.save(compound);
+    public CompoundNBT write(CompoundNBT compound) {
+        super.write(compound);
         compound.putBoolean("unbreakable", unbreakable);
 
         return compound;

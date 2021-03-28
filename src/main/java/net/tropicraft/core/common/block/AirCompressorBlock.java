@@ -31,11 +31,11 @@ import java.util.List;
 public class AirCompressorBlock extends Block {
 
 	@Nonnull
-    public static final EnumProperty<Direction> FACING = HorizontalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalBlock.HORIZONTAL_FACING;
 
     public AirCompressorBlock(Block.Properties properties) {
 		super(properties);
-        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH));
+        this.setDefaultState(this.getStateContainer().getBaseState().with(FACING, Direction.NORTH));
     }
 
     /**
@@ -43,26 +43,26 @@ public class AirCompressorBlock extends Block {
      */
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.appendHoverText(stack, worldIn, tooltip, flagIn);
-        tooltip.add(new TranslationTextComponent(getDescriptionId() + ".desc").withStyle(TextFormatting.GRAY));
+    public void addInformation(ItemStack stack, @Nullable IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+        tooltip.add(new TranslationTextComponent(getTranslationKey() + ".desc").mergeStyle(TextFormatting.GRAY));
     }
 
     @Override
-    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
+    protected void fillStateContainer(Builder<Block, BlockState> builder) {
+        super.fillStateContainer(builder);
         builder.add(FACING);
     }
 
     @Override
-    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (world.isClientSide) {
+    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (world.isRemote) {
 			return ActionResultType.SUCCESS;
 		}
 
-		ItemStack stack = player.getMainHandItem();
+		ItemStack stack = player.getHeldItemMainhand();
 
-		AirCompressorTileEntity mixer = (AirCompressorTileEntity)world.getBlockEntity(pos);
+		AirCompressorTileEntity mixer = (AirCompressorTileEntity)world.getTileEntity(pos);
 
 		if (mixer.isDoneCompressing()) {
 			mixer.ejectTank();
@@ -78,20 +78,20 @@ public class AirCompressorBlock extends Block {
 		ingredientStack.setCount(1);
 
 		if (mixer.addTank(ingredientStack)) {
-			player.inventory.removeItem(player.inventory.selected, 1);
+			player.inventory.decrStackSize(player.inventory.currentItem, 1);
 		}
 
         return ActionResultType.CONSUME;
 	}
 
     @Override
-    public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
-		if (!world.isClientSide) {
-		    AirCompressorTileEntity te = (AirCompressorTileEntity) world.getBlockEntity(pos);
+    public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (!world.isRemote) {
+		    AirCompressorTileEntity te = (AirCompressorTileEntity) world.getTileEntity(pos);
 			te.ejectTank();
 		}
 
-        super.onRemove(state, world, pos, newState, isMoving);
+        super.onReplaced(state, world, pos, newState, isMoving);
 	}
     
     @Override
@@ -109,6 +109,6 @@ public class AirCompressorBlock extends Block {
     @Nullable
     public BlockState getStateForPlacement(BlockItemUseContext context) {
         BlockState ret = super.getStateForPlacement(context);
-        return ret.setValue(FACING, context.getHorizontalDirection());
+        return ret.with(FACING, context.getPlacementHorizontalFacing());
     }
 }

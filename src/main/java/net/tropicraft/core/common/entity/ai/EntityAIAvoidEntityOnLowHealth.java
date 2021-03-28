@@ -13,6 +13,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Predicate;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class EntityAIAvoidEntityOnLowHealth<T extends Entity> extends Goal {
     private final Predicate<Entity> canBeSeenSelector;
     /** The entity we are attached to */
@@ -32,49 +34,49 @@ public class EntityAIAvoidEntityOnLowHealth<T extends Entity> extends Goal {
 
     public EntityAIAvoidEntityOnLowHealth(CreatureEntity theEntityIn, Class<T> classToAvoidIn, float avoidDistanceIn, double farSpeedIn, double nearSpeedIn, float healthToAvoid)
     {
-        this(theEntityIn, classToAvoidIn, (p_203782_0_) -> true, avoidDistanceIn, farSpeedIn, nearSpeedIn, healthToAvoid);
+        this(theEntityIn, classToAvoidIn, (entity) -> true, avoidDistanceIn, farSpeedIn, nearSpeedIn, healthToAvoid);
     }
 
     public EntityAIAvoidEntityOnLowHealth(CreatureEntity theEntityIn, Class<T> classToAvoidIn, Predicate<Entity> avoidTargetSelectorIn, float avoidDistanceIn, double farSpeedIn, double nearSpeedIn, float healthToAvoid)
     {
-        this.canBeSeenSelector = entity -> entity.isAlive() && theEntity.getSensing().canSee(entity);
+        this.canBeSeenSelector = entity -> entity.isAlive() && theEntity.getEntitySenses().canSee(entity);
         this.theEntity = theEntityIn;
         this.classToAvoid = classToAvoidIn;
         this.avoidTargetSelector = avoidTargetSelectorIn;
         this.avoidDistance = avoidDistanceIn;
         this.farSpeed = farSpeedIn;
         this.nearSpeed = nearSpeedIn;
-        this.entityPathNavigate = theEntityIn.getNavigation();
+        this.entityPathNavigate = theEntityIn.getNavigator();
         this.healthToAvoid = healthToAvoid;
-        this.setFlags(EnumSet.of(Flag.MOVE));
+        this.setMutexFlags(EnumSet.of(Flag.MOVE));
     }
 
     /**
      * Returns whether the EntityAIBase should begin execution.
      */
     @Override
-    public boolean canUse()
+    public boolean shouldExecute()
     {
 
         if (this.theEntity.getHealth() > healthToAvoid) return false;
 
-        List<T> list = this.theEntity.level.getEntitiesOfClass(this.classToAvoid,
-                this.theEntity.getBoundingBox().expandTowards((double)this.avoidDistance, 3.0D, (double)this.avoidDistance),
-                EntityPredicates.NO_CREATIVE_OR_SPECTATOR.and(this.canBeSeenSelector).and(this.avoidTargetSelector)
+        List<T> list = this.theEntity.world.getEntitiesWithinAABB(this.classToAvoid,
+                this.theEntity.getBoundingBox().expand((double)this.avoidDistance, 3.0D, (double)this.avoidDistance),
+                EntityPredicates.CAN_AI_TARGET.and(this.canBeSeenSelector).and(this.avoidTargetSelector)
         );
 
         if (list.isEmpty()) {
             return false;
         } else {
             this.closestLivingEntity = list.get(0);
-            Vector3d Vector3d = RandomPositionGenerator.getPosAvoid(this.theEntity, 16, 7, new Vector3d(this.closestLivingEntity.getX(), this.closestLivingEntity.getY(), this.closestLivingEntity.getZ()));
+            Vector3d Vector3d = RandomPositionGenerator.findRandomTargetBlockAwayFrom(this.theEntity, 16, 7, new Vector3d(this.closestLivingEntity.getPosX(), this.closestLivingEntity.getPosY(), this.closestLivingEntity.getPosZ()));
 
             if (Vector3d == null) {
                 return false;
-            } else if (this.closestLivingEntity.distanceToSqr(Vector3d.x, Vector3d.y, Vector3d.z) < this.closestLivingEntity.distanceToSqr(this.theEntity)) {
+            } else if (this.closestLivingEntity.getDistanceSq(Vector3d.x, Vector3d.y, Vector3d.z) < this.closestLivingEntity.getDistanceSq(this.theEntity)) {
                 return false;
             } else {
-                this.entityPathEntity = this.entityPathNavigate.createPath(Vector3d.x, Vector3d.y, Vector3d.z, 0);
+                this.entityPathEntity = this.entityPathNavigate.pathfind(Vector3d.x, Vector3d.y, Vector3d.z, 0);
                 return this.entityPathEntity != null;
             }
         }
@@ -84,25 +86,25 @@ public class EntityAIAvoidEntityOnLowHealth<T extends Entity> extends Goal {
      * Returns whether an in-progress EntityAIBase should continue executing
      */
     @Override
-    public boolean canContinueToUse()
+    public boolean shouldContinueExecuting()
     {
-        return this.entityPathNavigate.isInProgress();
+        return this.entityPathNavigate.hasPath();
     }
 
     /**
      * Execute a one shot task or start executing a continuous task
      */
     @Override
-    public void start()
+    public void startExecuting()
     {
-        this.entityPathNavigate.moveTo(this.entityPathEntity, this.farSpeed);
+        this.entityPathNavigate.setPath(this.entityPathEntity, this.farSpeed);
     }
 
     /**
      * Resets the task
      */
     @Override
-    public void stop()
+    public void resetTask()
     {
         this.closestLivingEntity = null;
     }
@@ -113,13 +115,13 @@ public class EntityAIAvoidEntityOnLowHealth<T extends Entity> extends Goal {
     @Override
     public void tick()
     {
-        if (this.theEntity.distanceToSqr(this.closestLivingEntity) < 49.0D)
+        if (this.theEntity.getDistanceSq(this.closestLivingEntity) < 49.0D)
         {
-            this.theEntity.getNavigation().setSpeedModifier(this.nearSpeed);
+            this.theEntity.getNavigator().setSpeed(this.nearSpeed);
         }
         else
         {
-            this.theEntity.getNavigation().setSpeedModifier(this.farSpeed);
+            this.theEntity.getNavigator().setSpeed(this.farSpeed);
         }
     }
 }

@@ -98,35 +98,35 @@ public class ScubaData implements INBTSerializable<CompoundNBT> {
     
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent event) {
-        World world = event.player.level;
+        World world = event.player.world;
         if (event.phase == Phase.END) {
             // TODO support more than chest slot?
-            ItemStack chestStack = event.player.getItemBySlot(EquipmentSlotType.CHEST);
+            ItemStack chestStack = event.player.getItemStackFromSlot(EquipmentSlotType.CHEST);
             Item chestItem = chestStack.getItem();
             if (chestItem instanceof ScubaArmorItem) {
                 LazyOptional<ScubaData> data = event.player.getCapability(CAPABILITY);
-                if (!world.isClientSide) {
+                if (!world.isRemote) {
                     underwaterPlayers.add((ServerPlayerEntity) event.player);
                 }
                 if (isUnderWater(event.player)) {
                     data.ifPresent(d -> {
                         d.tick(event.player);
-                        if (!world.isClientSide) {
+                        if (!world.isRemote) {
                             d.updateClient((ServerPlayerEntity) event.player, false);
                         }
                     });
                     ((ScubaArmorItem)chestItem).tickAir(event.player, EquipmentSlotType.CHEST, chestStack);
-                    if (!world.isClientSide && world.getGameTime() % 60 == 0) {
+                    if (!world.isRemote && world.getGameTime() % 60 == 0) {
                         // TODO this effect could be better, custom packet?
                         Vector3d eyePos = event.player.getEyePosition(0);
-                        Vector3d motion = event.player.getDeltaMovement();
-                        Vector3d particlePos = eyePos.add(motion.reverse());
-                        ((ServerWorld) world).sendParticles(ParticleTypes.BUBBLE,
-                                particlePos.x(), particlePos.y(), particlePos.z(),
-                                4 + world.random.nextInt(3),
+                        Vector3d motion = event.player.getMotion();
+                        Vector3d particlePos = eyePos.add(motion.inverse());
+                        ((ServerWorld) world).spawnParticle(ParticleTypes.BUBBLE,
+                                particlePos.getX(), particlePos.getY(), particlePos.getZ(),
+                                4 + world.rand.nextInt(3),
                                 0.25, 0.25, 0.25, motion.length());
                     }
-                } else if (!world.isClientSide && underwaterPlayers.remove(event.player)) { // Update client state as they leave the water
+                } else if (!world.isRemote && underwaterPlayers.remove(event.player)) { // Update client state as they leave the water
                     data.ifPresent(d -> d.updateClient((ServerPlayerEntity) event.player, false));
                 }
             }
@@ -158,7 +158,7 @@ public class ScubaData implements INBTSerializable<CompoundNBT> {
     }
     
     private static void updateClient(PlayerEvent event) {
-        if (!event.getPlayer().level.isClientSide) {
+        if (!event.getPlayer().world.isRemote) {
             event.getPlayer().getCapability(CAPABILITY).ifPresent(d -> d.updateClient((ServerPlayerEntity) event.getPlayer(), true));
         }
     }
@@ -170,13 +170,13 @@ public class ScubaData implements INBTSerializable<CompoundNBT> {
     
     public static boolean isUnderWater(PlayerEntity player) {
         BlockPos headPos = new BlockPos(player.getEyePosition(0));
-        return player.level.getFluidState(headPos).is(FluidTags.WATER);
+        return player.world.getFluidState(headPos).isTagged(FluidTags.WATER);
     }
     
     public static double getDepth(PlayerEntity player) {
         if (isUnderWater(player)) {
-            int surface = player.level.getSeaLevel();
-            double depth = surface - (player.getEyePosition(0).y());
+            int surface = player.world.getSeaLevel();
+            double depth = surface - (player.getEyePosition(0).getY());
             return depth;
         }
         return 0;
@@ -184,7 +184,7 @@ public class ScubaData implements INBTSerializable<CompoundNBT> {
     
     void tick(PlayerEntity player) {
         this.diveTime++;
-        if (player.level.getGameTime() % 100 == 0) {
+        if (player.world.getGameTime() % 100 == 0) {
             dirty = true;
         }
         updateMaxDepth(getDepth(player));

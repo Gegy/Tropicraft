@@ -14,7 +14,7 @@ public class TropicsUnderwaterCaveCarver extends UnderwaterCaveWorldCarver {
 
     public TropicsUnderwaterCaveCarver(Codec<ProbabilityConfig> codec) {
         super(codec);
-        this.replaceableBlocks = ImmutableSet.<Block> builder().addAll(this.replaceableBlocks)
+        this.carvableBlocks = ImmutableSet.<Block> builder().addAll(this.carvableBlocks)
                 .add(TropicraftBlocks.CORAL_SAND.get())
                 .add(TropicraftBlocks.FOAMY_SAND.get())
                 .add(TropicraftBlocks.MINERAL_SAND.get())
@@ -24,12 +24,12 @@ public class TropicsUnderwaterCaveCarver extends UnderwaterCaveWorldCarver {
     }
 
     @Override
-    protected boolean hasWater(IChunk chunkIn, int chunkX, int chunkZ, int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+    protected boolean func_222700_a(IChunk chunkIn, int chunkX, int chunkZ, int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
         return false;
     }
     
     @Override
-    protected float getThickness(Random rand) {
+    protected float func_230359_a_(Random rand) {
         float f = rand.nextFloat() * 3.0F + rand.nextFloat();
         if (rand.nextInt(10) == 0) {
            f *= rand.nextFloat() * rand.nextFloat() * 5.0F + 1.0F;
@@ -39,7 +39,7 @@ public class TropicsUnderwaterCaveCarver extends UnderwaterCaveWorldCarver {
     }
     
     @Override
-    protected int getCaveY(Random random) {
+    protected int func_230361_b_(Random random) {
         return random.nextInt(random.nextInt(240) + 8);
     }
 }

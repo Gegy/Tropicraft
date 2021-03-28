@@ -23,27 +23,27 @@ public class WallItemEntity extends BambooItemFrame {
 	}
 
 	@Override
-	public int getWidth() {
+	public int getWidthPixels() {
 		return 16;
 	}
 
 	@Override
-	public int getHeight() {
+	public int getHeightPixels() {
 		return 16;
 	}
 
     @Override
-    protected void dropItem(@Nullable Entity entityIn, boolean p_146065_2_) {
-    	super.dropItem(entityIn, false);
+    protected void dropItemOrSelf(@Nullable Entity entityIn, boolean p_146065_2_) {
+    	super.dropItemOrSelf(entityIn, false);
     	this.remove();
     }
 
     @Override
-    public void playPlacementSound() {
+    public void playPlaceSound() {
     }
 
 	@Override
 	public ItemStack getPickedResult(RayTraceResult target) {
-		return getItem();
+		return getDisplayedItem();
 	}
 }

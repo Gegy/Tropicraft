@@ -22,13 +22,13 @@ public class MessageAirCompressorInventory extends MessageTileEntity<AirCompress
     
     public static void encode(final MessageAirCompressorInventory message, final PacketBuffer buf) {
         MessageTileEntity.encode(message, buf);
-        buf.writeItem(message.tank);
+        buf.writeItemStack(message.tank);
     }
 
     public static MessageAirCompressorInventory decode(final PacketBuffer buf) {
         final MessageAirCompressorInventory message = new MessageAirCompressorInventory();
         MessageTileEntity.decode(message, buf);
-        message.tank = buf.readItem();
+        message.tank = buf.readItemStack();
         return message;
     }
 

@@ -11,21 +11,21 @@ import net.tropicraft.core.common.entity.hostile.TropiSpiderEntity;
 public class TropiSpiderRenderer extends SpiderRenderer<TropiSpiderEntity> {
 	public TropiSpiderRenderer(final EntityRendererManager manager) {
 		super(manager);
-		shadowStrength = 0.5f;
+		shadowOpaque = 0.5f;
 	}
 
 	@Override
 	public void render(TropiSpiderEntity spider, float entityYaw, float partialTicks, MatrixStack stack, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		stack.pushPose();
+		stack.push();
 		final float scale = getScale(spider);
-		shadowRadius = scale;
+		shadowSize = scale;
 		stack.scale(scale, scale, scale);
 		super.render(spider, entityYaw, partialTicks, stack, bufferIn, packedLightIn);
-		stack.popPose();
+		stack.pop();
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(TropiSpiderEntity entity) {
+	public ResourceLocation getEntityTexture(TropiSpiderEntity entity) {
 		if (entity.getSpiderType() == TropiSpiderEntity.Type.CHILD) {
 			return TropicraftRenderUtils.bindTextureEntity("spiderchild");
 		}

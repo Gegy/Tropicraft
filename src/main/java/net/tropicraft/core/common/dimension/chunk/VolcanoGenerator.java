@@ -37,10 +37,10 @@ import java.util.function.Supplier;
 public class VolcanoGenerator {
 
 	public static Set<ResourceLocation> volcanoSpawnBiomesLand = ImmutableSet.of(
-			TropicraftBiomes.TROPICS.location(), TropicraftBiomes.RAINFOREST_PLAINS.location()
+			TropicraftBiomes.TROPICS.getLocation(), TropicraftBiomes.RAINFOREST_PLAINS.getLocation()
 	);
 	public static Set<ResourceLocation> volcanoSpawnBiomesOcean = ImmutableSet.of(
-			TropicraftBiomes.TROPICS_OCEAN.location()
+			TropicraftBiomes.TROPICS_OCEAN.getLocation()
 	);
 
 	private final long worldSeed;
@@ -63,9 +63,9 @@ public class VolcanoGenerator {
 
 	private static final int CHUNK_RANGE = MAX_RADIUS >> 4;
 
-	private final static Supplier<BlockState> VOLCANO_BLOCK = TropicraftBlocks.CHUNK.lazyMap(Block::defaultBlockState);
-	private final static Supplier<BlockState> LAVA_BLOCK = () -> Blocks.LAVA.defaultBlockState();
-	private final static Supplier<BlockState> SAND_BLOCK = TropicraftBlocks.VOLCANIC_SAND.lazyMap(Block::defaultBlockState);
+	private final static Supplier<BlockState> VOLCANO_BLOCK = TropicraftBlocks.CHUNK.lazyMap(Block::getDefaultState);
+	private final static Supplier<BlockState> LAVA_BLOCK = () -> Blocks.LAVA.getDefaultState();
+	private final static Supplier<BlockState> SAND_BLOCK = TropicraftBlocks.VOLCANIC_SAND.lazyMap(Block::getDefaultState);
 
 	private final BiomeProvider biomeSource;
 
@@ -77,19 +77,19 @@ public class VolcanoGenerator {
 	@SubscribeEvent
 	public static void onServerStarting(FMLServerStartingEvent event) {
 		// we don't really have a structure but we fake it
-		CommandDispatcher<CommandSource> dispatcher = event.getServer().getCommands().getDispatcher();
+		CommandDispatcher<CommandSource> dispatcher = event.getServer().getCommandManager().getDispatcher();
 
-		LiteralArgumentBuilder<CommandSource> locate = Commands.literal("locate").requires(source -> source.hasPermission(2));
+		LiteralArgumentBuilder<CommandSource> locate = Commands.literal("locate").requires(source -> source.hasPermissionLevel(2));
 		dispatcher.register(
 			locate.then(Commands.literal(Constants.MODID + ":volcano")
 				.executes(ctx -> {
 					CommandSource source = ctx.getSource();
-					BlockPos pos = new BlockPos(source.getPosition());
-					BlockPos volcanoPos = getVolcanoNear(source.getLevel(), pos.getX() >> 4, pos.getZ() >> 4, 100);
+					BlockPos pos = new BlockPos(source.getPos());
+					BlockPos volcanoPos = getVolcanoNear(source.getWorld(), pos.getX() >> 4, pos.getZ() >> 4, 100);
 					if (volcanoPos == null) {
 						throw new SimpleCommandExceptionType(new TranslationTextComponent("commands.locate.failed")).create();
 					} else {
-						return LocateCommand.showLocateResult(source, "Volcano", pos, volcanoPos, "commands.locate.success");
+						return LocateCommand.func_241054_a_(source, "Volcano", pos, volcanoPos, "commands.locate.success");
 					}
 			}))
 		);
@@ -133,12 +133,12 @@ public class VolcanoGenerator {
 			    double volcanoHeight = getVolcanoHeight(relativeX, relativeZ, radiusX, radiusZ, volcNoise);
 			    float distanceSquared = getDistanceSq(relativeX, relativeZ, radiusX, radiusZ);
 
-                int groundHeight = chunk.getHeight(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
+                int groundHeight = chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
                 groundHeight = Math.min(groundHeight, lavaLevel - 3);
 
 				if (distanceSquared < 1) {
 					for (int y = CHUNK_SIZE_Y; y > 0; y--) {
-						pos.set(x, y, z);
+						pos.setPos(x, y, z);
 
 						if (volcanoHeight + groundHeight < calderaCutoff) {
 							if (volcanoHeight + groundHeight <= volcanoTop) {
@@ -163,7 +163,7 @@ public class VolcanoGenerator {
 							} else if (y <= lavaLevel) {
 								placeBlock(pos, LAVA_BLOCK, chunk);
 							} else {
-								placeBlock(pos, Blocks.AIR::defaultBlockState, chunk);
+								placeBlock(pos, Blocks.AIR::getDefaultState, chunk);
 							}
 						}
 					}
@@ -309,7 +309,7 @@ public class VolcanoGenerator {
 	 * The posY of the returned object should be used as the volcano radius
 	 */
 	public static BlockPos getVolcanoNear(ServerWorld world, int chunkX, int chunkZ, int maxRadius) {
-		return getVolcanoNear(world.getChunkSource().getGenerator().getBiomeSource(), world.getSeed(), chunkX, chunkZ, maxRadius);
+		return getVolcanoNear(world.getChunkProvider().getChunkGenerator().getBiomeProvider(), world.getSeed(), chunkX, chunkZ, maxRadius);
 	}
 
 	/**

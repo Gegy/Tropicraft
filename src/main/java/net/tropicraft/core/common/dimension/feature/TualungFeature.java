@@ -25,8 +25,8 @@ public class TualungFeature extends RainforestTreeFeature {
     }
 
     @Override
-    public boolean place(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
-        pos = pos.immutable();
+    public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+        pos = pos.toImmutable();
         int i = pos.getX(); int j = pos.getY(); int k = pos.getZ();
         int height = rand.nextInt(maxHeight - baseHeight) + baseHeight + j;
         int branches = rand.nextInt(3) + 3;
@@ -43,15 +43,15 @@ public class TualungFeature extends RainforestTreeFeature {
             return false;
         }
 
-        if (!getSapling().canSurvive(getSapling().defaultBlockState(), world, pos)) {
+        if (!getSapling().isValidPosition(getSapling().getDefaultState(), world, pos)) {
             return false;
         }
 
-        setState(world, new BlockPos(i, j, k), Blocks.DIRT.defaultBlockState());
-        setState(world, new BlockPos(i - 1, j, k), Blocks.DIRT.defaultBlockState());
-        setState(world, new BlockPos(i + 1, j, k), Blocks.DIRT.defaultBlockState());
-        setState(world, new BlockPos(i, j, k - 1), Blocks.DIRT.defaultBlockState());
-        setState(world, new BlockPos(i, j, k + 1), Blocks.DIRT.defaultBlockState());
+        setState(world, new BlockPos(i, j, k), Blocks.DIRT.getDefaultState());
+        setState(world, new BlockPos(i - 1, j, k), Blocks.DIRT.getDefaultState());
+        setState(world, new BlockPos(i + 1, j, k), Blocks.DIRT.getDefaultState());
+        setState(world, new BlockPos(i, j, k - 1), Blocks.DIRT.getDefaultState());
+        setState(world, new BlockPos(i, j, k + 1), Blocks.DIRT.getDefaultState());
 
         for (int y = j; y < height; y++) {
             placeLog(world, i, y, k);

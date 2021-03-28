@@ -54,16 +54,16 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
 
     public BeachFloatEntity(EntityType<BeachFloatEntity> type, World worldIn) {
         super(type, worldIn, TropicraftItems.BEACH_FLOATS);
-        this.noCulling = true;
+        this.ignoreFrustumCheck = true;
         this.isEmpty = true;
-        this.blocksBuilding = true;
-        this.pushthrough = .95F;
-        setId(this.getId());
+        this.preventEntitySpawning = true;
+        this.entityCollisionReduction = .95F;
+        setEntityId(this.getEntityId());
     }
     
     @Override
-    public void setId(int id) {
-        super.setId(id);
+    public void setEntityId(int id) {
+        super.setEntityId(id);
         rand.setSeed(id);
         this.windModifier = (1 + (rand.nextGaussian() * 0.1)) - 0.05;
     }
@@ -71,26 +71,26 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
     @Override
     public void tick() {
         Entity rider = getControllingPassenger();
-        if (level.isClientSide && rider instanceof PlayerEntity) {
+        if (world.isRemote && rider instanceof PlayerEntity) {
             PlayerEntity controller = (PlayerEntity) rider;
-            float move = controller.zza;
-            float rot = -controller.xxa;
+            float move = controller.moveForward;
+            float rot = -controller.moveStrafing;
             rotationSpeed += rot * 0.25f;
 
-            float ang = yRot;
+            float ang = rotationYaw;
             float moveX = MathHelper.sin(-ang * 0.017453292F) * move * 0.0035f;
             float moveZ = MathHelper.cos(ang * 0.017453292F) * move * 0.0035f;
-            setDeltaMovement(getDeltaMovement().add(moveX, 0, moveZ));
+            setMotion(getMotion().add(moveX, 0, moveZ));
         }
 
-        if (this.wasTouchingWater) {
-            double windAng = (windNoise.getValue(getX() / 1000, getZ() / 1000, false) + 1) * Math.PI;
+        if (this.inWater) {
+            double windAng = (windNoise.noiseAt(getPosX() / 1000, getPosZ() / 1000, false) + 1) * Math.PI;
             double windX = Math.sin(windAng) * 0.0005 * windModifier;
             double windZ = Math.cos(windAng) * 0.0005 * windModifier;
-            setDeltaMovement(getDeltaMovement().add(windX, 0, windZ));
+            setMotion(getMotion().add(windX, 0, windZ));
             // Rotate towards a target yaw with some random perturbance
             double targetYaw = Math.toDegrees(windAng) + ((windModifier - 1) * 45);
-            double yaw = (MathHelper.wrapDegrees(this.yRot) + 180 - 35) % 360;
+            double yaw = (MathHelper.wrapDegrees(this.rotationYaw) + 180 - 35) % 360;
             double angleDiff = targetYaw - yaw;
             if (angleDiff > 0) {
                 this.rotationSpeed += Math.min(0.005 * windModifier, angleDiff);
@@ -103,36 +103,36 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
         double center = getCenterY();
         double eps = 1 / 16D;
         if (water < center - eps) { // Gravity
-            setDeltaMovement(getDeltaMovement().add(0, -MathHelper.clamp(center - water, 0, 0.04), 0));
+            setMotion(getMotion().add(0, -MathHelper.clamp(center - water, 0, 0.04), 0));
         } else if (water > center + eps) {
             double floatpush = MathHelper.clamp(water - center, 0, 0.02);
-            setDeltaMovement(getDeltaMovement().add(0, floatpush, 0));
-        } else if (Math.abs(getDeltaMovement().y) < 0.02) { // Close enough, just force to the correct spot
-            if (getDeltaMovement().y != 0) {
+            setMotion(getMotion().add(0, floatpush, 0));
+        } else if (Math.abs(getMotion().y) < 0.02) { // Close enough, just force to the correct spot
+            if (getMotion().y != 0) {
                 lerpY = water - 0.011;
             }
-            setDeltaMovement(getDeltaMovement().multiply(1, 0, 1));
+            setMotion(getMotion().mul(1, 0, 1));
             prevMotionY = 0;
         }
         
         super.tick();
 
-        yRot += rotationSpeed;
-        move(MoverType.PLAYER, getDeltaMovement());
+        rotationYaw += rotationSpeed;
+        move(MoverType.PLAYER, getMotion());
 
-        setDeltaMovement(getDeltaMovement().multiply(0.9, 0.9, 0.9));
+        setMotion(getMotion().mul(0.9, 0.9, 0.9));
         rotationSpeed *= 0.9f;
 
-        if (!this.level.isClientSide) {
-            List<Entity> list = this.level.getEntities(this, this.getBoundingBox().inflate(0.20000000298023224D, 0.0D, 0.20000000298023224D));
+        if (!this.world.isRemote) {
+            List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getBoundingBox().grow(0.20000000298023224D, 0.0D, 0.20000000298023224D));
             for (Entity entity : list) {
-                if (entity != this.getControllingPassenger() && entity.isPushable()) {
-                    entity.push(this);
+                if (entity != this.getControllingPassenger() && entity.canBePushed()) {
+                    entity.applyEntityCollision(this);
                 }
             }
 
             if (this.getControllingPassenger() != null && !this.getControllingPassenger().isAlive()) {
-                this.ejectPassengers();
+                this.removePassengers();
             }
         }
     }
@@ -148,16 +148,16 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
     }
 
     @Override
-    protected void checkFallDamage(double y, boolean onGroundIn, BlockState state, BlockPos pos) {
-        this.prevMotionY = this.getDeltaMovement().y;
-        super.checkFallDamage(y, onGroundIn, state, pos);
+    protected void updateFallState(double y, boolean onGroundIn, BlockState state, BlockPos pos) {
+        this.prevMotionY = this.getMotion().y;
+        super.updateFallState(y, onGroundIn, state, pos);
     }
 
     @Override
-    protected boolean updateInWaterStateAndDoFluidPushing() {
-        this.fluidHeight.clear();
+    protected boolean func_233566_aG_() {
+        this.eyesFluidLevel.clear();
         this.updateWaterState();
-        boolean lava = this.updateFluidHeightAndDoFluidPushing(FluidTags.LAVA, this.level.dimensionType().ultraWarm() ? 0.007 : 0.0023333333333333335D);
+        boolean lava = this.handleFluidAcceleration(FluidTags.LAVA, this.world.getDimensionType().isUltrawarm() ? 0.007 : 0.0023333333333333335D);
         return this.isInWater() || lava;
     }
 
@@ -166,16 +166,16 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
         setBoundingBox(temp.contract(1, 0, 1).contract(-1, 0.125, -1));
 
         try {
-            if (this.updateFluidHeightAndDoFluidPushing(FluidTags.WATER, 0.014D)) {
-                if (!this.wasTouchingWater && !this.firstTick) {
+            if (this.handleFluidAcceleration(FluidTags.WATER, 0.014D)) {
+                if (!this.inWater && !this.firstUpdate) {
                     this.doWaterSplashEffect();
                 }
 
                 this.fallDistance = 0.0F;
-                this.wasTouchingWater = true;
-                this.clearFire();
+                this.inWater = true;
+                this.extinguish();
             } else {
-                this.wasTouchingWater = false;
+                this.inWater = false;
             }
         } finally {
             setBoundingBox(temp);
@@ -183,26 +183,26 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
     }
 
     @Override
-    public ActionResultType interact(PlayerEntity player, Hand hand) {
-        if (!this.level.isClientSide && !player.isShiftKeyDown()) {
+    public ActionResultType processInitialInteract(PlayerEntity player, Hand hand) {
+        if (!this.world.isRemote && !player.isSneaking()) {
             player.startRiding(this);
             return ActionResultType.SUCCESS;
         }
 
-        return !player.isPassengerOfSameVehicle(this) ? ActionResultType.SUCCESS : ActionResultType.PASS;
+        return !player.isRidingSameEntity(this) ? ActionResultType.SUCCESS : ActionResultType.PASS;
     }
 
     /* Following three methods copied from EntityBoat for passenger updates */
 
     @Override
-    public void positionRider(@Nonnull Entity passenger) {
-        if (this.hasPassenger(passenger)) {
+    public void updatePassenger(@Nonnull Entity passenger) {
+        if (this.isPassenger(passenger)) {
             // float yaw = this.rotationYaw;
 
             // passenger.setPosition(x, this.posY + this.getMountedYOffset() + passenger.getYOffset(), z);
 
             float f = 0.0F;
-            float f1 = (float) ((!isAlive() ? 0.001 : this.getPassengersRidingOffset()) + passenger.getMyRidingOffset());
+            float f1 = (float) ((!isAlive() ? 0.001 : this.getMountedYOffset()) + passenger.getYOffset());
 
             if (this.getPassengers().size() > 1) {
                 int i = this.getPassengers().indexOf(passenger);
@@ -219,21 +219,21 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
             }
 
             float len = 0.6f;
-            double x = this.getX() + (-MathHelper.sin(-this.yRot * 0.017453292F) * len);
-            double z = this.getZ() + (-MathHelper.cos(this.yRot * 0.017453292F) * len);
-            passenger.setPos(x, this.getY() + (double) f1, z);
-            passenger.yRot += this.rotationSpeed;
-            passenger.setYHeadRot(passenger.getYHeadRot() + this.rotationSpeed);
+            double x = this.getPosX() + (-MathHelper.sin(-this.rotationYaw * 0.017453292F) * len);
+            double z = this.getPosZ() + (-MathHelper.cos(this.rotationYaw * 0.017453292F) * len);
+            passenger.setPosition(x, this.getPosY() + (double) f1, z);
+            passenger.rotationYaw += this.rotationSpeed;
+            passenger.setRotationYawHead(passenger.getRotationYawHead() + this.rotationSpeed);
             this.applyYawToEntity(passenger);
 
             if (passenger instanceof LivingEntity && this.getPassengers().size() > 1) {
-                int j = passenger.getId() % 2 == 0 ? 90 : 270;
-                passenger.setYBodyRot(((LivingEntity) passenger).yBodyRot + (float) j);
-                passenger.setYHeadRot(passenger.getYHeadRot() + (float) j);
+                int j = passenger.getEntityId() % 2 == 0 ? 90 : 270;
+                passenger.setRenderYawOffset(((LivingEntity) passenger).renderYawOffset + (float) j);
+                passenger.setRotationYawHead(passenger.getRotationYawHead() + (float) j);
             }
 
             if (passenger instanceof PlayerEntity) {
-                ((PlayerEntity) passenger).setBoundingBox(getBoundingBox().expandTowards(0, 0.3, 0).contract(0, -0.1875, 0));
+                ((PlayerEntity) passenger).setBoundingBox(getBoundingBox().expand(0, 0.3, 0).contract(0, -0.1875, 0));
             }
         }
     }
@@ -242,32 +242,32 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
     protected void removePassenger(Entity passenger) {
         super.removePassenger(passenger);
         if (passenger instanceof PlayerEntity) {
-            passenger.refreshDimensions();
+            passenger.recalculateSize();
         }
     }
 
     protected void applyYawToEntity(Entity entityToUpdate) {
-        if (!entityToUpdate.level.isClientSide || isClientFirstPerson()) {
-            entityToUpdate.setYBodyRot(this.yRot);
-            float yaw = MathHelper.wrapDegrees(entityToUpdate.yRot - this.yRot);
-            float pitch = MathHelper.wrapDegrees(entityToUpdate.xRot - this.xRot);
+        if (!entityToUpdate.world.isRemote || isClientFirstPerson()) {
+            entityToUpdate.setRenderYawOffset(this.rotationYaw);
+            float yaw = MathHelper.wrapDegrees(entityToUpdate.rotationYaw - this.rotationYaw);
+            float pitch = MathHelper.wrapDegrees(entityToUpdate.rotationPitch - this.rotationPitch);
             float clampedYaw = MathHelper.clamp(yaw, -105.0F, 105.0F);
             float clampedPitch = MathHelper.clamp(pitch, -100F, -10F);
-            entityToUpdate.yRotO += clampedYaw - yaw;
-            entityToUpdate.yRot += clampedYaw - yaw;
-            entityToUpdate.xRotO += clampedPitch - pitch;
-            entityToUpdate.xRot += clampedPitch - pitch;
-            entityToUpdate.setYHeadRot(entityToUpdate.yRot);
+            entityToUpdate.prevRotationYaw += clampedYaw - yaw;
+            entityToUpdate.rotationYaw += clampedYaw - yaw;
+            entityToUpdate.prevRotationPitch += clampedPitch - pitch;
+            entityToUpdate.rotationPitch += clampedPitch - pitch;
+            entityToUpdate.setRotationYawHead(entityToUpdate.rotationYaw);
         }
     }
 
     @Override
-    public void onPassengerTurned(@Nonnull Entity entityToUpdate) {
+    public void applyOrientationToEntity(@Nonnull Entity entityToUpdate) {
         this.applyYawToEntity(entityToUpdate);
     }
 
     private boolean isClientFirstPerson() {
-        return Minecraft.getInstance().options.getCameraType() == PointOfView.FIRST_PERSON;
+        return Minecraft.getInstance().gameSettings.getPointOfView() == PointOfView.FIRST_PERSON;
     }
 
     /* Again, from entity boat, for water checks */
@@ -287,11 +287,11 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
         for (int y = maxY; y >= minY; --y) {
             for (int x = minX; x < maxX; x++) {
                 for (int z = minZ; z < maxZ; ++z) {
-                    pos.set(x, y, z);
-                    FluidState fluidstate = this.level.getFluidState(pos);
+                    pos.setPos(x, y, z);
+                    FluidState fluidstate = this.world.getFluidState(pos);
 
-                    if (fluidstate.getType().isSame(Fluids.WATER)) {
-                        waterHeight = Math.max(waterHeight, pos.getY() + fluidstate.getHeight(this.level, pos));
+                    if (fluidstate.getFluid().isEquivalentTo(Fluids.WATER)) {
+                        waterHeight = Math.max(waterHeight, pos.getY() + fluidstate.getActualHeight(this.world, pos));
                     }
                     if (waterHeight >= maxY) {
                         return waterHeight;
@@ -307,12 +307,12 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
      * Returns true if this entity should push and be pushed by other entities when colliding.
      */
     @Override
-    public boolean isPushable() {
+    public boolean canBePushed() {
         return true;
     }
 
     @Override
-    public double getMyRidingOffset() {
+    public double getYOffset() {
         return 0;
     }
 
@@ -320,8 +320,8 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
      * Returns the Y offset from the entity's position for any entity riding this one.
      */
     @Override
-    public double getPassengersRidingOffset() {
-        return getBbHeight() - 1.1;
+    public double getMountedYOffset() {
+        return getHeight() - 1.1;
     }
 
     /**
@@ -338,8 +338,8 @@ public class BeachFloatEntity extends FurnitureEntity implements IEntityAddition
      * Gets the horizontal facing direction of this Entity, adjusted to take specially-treated entity types into account.
      */
     @Override
-    public Direction getMotionDirection() {
-        return this.getDirection().getClockWise();
+    public Direction getAdjustedHorizontalFacing() {
+        return this.getHorizontalFacing().rotateY();
     }
 
     @Override

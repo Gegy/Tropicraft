@@ -19,36 +19,36 @@ public class EggRenderer extends LivingRenderer<EggEntity, EggModel> {
 
 	public EggRenderer(final EntityRendererManager rendererManager) {
 		super(rendererManager, new EggModel(), 1f);
-		shadowStrength = 0.5f;
+		shadowOpaque = 0.5f;
 	}
 
 	@Override
 	public void render(EggEntity egg, float entityYaw, float partialTicks, MatrixStack stack, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		stack.pushPose();
+		stack.push();
 		if (egg.shouldEggRenderFlat()) {
-			shadowRadius = 0.0f;
+			shadowSize = 0.0f;
 			stack.translate(0, 0.05, 0);
 			drawFlatEgg(egg, partialTicks, stack, bufferIn, packedLightIn);
 		} else {
-			shadowRadius = 0.2f;
+			shadowSize = 0.2f;
 			stack.scale(0.5f, 0.5f, 0.5f);
 			super.render(egg, entityYaw, partialTicks, stack, bufferIn, packedLightIn);
 		}
-		stack.popPose();
+		stack.pop();
 	}
 
 	public void drawFlatEgg(EggEntity ent, float partialTicks, MatrixStack stack, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		stack.pushPose();
+		stack.push();
 
-		stack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-		stack.mulPose(Vector3f.YP.rotationDegrees(180.0F));
+		stack.rotate(this.renderManager.getCameraOrientation());
+		stack.rotate(Vector3f.YP.rotationDegrees(180.0F));
 
 		stack.scale(0.25f, 0.25f, 0.25f);
 
-		final IVertexBuilder buffer = TropicraftRenderUtils.getEntityCutoutBuilder(bufferIn, getTextureLocation(ent));
-		int overlay = getOverlayCoords(ent, getWhiteOverlayProgress(ent, partialTicks));
+		final IVertexBuilder buffer = TropicraftRenderUtils.getEntityCutoutBuilder(bufferIn, getEntityTexture(ent));
+		int overlay = getPackedOverlay(ent, getOverlayProgress(ent, partialTicks));
 		
-		Matrix4f mat = stack.last().pose();
+		Matrix4f mat = stack.getLast().getMatrix();
 		Matrix3f normal = new Matrix3f();
 		normal.setIdentity();
 		TropicraftSpecialRenderHelper.vertex(buffer, mat, normal, -.5, -.25, 0, 1, 1, 1, 1, 0, 1, Direction.UP, packedLightIn, overlay);
@@ -56,16 +56,16 @@ public class EggRenderer extends LivingRenderer<EggEntity, EggModel> {
 		TropicraftSpecialRenderHelper.vertex(buffer, mat, normal,  .5,  .75, 0, 1, 1, 1, 1, 1, 0, Direction.UP, packedLightIn, overlay);
 		TropicraftSpecialRenderHelper.vertex(buffer, mat, normal, -.5,  .75, 0, 1, 1, 1, 1, 0, 0, Direction.UP, packedLightIn, overlay);
 
-		stack.popPose();
+		stack.pop();
 	}
 	
 	@Override
-	protected boolean shouldShowName(EggEntity entity) {
+	protected boolean canRenderName(EggEntity entity) {
 		return entity.hasCustomName();
 	}
 	
 	@Override
-	public ResourceLocation getTextureLocation(EggEntity entity) {
+	public ResourceLocation getEntityTexture(EggEntity entity) {
 		return TropicraftRenderUtils.bindTextureEntity(entity.getEggTexture());
 	}
 }

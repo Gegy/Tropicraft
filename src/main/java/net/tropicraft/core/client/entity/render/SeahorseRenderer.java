@@ -15,23 +15,23 @@ import net.tropicraft.core.common.entity.underdasea.SeahorseEntity;
 public class SeahorseRenderer extends MobRenderer<SeahorseEntity, SeahorseModel> {
 	public SeahorseRenderer(EntityRendererManager renderManager) {
 		super(renderManager, new SeahorseModel(), 0.5F);
-		shadowStrength = 0.5f;
+		shadowOpaque = 0.5f;
 	}
 
 	@Override
 	public void render(SeahorseEntity seahorse, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		matrixStackIn.pushPose();
+		matrixStackIn.push();
 
 		matrixStackIn.translate(0, -1f, 0);
 		matrixStackIn.scale(0.5f, 0.5f, 0.5f);
 
 		super.render(seahorse, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
-		matrixStackIn.popPose();
+		matrixStackIn.pop();
 	}
 
 	@Nullable
 	@Override
-	public ResourceLocation getTextureLocation(SeahorseEntity seahorseEntity) {
+	public ResourceLocation getEntityTexture(SeahorseEntity seahorseEntity) {
 		return TropicraftRenderUtils.getTextureEntity(String.format("seahorse/%s", seahorseEntity.getTexture()));
 	}
 }

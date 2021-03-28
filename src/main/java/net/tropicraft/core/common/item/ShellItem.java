@@ -19,22 +19,22 @@ public class ShellItem extends Item {
     }
 
     @Override
-    public ActionResultType useOn(final ItemUseContext context) {
-        final Direction facing = context.getClickedFace();
-        final ItemStack stack = context.getPlayer().getItemInHand(context.getHand());
-        final BlockPos pos = context.getClickedPos().relative(facing);
+    public ActionResultType onItemUse(final ItemUseContext context) {
+        final Direction facing = context.getFace();
+        final ItemStack stack = context.getPlayer().getHeldItem(context.getHand());
+        final BlockPos pos = context.getPos().offset(facing);
 
         // Must set the world coordinates here, or onValidSurface will be false.
-        final World world = context.getLevel();
+        final World world = context.getWorld();
         final WallItemEntity hangingEntity = new WallItemEntity(world, pos, facing);
-        hangingEntity.setItem(stack);
+        hangingEntity.setDisplayedItem(stack);
 
-        if (!context.getPlayer().mayUseItemAt(pos, facing, stack)) {
+        if (!context.getPlayer().canPlayerEdit(pos, facing, stack)) {
             return ActionResultType.FAIL;
         } else {
-            if (hangingEntity.survives()) {
-                if (!world.isClientSide) {
-                    world.addFreshEntity(hangingEntity);
+            if (hangingEntity.onValidSurface()) {
+                if (!world.isRemote) {
+                    world.addEntity(hangingEntity);
                 }
 
                 stack.shrink(1);

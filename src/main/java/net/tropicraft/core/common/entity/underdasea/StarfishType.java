@@ -84,7 +84,7 @@ public enum StarfishType implements IStringSerializable {
 	}
 
 	@Override
-	public String getSerializedName() {
+	public String getString() {
 		return unlocalizedName;
 	}
 }

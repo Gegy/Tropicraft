@@ -57,71 +57,71 @@ public class TropicraftTropicalFishEntity extends AbstractGroupFishEntity implem
         }
     }
 
-    private static final DataParameter<Byte> DATA_FISH_TYPE = EntityDataManager.defineId(TropicraftTropicalFishEntity.class, DataSerializers.BYTE);
+    private static final DataParameter<Byte> DATA_FISH_TYPE = EntityDataManager.createKey(TropicraftTropicalFishEntity.class, DataSerializers.BYTE);
 
     public TropicraftTropicalFishEntity(EntityType<? extends AbstractGroupFishEntity> type, World world) {
         super(type, world);
     }
 
     public static AttributeModifierMap.MutableAttribute createAttributes() {
-        return AbstractGroupFishEntity.createAttributes()
-                .add(Attributes.MAX_HEALTH, 5.0);
+        return AbstractGroupFishEntity.func_234176_m_()
+                .createMutableAttribute(Attributes.MAX_HEALTH, 5.0);
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        entityData.define(DATA_FISH_TYPE, (byte) 0);
+    protected void registerData() {
+        super.registerData();
+        dataManager.register(DATA_FISH_TYPE, (byte) 0);
     }
 
     @Override
     @Nullable
-    public ILivingEntityData finalizeSpawn(IServerWorld world, DifficultyInstance difficultyInstance, SpawnReason spawnReason, @Nullable ILivingEntityData entityData, @Nullable CompoundNBT nbt) {
-        entityData = super.finalizeSpawn(world, difficultyInstance, spawnReason, entityData, nbt);
+    public ILivingEntityData onInitialSpawn(IServerWorld world, DifficultyInstance difficultyInstance, SpawnReason spawnReason, @Nullable ILivingEntityData entityData, @Nullable CompoundNBT nbt) {
+        entityData = super.onInitialSpawn(world, difficultyInstance, spawnReason, entityData, nbt);
         if (nbt != null && nbt.contains("BucketVariantTag", 3)) {
             setFishType(FishType.getById(nbt.getInt("BucketVariantTag")));
         } else {
-            setFishType(FishType.getRandomType(random));
+            setFishType(FishType.getRandomType(rand));
         }
         return entityData;
     }
 
     public FishType getFishType() {
-        return FishType.VALUES[entityData.get(DATA_FISH_TYPE)];
+        return FishType.VALUES[dataManager.get(DATA_FISH_TYPE)];
     }
 
     public void setFishType(final FishType type) {
-        entityData.set(DATA_FISH_TYPE, (byte) type.ordinal());
+        dataManager.set(DATA_FISH_TYPE, (byte) type.ordinal());
     }
 
     @Override
-    public int getMaxSchoolSize() {
+    public int getMaxGroupSize() {
         return 24;
     }
 
     @Override
-    protected ItemStack getBucketItemStack() {
+    protected ItemStack getFishBucket() {
         return new ItemStack(TropicraftItems.TROPICAL_FISH_BUCKET.get());
     }
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.SALMON_AMBIENT;
+        return SoundEvents.ENTITY_SALMON_AMBIENT;
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.SALMON_DEATH;
+        return SoundEvents.ENTITY_SALMON_DEATH;
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource dmgSrc) {
-        return SoundEvents.SALMON_HURT;
+        return SoundEvents.ENTITY_SALMON_HURT;
     }
 
     @Override
     protected SoundEvent getFlopSound() {
-        return SoundEvents.SALMON_FLOP;
+        return SoundEvents.ENTITY_SALMON_FLOP;
     }
 
     @Override
@@ -135,49 +135,49 @@ public class TropicraftTropicalFishEntity extends AbstractGroupFishEntity implem
     }
 
     @Override
-    protected ActionResultType mobInteract(PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getItemInHand(hand);
+    protected ActionResultType getEntityInteractionResult(PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getHeldItem(hand);
         if (!stack.isEmpty() && stack.getItem() == TropicraftItems.FISHING_NET.get()) {
             final int firstHotbarSlot = 0;
             int bucketSlot = -1;
-            for (int i = 0; i < PlayerInventory.getSelectionSize(); i++) {
-                ItemStack s = player.inventory.getItem(firstHotbarSlot + i);
+            for (int i = 0; i < PlayerInventory.getHotbarSize(); i++) {
+                ItemStack s = player.inventory.getStackInSlot(firstHotbarSlot + i);
                 if (isFishHolder(s)) {
                     bucketSlot = firstHotbarSlot + i;
                     break;
                 }
             }
 
-            if (bucketSlot == -1 && isFishHolder(player.getOffhandItem())) {
+            if (bucketSlot == -1 && isFishHolder(player.getHeldItemOffhand())) {
                 bucketSlot = 36;
             }
 
             if (bucketSlot >= 0) {
-                ItemStack fishHolder = player.inventory.getItem(bucketSlot);
+                ItemStack fishHolder = player.inventory.getStackInSlot(bucketSlot);
                 if (fishHolder.getItem() == Items.WATER_BUCKET) {
                     fishHolder = new ItemStack(TropicraftItems.TROPICAL_FISH_BUCKET.get());
-                    player.inventory.setItem(bucketSlot, fishHolder);
+                    player.inventory.setInventorySlotContents(bucketSlot, fishHolder);
                 }
-                saveToBucketTag(fishHolder);
-                player.swing(hand);
-                level.playSound(player, blockPosition(), SoundEvents.GENERIC_SWIM, SoundCategory.PLAYERS, 0.25f, 1f + (random.nextFloat() * 0.4f));
+                setBucketData(fishHolder);
+                player.swingArm(hand);
+                world.playSound(player, getPosition(), SoundEvents.ENTITY_GENERIC_SWIM, SoundCategory.PLAYERS, 0.25f, 1f + (rand.nextFloat() * 0.4f));
                 remove();
                 return ActionResultType.SUCCESS;
             }
         }
 
-        return super.mobInteract(player, hand);
+        return super.getEntityInteractionResult(player, hand);
     }
 
     @Override
-    public void addAdditionalSaveData(final CompoundNBT compound) {
-        super.addAdditionalSaveData(compound);
+    public void writeAdditional(final CompoundNBT compound) {
+        super.writeAdditional(compound);
         compound.putInt("FishType", getFishType().id);
     }
 
     @Override
-    public void readAdditionalSaveData(final CompoundNBT compound) {
-        super.readAdditionalSaveData(compound);
+    public void readAdditional(final CompoundNBT compound) {
+        super.readAdditional(compound);
         setFishType(FishType.getById(compound.getInt("FishType")));
     }
 
@@ -185,8 +185,8 @@ public class TropicraftTropicalFishEntity extends AbstractGroupFishEntity implem
      * Add extra data to the bucket that just picked this fish up
      */
     @Override
-    protected void saveToBucketTag(final ItemStack bucket) {
-        super.saveToBucketTag(bucket);
+    protected void setBucketData(final ItemStack bucket) {
+        super.setBucketData(bucket);
         CompoundNBT compoundnbt = bucket.getOrCreateTag();
         compoundnbt.putInt("BucketVariantTag", getFishType().id);
     }

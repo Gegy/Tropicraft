@@ -34,7 +34,7 @@ public class TropiSpiderEntity extends SpiderEntity {
 		private static final Type[] VALUES = values();
 	}
 
-	private static final DataParameter<Byte> TYPE = EntityDataManager.<Byte>defineId(TropiSpiderEntity.class, DataSerializers.BYTE);
+	private static final DataParameter<Byte> TYPE = EntityDataManager.<Byte>createKey(TropiSpiderEntity.class, DataSerializers.BYTE);
 	private static final int SPIDER_MATURE_AGE = 20 * 60 * 10; // From child to adult in 10 real minutes
 	private static final int SPIDER_MAX_EGGS = 10;
 	private static final long SPIDER_MIN_EGG_DELAY = 12000; // Once per half minecraft day minimum
@@ -47,22 +47,22 @@ public class TropiSpiderEntity extends SpiderEntity {
 
 	public TropiSpiderEntity(final EntityType<? extends SpiderEntity> type, World world) {
 		super(type, world);
-		tickCount = SPIDER_MATURE_AGE;
-		ticksSinceLastEgg = tickCount;
+		ticksExisted = SPIDER_MATURE_AGE;
+		ticksSinceLastEgg = ticksExisted;
 	}
 
 	public static TropiSpiderEntity haveBaby(final TropiSpiderEntity mother) {
-		final TropiSpiderEntity baby = new TropiSpiderEntity(TropicraftEntities.TROPI_SPIDER.get(), mother.level);
+		final TropiSpiderEntity baby = new TropiSpiderEntity(TropicraftEntities.TROPI_SPIDER.get(), mother.world);
 		baby.setSpiderType(Type.CHILD);
-		baby.tickCount = 0;
+		baby.ticksExisted = 0;
 		baby.mother = mother;
 		return baby;
 	}
 
 	@Override
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		entityData.define(TYPE, initialType);
+	protected void registerData() {
+		super.registerData();
+		dataManager.register(TYPE, initialType);
 	}
 
 	@Override
@@ -75,21 +75,21 @@ public class TropiSpiderEntity extends SpiderEntity {
 	}
 	
 	@Override
-	protected void actuallyHurt(DamageSource damageSrc, float damageAmount) {
-		if (damageSrc.getEntity() != null && damageSrc.getEntity() instanceof LivingEntity) {
-			setTarget((LivingEntity) damageSrc.getEntity());
+	protected void damageEntity(DamageSource damageSrc, float damageAmount) {
+		if (damageSrc.getTrueSource() != null && damageSrc.getTrueSource() instanceof LivingEntity) {
+			setAttackTarget((LivingEntity) damageSrc.getTrueSource());
 		}
-		super.actuallyHurt(damageSrc, damageAmount);
+		super.damageEntity(damageSrc, damageAmount);
 	}
 
 	@Override
-    public boolean onClimbable() {
-		return isClimbing() && getNavigation().isDone();
+    public boolean isOnLadder() {
+		return isBesideClimbableBlock() && getNavigator().noPath();
 	}
 
 	@Override
-    public boolean isClimbing() {
-		return horizontalCollision;
+    public boolean isBesideClimbableBlock() {
+		return collidedHorizontally;
 	}
 
 	@Override
@@ -102,32 +102,32 @@ public class TropiSpiderEntity extends SpiderEntity {
 //			this.setSize(1.4F, 0.9F);
 //		}
 		super.tick();
-		LivingEntity attackTarget = getTarget();
+		LivingEntity attackTarget = getAttackTarget();
 		if (attackTarget != null) {
-			if (distanceToSqr(attackTarget) < 128D) {
+			if (getDistanceSq(attackTarget) < 128D) {
 				Util.tryMoveToEntityLivingLongDist(this, attackTarget, 0.8f);
 			}
 		}
-		if (!level.isClientSide && attackTarget != null && onGround && random.nextInt(3) == 0 && attackTarget.distanceTo(this) < 5) {
-			getNavigation().stop();
-			jumpFromGround();
-			flyingSpeed = 0.3f;
+		if (!world.isRemote && attackTarget != null && onGround && rand.nextInt(3) == 0 && attackTarget.getDistance(this) < 5) {
+			getNavigator().clearPath();
+			jump();
+			jumpMovementFactor = 0.3f;
 		} else {
-			flyingSpeed = 0.2f;
+			jumpMovementFactor = 0.2f;
 		}
-		if (!level.isClientSide) {
+		if (!world.isRemote) {
 			if (getSpiderType() == Type.CHILD) {
-				if (tickCount >= SPIDER_MATURE_AGE) {
+				if (ticksExisted >= SPIDER_MATURE_AGE) {
 					setSpiderType(Type.ADULT);
 				}
 				if (mother != null) {
-					if (distanceToSqr(mother) > 16D) {
+					if (getDistanceSq(mother) > 16D) {
 						Util.tryMoveToEntityLivingLongDist(this, mother, 0.8f);
 					} else {
-						getNavigation().stop();
+						getNavigator().clearPath();
 					}
-					if (mother.getTarget() != null) {
-						setTarget(mother.getTarget());
+					if (mother.getAttackTarget() != null) {
+						setAttackTarget(mother.getAttackTarget());
 					}
 				}
 			}
@@ -136,13 +136,13 @@ public class TropiSpiderEntity extends SpiderEntity {
 				if (mother != null) {
 					if (!mother.isAlive()) {
 						mother = null;
-						getNavigation().stop();
-						setTarget(null);
+						getNavigator().clearPath();
+						setAttackTarget(null);
 					}
 					// issues much?
-					setTarget(this.mother);
+					setAttackTarget(this.mother);
 				}
-				if (random.nextInt(SPIDER_EGG_CHANCE) == 0 && this.ticksSinceLastEgg > SPIDER_MIN_EGG_DELAY && this.tickCount % 80 == 0) {
+				if (rand.nextInt(SPIDER_EGG_CHANCE) == 0 && this.ticksSinceLastEgg > SPIDER_MIN_EGG_DELAY && this.ticksExisted % 80 == 0) {
 					buildNest();
 				}
 			}
@@ -150,7 +150,7 @@ public class TropiSpiderEntity extends SpiderEntity {
 			if (getSpiderType() == Type.MOTHER) {
 				if (nestSite != null) {
 					if (ticksSinceLastEgg < 2000) {
-						if (!blockPosition().closerThan(nestSite, 16)) {
+						if (!getPosition().withinDistance(nestSite, 16)) {
 							Util.tryMoveToXYZLongDist(this, nestSite, 0.9f);
 						}
 					} else {
@@ -165,13 +165,13 @@ public class TropiSpiderEntity extends SpiderEntity {
 	
 	@Override
 	protected SoundEvent getAmbientSound() {
-		return random.nextInt(20) == 0 ? super.getAmbientSound() : null;
+		return rand.nextInt(20) == 0 ? super.getAmbientSound() : null;
 	}
 
 	@Override
 	protected void playStepSound(BlockPos pos, BlockState blockState) {
 		if (getSpiderType() == Type.CHILD) {
-			if (random.nextInt(20) == 0) {
+			if (rand.nextInt(20) == 0) {
 				super.playStepSound(pos, blockState);
 			}
 		} else {
@@ -180,70 +180,70 @@ public class TropiSpiderEntity extends SpiderEntity {
 	}
 
 	@Override
-	public boolean isPushable() {
+	public boolean canBePushed() {
 		return getSpiderType() != Type.MOTHER;
 	}
 
 	public void buildNest() {
-		if (!level.isClientSide) {
+		if (!world.isRemote) {
 			setSpiderType(Type.MOTHER);
-			int r = random.nextInt(SPIDER_MAX_EGGS) + 1;
+			int r = rand.nextInt(SPIDER_MAX_EGGS) + 1;
 			
 			if (r < 2) {
 				return;
 			}
 			
 			for (int i = 0; i < r; i++) {
-				TropiSpiderEggEntity egg = TropicraftEntities.TROPI_SPIDER_EGG.get().create(level);
-				egg.setMotherId(getUUID());
-				egg.setPos(blockPosition().getX() + random.nextFloat(), blockPosition().getY(), blockPosition().getZ() + random.nextFloat());
-				level.addFreshEntity(egg);
+				TropiSpiderEggEntity egg = TropicraftEntities.TROPI_SPIDER_EGG.get().create(world);
+				egg.setMotherId(getUniqueID());
+				egg.setPosition(getPosition().getX() + rand.nextFloat(), getPosition().getY(), getPosition().getZ() + rand.nextFloat());
+				world.addEntity(egg);
 				ticksSinceLastEgg = 0;
 			}
 			
 			for (int x = 0; x < 5; x++) {
 				for (int z = 0; z < 5; z++) {
-					if (random.nextInt(8) == 0) {
-						BlockPos pos = new BlockPos(blockPosition().getX() - 2 + x, blockPosition().getY(),
-								blockPosition().getZ() - 2 + z);
-						if (level.getBlockState(pos).getBlock().equals(Blocks.AIR) && level.getBlockState(pos.below()).getMaterial().isSolid()) {
-							level.setBlockAndUpdate(pos, Blocks.COBWEB.defaultBlockState());
+					if (rand.nextInt(8) == 0) {
+						BlockPos pos = new BlockPos(getPosition().getX() - 2 + x, getPosition().getY(),
+								getPosition().getZ() - 2 + z);
+						if (world.getBlockState(pos).getBlock().equals(Blocks.AIR) && world.getBlockState(pos.down()).getMaterial().isSolid()) {
+							world.setBlockState(pos, Blocks.COBWEB.getDefaultState());
 						}
 					}
 				}
 			}
-			nestSite = blockPosition();
+			nestSite = getPosition();
 		}
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundNBT n) {
-		n.putInt("ticks", tickCount);
+	public void writeAdditional(CompoundNBT n) {
+		n.putInt("ticks", ticksExisted);
 		n.putByte("spiderType", (byte) getSpiderType().ordinal());
 		n.putLong("timeSinceLastEgg", ticksSinceLastEgg);
-		super.addAdditionalSaveData(n);
+		super.writeAdditional(n);
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundNBT n) {
-		tickCount = n.getInt("ticks");
+	public void readAdditional(CompoundNBT n) {
+		ticksExisted = n.getInt("ticks");
 		setSpiderType(n.getByte("spiderType"));
 		ticksSinceLastEgg = n.getLong("timeSinceLastEgg");
-		super.readAdditionalSaveData(n);
+		super.readAdditional(n);
 	}
 	
 	public Type getSpiderType() {
-		return Type.VALUES[getEntityData().get(TYPE)];
+		return Type.VALUES[getDataManager().get(TYPE)];
 	}
 
 	public void setSpiderType(Type type) {
-		getEntityData().set(TYPE, (byte) type.ordinal());
-		refreshDimensions();
+		getDataManager().set(TYPE, (byte) type.ordinal());
+		recalculateSize();
 	}
 
 	public void setSpiderType(byte b) {
-		getEntityData().set(TYPE, b);
-		refreshDimensions();
+		getDataManager().set(TYPE, b);
+		recalculateSize();
 	}
 
 	@Override

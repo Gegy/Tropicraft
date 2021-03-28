@@ -42,9 +42,9 @@ public class LoveTropicsShellItem extends ShellItem implements IColoredItem {
     }
 
     @Override
-    public ITextComponent getName(final ItemStack stack) {
+    public ITextComponent getDisplayName(final ItemStack stack) {
         if (!stack.hasTag() || !stack.getTag().contains("Name")) {
-            return super.getName(stack);
+            return super.getDisplayName(stack);
         }
         final String name = stack.getTag().getString("Name");
         final String type = name.endsWith("s") ? "with_s" : "normal";

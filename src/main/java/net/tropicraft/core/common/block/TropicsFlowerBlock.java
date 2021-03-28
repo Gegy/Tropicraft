@@ -24,6 +24,6 @@ public class TropicsFlowerBlock extends FlowerBlock {
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
 		Vector3d offset = state.getOffset(world, pos);
-		return shape.move(offset.x, offset.y, offset.z);
+		return shape.withOffset(offset.x, offset.y, offset.z);
 	}
 }

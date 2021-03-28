@@ -21,16 +21,16 @@ public class EagleRayRenderer extends MobRenderer<EagleRayEntity, EagleRayModel>
 
     @Override
     public void render(EagleRayEntity eagleRay, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-        matrixStackIn.pushPose();
+        matrixStackIn.push();
         // TODO still needed?
         matrixStackIn.translate(0, -1.25, 0);
         super.render(eagleRay, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
-        matrixStackIn.popPose();
+        matrixStackIn.pop();
     }
 
     @Nullable
     @Override
-    public ResourceLocation getTextureLocation(EagleRayEntity eagleRayEntity) {
+    public ResourceLocation getEntityTexture(EagleRayEntity eagleRayEntity) {
         return RAY_TEXTURE_LOC;
     }
 }

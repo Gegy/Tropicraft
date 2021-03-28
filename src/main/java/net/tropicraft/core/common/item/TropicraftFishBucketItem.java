@@ -13,6 +13,8 @@ import net.minecraft.world.server.ServerWorld;
 
 import java.util.function.Supplier;
 
+import net.minecraft.item.Item.Properties;
+
 public class TropicraftFishBucketItem<T extends AbstractFishEntity> extends FishBucketItem {
     private final Supplier<? extends EntityType<T>> fishType;
 
@@ -22,8 +24,8 @@ public class TropicraftFishBucketItem<T extends AbstractFishEntity> extends Fish
     }
 
     @Override
-    public void checkExtraContent(World world, ItemStack stack, BlockPos pos) {
-        if (!world.isClientSide) {
+    public void onLiquidPlaced(World world, ItemStack stack, BlockPos pos) {
+        if (!world.isRemote) {
             this.placeFish((ServerWorld) world, stack, pos);
         }
     }
