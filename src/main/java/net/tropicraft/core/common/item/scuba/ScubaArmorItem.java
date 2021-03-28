@@ -75,11 +75,13 @@ public class ScubaArmorItem extends TropicraftArmorItem {
             armorModel = ModelScubaGear.CHEST;
             break;
         case FEET:
-            armorModel = new ModelScubaGear(0, EquipmentSlotType.FEET);//.FEET;
+            armorModel = ModelScubaGear.FEET;
             break;
         default:
             return null;
         }
+
+        ((BipedModel) armorModel).setLivingAnimations(entityLiving, 0.0F, 0.0F, 1.0F);
 
         armorModel.isSneak = entityLiving.isSneaking();
         armorModel.isChild = entityLiving.isChild();
