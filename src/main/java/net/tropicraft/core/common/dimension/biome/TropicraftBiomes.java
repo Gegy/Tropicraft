@@ -4,6 +4,7 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.*;
 import net.minecraft.world.gen.GenerationStage;
@@ -35,7 +36,7 @@ public final class TropicraftBiomes {
 	public static final int TROPICS_WATER_COLOR = 0x4eecdf;
 	public static final int TROPICS_WATER_FOG_COLOR = 0x041f33;
 	public static final int TROPICS_FOG_COLOR = 0xC0D8FF;
-	public static final int TROPICS_SKY_COLOR = BiomeMaker.makePlainsBiome(false).getSkyColor();
+	public static final int TROPICS_SKY_COLOR = getSkyColor(0.8F);
 
 	public static final RegistryKey<Biome> TROPICS_OCEAN = key("tropics_ocean");
 	public static final RegistryKey<Biome> TROPICS = key("tropics");
@@ -347,6 +348,11 @@ public final class TropicraftBiomes {
 				.withSkyColor(TROPICS_SKY_COLOR)
 				.setWaterColor(TROPICS_WATER_COLOR)
 				.setWaterFogColor(TROPICS_WATER_FOG_COLOR);
+	}
+
+	private static int getSkyColor(float temperature) {
+		float shift = MathHelper.clamp(temperature / 3.0F, -1.0F, 1.0F);
+		return MathHelper.hsvToRGB((224.0F / 360.0F) - shift * 0.05F, 0.5F + shift * 0.1F, 1.0F);
 	}
 
 	static final class Register {

@@ -19,10 +19,14 @@ import net.minecraftforge.fml.hooks.BasicEventHooks;
 import net.tropicraft.Constants;
 import net.tropicraft.core.common.dimension.biome.TropicraftBiomeProvider;
 import net.tropicraft.core.common.dimension.chunk.TropicraftChunkGenerator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.function.Supplier;
 
 public class TropicraftDimension {
+	private static final Logger LOGGER = LogManager.getLogger(TropicraftDimension.class);
+
 	public static final ResourceLocation ID = new ResourceLocation(Constants.MODID, "tropics");
 
 	public static final RegistryKey<World> WORLD = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, ID);
@@ -57,9 +61,13 @@ public class TropicraftDimension {
 	 * @param destination The target dimension to teleport to
 	 */
 	public static void teleportPlayerNoPortal(ServerPlayerEntity player, RegistryKey<World> destination) {
-		if (!ForgeHooks.onTravelToDimension(player, destination)) return;
-
 		ServerWorld world = player.server.getWorld(destination);
+		if (world == null) {
+			LOGGER.error("Cannot teleport player to dimension {} as it does not exist!", destination.getLocation());
+			return;
+		}
+
+		if (!ForgeHooks.onTravelToDimension(player, destination)) return;
 
 		int x = MathHelper.floor(player.getPosX());
 		int z = MathHelper.floor(player.getPosZ());
