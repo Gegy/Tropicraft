@@ -69,9 +69,9 @@ public class Util {
                 success = ent.getNavigator().tryMoveToXYZ(x, y, z, moveSpeedAmp);
                 //System.out.println("success? " + success + "- move to player: " + ent + " -> " + player);
             } else {
-		        /*int x = MathHelper.floor(player.posX);
-		        int y = MathHelper.floor(player.posY);
-		        int z = MathHelper.floor(player.posZ);*/
+                /*int x = MathHelper.floor(player.posX);
+                int y = MathHelper.floor(player.posY);
+                int z = MathHelper.floor(player.posZ);*/
 
                 double d = x+0.5F - ent.getPosX();
                 double d2 = z+0.5F - ent.getPosZ();

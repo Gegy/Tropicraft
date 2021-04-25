@@ -147,7 +147,7 @@ public class CurvedPalmTreeFeature extends PalmTreeFeature {
         }
 
         if (iPos < Math.abs(iNeg) && iPos < kPos && iPos < Math.abs(kNeg)) {
-            return X_PLUS;  	 // 1
+            return X_PLUS;       // 1
         } else if (Math.abs(iNeg) < iPos && Math.abs(iNeg) < kPos && Math.abs(iNeg) < Math.abs(kNeg)) {
             return X_MINUS;    // 2
         } else if (kPos < Math.abs(iNeg) && kPos < iPos && kPos < Math.abs(kNeg)) {

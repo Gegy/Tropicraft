@@ -272,7 +272,7 @@ public class EIHFeature extends Feature<NoFeatureConfig> {
             case 8:
                 blockState = TropicraftBlocks.ZIRCON_BLOCK.get().getDefaultState();
                 break;
-            default:	// Should never get called, if so, redstone in tropics :o
+            default:    // Should never get called, if so, redstone in tropics :o
                 blockState = Blocks.REDSTONE_BLOCK.getDefaultState();
                 break;
         }

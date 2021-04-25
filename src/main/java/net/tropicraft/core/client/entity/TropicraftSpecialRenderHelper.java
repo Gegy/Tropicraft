@@ -49,11 +49,11 @@ public class TropicraftSpecialRenderHelper {
     }
     
     public static void vertex(IVertexBuilder bufferIn, MatrixStack ms, double x, double y, double z, float red, float green, float blue, float alpha, float texU, float texV, Direction normal, int packedLight, int packedOverlay) {
-    	vertex(bufferIn, ms.getLast().getMatrix(), ms.getLast().getNormal(), x, y, z, red, green, blue, alpha, texU, texV, normal, packedLight, packedOverlay);
+        vertex(bufferIn, ms.getLast().getMatrix(), ms.getLast().getNormal(), x, y, z, red, green, blue, alpha, texU, texV, normal, packedLight, packedOverlay);
     }
 
     public static void vertex(IVertexBuilder bufferIn, Matrix4f matrixIn, Matrix3f matrixNormalIn, double x, double y, double z, float red, float green, float blue, float alpha, float texU, float texV, Direction normal, int packedLight, int packedOverlay) {
-    	Vector3i normalVec = normal.getDirectionVec();
+        Vector3i normalVec = normal.getDirectionVec();
         bufferIn.pos(matrixIn, (float) x, (float) y, (float) z).color(red, green, blue, alpha).tex(texU, texV).overlay(packedOverlay).lightmap(packedLight).normal(matrixNormalIn, normalVec.getX(), normalVec.getY(), normalVec.getZ()).endVertex();
     }
 

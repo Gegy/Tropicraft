@@ -35,25 +35,25 @@ public abstract class PalmTreeFeature extends Feature<NoFeatureConfig> {
     }
 
     protected void placeLeaf(final IWorldGenerationReader world, int x, int y, int z) {
-    	this.placeLeaf(world, new BlockPos(x, y, z));
+        this.placeLeaf(world, new BlockPos(x, y, z));
     }
 
-	protected void placeLeaf(final IWorldGenerationReader world, BlockPos pos) {
-		// From FoliagePlacer
-		if (TreeFeature.isReplaceableAt(world, pos)) {
-			setBlockState(world, pos, getLeaf());
-		}
-	}
+    protected void placeLeaf(final IWorldGenerationReader world, BlockPos pos) {
+        // From FoliagePlacer
+        if (TreeFeature.isReplaceableAt(world, pos)) {
+            setBlockState(world, pos, getLeaf());
+        }
+    }
 
     protected void placeLog(final IWorldGenerationReader world, int x, int y, int z) {
-		this.placeLog(world, new BlockPos(x, y, z));
+        this.placeLog(world, new BlockPos(x, y, z));
     }
 
-	protected void placeLog(final IWorldGenerationReader world, BlockPos pos) {
-		if (TreeFeature.isLogsAt(world, pos)) {
-			setBlockState(world, pos, getLog());
-		}
-	}
+    protected void placeLog(final IWorldGenerationReader world, BlockPos pos) {
+        if (TreeFeature.isLogsAt(world, pos)) {
+            setBlockState(world, pos, getLog());
+        }
+    }
 
     private static final Direction[] DIRECTIONS = ArrayUtils.removeElement(Direction.values(), Direction.UP);
     public static void spawnCoconuts(IWorldGenerationReader world, BlockPos pos, Random random, int chance, BlockState leaf) {

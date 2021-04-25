@@ -19,17 +19,17 @@ import net.tropicraft.core.common.block.tileentity.BambooChestTileEntity;
 @EventBusSubscriber(modid = Constants.MODID, bus = Bus.MOD, value = Dist.CLIENT)
 public class BambooChestRenderer extends ChestTileEntityRenderer<BambooChestTileEntity> {
 
-	public static final RenderMaterial BAMBOO_CHEST_MATERIAL = getChestMaterial("bamboo_chest/normal");
-	public static final RenderMaterial BAMBOO_CHEST_LEFT_MATERIAL = getChestMaterial("bamboo_chest/normal_left");
-	public static final RenderMaterial BAMBOO_CHEST_RIGHT_MATERIAL = getChestMaterial("bamboo_chest/normal_right");
+    public static final RenderMaterial BAMBOO_CHEST_MATERIAL = getChestMaterial("bamboo_chest/normal");
+    public static final RenderMaterial BAMBOO_CHEST_LEFT_MATERIAL = getChestMaterial("bamboo_chest/normal_left");
+    public static final RenderMaterial BAMBOO_CHEST_RIGHT_MATERIAL = getChestMaterial("bamboo_chest/normal_right");
 
-	@SubscribeEvent
+    @SubscribeEvent
     public static void onTextureStitchPre(TextureStitchEvent.Pre event) {
-    	if (event.getMap().getTextureLocation().equals(Atlases.CHEST_ATLAS)) {
-    		event.addSprite(BAMBOO_CHEST_MATERIAL.getTextureLocation());
-    		event.addSprite(BAMBOO_CHEST_LEFT_MATERIAL.getTextureLocation());
-    		event.addSprite(BAMBOO_CHEST_RIGHT_MATERIAL.getTextureLocation());
-    	}
+        if (event.getMap().getTextureLocation().equals(Atlases.CHEST_ATLAS)) {
+            event.addSprite(BAMBOO_CHEST_MATERIAL.getTextureLocation());
+            event.addSprite(BAMBOO_CHEST_LEFT_MATERIAL.getTextureLocation());
+            event.addSprite(BAMBOO_CHEST_RIGHT_MATERIAL.getTextureLocation());
+        }
     }
 
     private static RenderMaterial getChestMaterial(ChestType chestType, RenderMaterial normalMaterial, RenderMaterial leftMaterial, RenderMaterial rightMaterial) {

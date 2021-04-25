@@ -117,7 +117,7 @@ public class TeleporterTropics extends Teleporter {
         long j1 = ChunkPos.asLong(entityX, entityZ);
 
         if (destinationCoordinateCache.containsKey(j1)) {
-            //	System.out.println("Setting closest portal to 0");
+            //    System.out.println("Setting closest portal to 0");
             PortalPosition portalposition = (PortalPosition)destinationCoordinateCache.get(j1);
             closestPortal = 0.0D;
             blockpos = portalposition.pos;
@@ -159,7 +159,7 @@ public class TeleporterTropics extends Teleporter {
             }
         }
 
-        //	System.out.println("Setting closest portal to " + closestPortal);
+        //    System.out.println("Setting closest portal to " + closestPortal);
 
         if (closestPortal >= 0.0D)
         {
@@ -293,7 +293,7 @@ public class TeleporterTropics extends Teleporter {
                                 }
 
                                 //if (!getValidBuildBlocks().contains(world.getBlock(x + xOffset, otherY, z + zOffset))) {
-                                //	continue nextCoords;
+                                //    continue nextCoords;
                                 //}
                             }
                         }

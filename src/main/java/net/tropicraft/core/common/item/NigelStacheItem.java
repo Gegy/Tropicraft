@@ -30,6 +30,6 @@ public class NigelStacheItem extends ArmorItem {
     
     @Override
     public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot, String type) {
-    	return TropicraftRenderUtils.getTextureArmor("nigel_layer_1").toString();
+        return TropicraftRenderUtils.getTextureArmor("nigel_layer_1").toString();
     }
 }

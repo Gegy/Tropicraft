@@ -334,7 +334,7 @@ public class SeaTurtleEntity extends TurtleEntity {
                         }
                         //this.swimSpeedCurrent = 1f;
                     }
-                    //	this.swimYaw = -passenger.rotationYaw;
+                    //    this.swimYaw = -passenger.rotationYaw;
                 }
                 //p.rotationYaw = this.rotationYaw;
             } else
@@ -390,10 +390,10 @@ public class SeaTurtleEntity extends TurtleEntity {
 
                 if (this.canPassengerSteer()) {
                     Vector3d travel = new Vector3d(strafe, verticalFromPitch + vertical, forward)
-                    		.scale(this.getAttribute(Attributes.MOVEMENT_SPEED).getValue())
-                    		// This scale controls max speed. We reduce it significantly here so that the range of speed is higher
-                    		// This is compensated for by the high value passed to moveRelative
-                    		.scale(0.025F);
+                            .scale(this.getAttribute(Attributes.MOVEMENT_SPEED).getValue())
+                            // This scale controls max speed. We reduce it significantly here so that the range of speed is higher
+                            // This is compensated for by the high value passed to moveRelative
+                            .scale(0.025F);
                     // This is the effective speed modifier, controls the post-scaling of the movement vector
                     moveRelative(1F, travel);
                     move(MoverType.SELF, getMotion());

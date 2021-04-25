@@ -51,9 +51,9 @@ public class DrinkMixerRenderer extends MachineRenderer<DrinkMixerTileEntity> {
 
     @Override
     public void renderIngredients(final DrinkMixerTileEntity te, final MatrixStack stack, final IRenderTypeBuffer buffer, int combinedLightIn, int combinedOverlayIn) {
-    	if (dummyEntityItem == null) {
-    		 dummyEntityItem = new ItemEntity(Minecraft.getInstance().world, 0.0, 0.0, 0.0, new ItemStack(Items.SUGAR));
-    	}
+        if (dummyEntityItem == null) {
+             dummyEntityItem = new ItemEntity(Minecraft.getInstance().world, 0.0, 0.0, 0.0, new ItemStack(Items.SUGAR));
+        }
         final NonNullList<ItemStack> ingredients = te.getIngredients();
 
         if (!te.isDoneMixing()) {

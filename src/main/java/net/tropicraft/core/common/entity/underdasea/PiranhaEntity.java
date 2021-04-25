@@ -23,7 +23,7 @@ public class PiranhaEntity extends AbstractGroupFishEntity implements IAtlasFish
                 .createMutableAttribute(Attributes.MAX_HEALTH, 5.0);
     }
 
-	@Override
+    @Override
     protected ActionResultType getEntityInteractionResult(PlayerEntity player, Hand hand) {
         return ActionResultType.PASS;
     }

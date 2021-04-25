@@ -43,7 +43,7 @@ public class MarlinEntity extends AbstractFishEntity {
                 .createMutableAttribute(Attributes.MAX_HEALTH, 5.0);
     }
     
-	@Override
+    @Override
     protected ActionResultType getEntityInteractionResult(PlayerEntity player, Hand hand) {
         return ActionResultType.PASS;
     }

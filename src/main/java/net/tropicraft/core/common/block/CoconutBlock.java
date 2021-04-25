@@ -29,23 +29,23 @@ public class CoconutBlock extends DirectionalBlock {
     protected void fillStateContainer(Builder<Block, BlockState> builder) {
         super.fillStateContainer(builder);
         builder.add(FACING);
-	}
+    }
 
-	@Override
-	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		Direction dir = state.get(FACING);
-		BlockPos checkPos = pos.offset(dir);
-		return worldIn.getBlockState(checkPos).getBlock() == Blocks.GRINDSTONE // coconut yeeters allowed
-				|| Block.hasEnoughSolidSide(worldIn, checkPos, dir.getOpposite());
-	}
+    @Override
+    public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
+        Direction dir = state.get(FACING);
+        BlockPos checkPos = pos.offset(dir);
+        return worldIn.getBlockState(checkPos).getBlock() == Blocks.GRINDSTONE // coconut yeeters allowed
+                || Block.hasEnoughSolidSide(worldIn, checkPos, dir.getOpposite());
+    }
 
-	@Override
-	@Deprecated
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		return stateIn.get(FACING) == facing && !stateIn.isValidPosition(worldIn, currentPos)
-				? Blocks.AIR.getDefaultState()
-				: super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
-	}
+    @Override
+    @Deprecated
+    public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+        return stateIn.get(FACING) == facing && !stateIn.isValidPosition(worldIn, currentPos)
+                ? Blocks.AIR.getDefaultState()
+                : super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+    }
 
     @Override
     public VoxelShape getShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos, final ISelectionContext context) {

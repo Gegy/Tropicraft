@@ -634,7 +634,7 @@ public class EntityKoaBase extends VillagerEntity {
         if (hand != Hand.MAIN_HAND) return ActionResultType.PASS;
 
         ActionResultType ret = ActionResultType.PASS;
-    	try {
+        try {
             boolean doTrade = true;
             if (!this.world.isRemote) {
 
@@ -700,10 +700,10 @@ public class EntityKoaBase extends VillagerEntity {
                     //_buyingPlayer.set(this, null);
                 }
             }
-    	} catch (Exception e) {
-    		throw new RuntimeException(e);
-    	}
-    	return ret;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return ret;
     }
 
     @Override

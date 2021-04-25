@@ -99,20 +99,20 @@ public class PineappleBlock extends TallFlowerBlock implements IGrowable, IPlant
     
     @Override
     public void onBlockHarvested(World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
-    	if (state.get(HALF) == DoubleBlockHalf.LOWER) {
-    		super.onBlockHarvested(worldIn, pos, state, player);
-    	} else {
-    	    worldIn.playEvent(player, 2001, pos, getStateId(state));
-    	    spawnDrops(state, worldIn, pos, null, player, player.getHeldItemMainhand());
-    	}
+        if (state.get(HALF) == DoubleBlockHalf.LOWER) {
+            super.onBlockHarvested(worldIn, pos, state, player);
+        } else {
+            worldIn.playEvent(player, 2001, pos, getStateId(state));
+            spawnDrops(state, worldIn, pos, null, player, player.getHeldItemMainhand());
+        }
     }
     
     @Override
     public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-    	if (isValidPosition(stateIn, worldIn, currentPos)) {
-    		return stateIn;
-    	}
-    	return Blocks.AIR.getDefaultState();
+        if (isValidPosition(stateIn, worldIn, currentPos)) {
+            return stateIn;
+        }
+        return Blocks.AIR.getDefaultState();
     }
     
     @Override
