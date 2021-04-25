@@ -13,7 +13,8 @@ public enum TropicraftLangKeys {
     SCUBA_DIVE_TIME("scuba", "dive_time", "Dive Time: %s"),
     SCUBA_DEPTH("scuba", "depth", "Current Depth: %s"),
     SCUBA_MAX_DEPTH("scuba", "max_depth", "Max Depth: %s"),
-    SCUBA_VISIBILITY_STAT("scuba", "scuba.visibility", "Underwater Fog Reduction");
+    SCUBA_VISIBILITY_STAT("scuba", "scuba.visibility", "Underwater Fog Reduction")
+    ;
 
     protected final String key, value;
     private final TranslationTextComponent component;

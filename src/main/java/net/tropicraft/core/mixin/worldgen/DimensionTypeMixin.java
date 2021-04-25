@@ -23,19 +23,19 @@ import java.util.function.Supplier;
  */
 @Mixin(DimensionType.class)
 public class DimensionTypeMixin {
-	@Inject(method = "getDefaultSimpleRegistry", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
-	private static void getDefaultSimpleRegistry(
-			Registry<DimensionType> dimensionTypeRegistry,
-			Registry<Biome> biomeRegistry,
-			Registry<DimensionSettings> dimensionSettingsRegistry,
-			long seed,
-			CallbackInfoReturnable<SimpleRegistry<Dimension>> ci,
-			SimpleRegistry<Dimension> dimensionRegistry
-	) {
-		Supplier<DimensionType> dimensionType = () -> dimensionTypeRegistry.getOrThrow(TropicraftDimension.DIMENSION_TYPE);
-		ChunkGenerator generator = TropicraftDimension.createGenerator(biomeRegistry, dimensionSettingsRegistry, seed);
+    @Inject(method = "getDefaultSimpleRegistry", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
+    private static void getDefaultSimpleRegistry(
+            Registry<DimensionType> dimensionTypeRegistry,
+            Registry<Biome> biomeRegistry,
+            Registry<DimensionSettings> dimensionSettingsRegistry,
+            long seed,
+            CallbackInfoReturnable<SimpleRegistry<Dimension>> ci,
+            SimpleRegistry<Dimension> dimensionRegistry
+    ) {
+        Supplier<DimensionType> dimensionType = () -> dimensionTypeRegistry.getOrThrow(TropicraftDimension.DIMENSION_TYPE);
+        ChunkGenerator generator = TropicraftDimension.createGenerator(biomeRegistry, dimensionSettingsRegistry, seed);
 
-		Dimension dimension = new Dimension(dimensionType, generator);
-		dimensionRegistry.register(TropicraftDimension.DIMENSION, dimension, Lifecycle.stable());
-	}
+        Dimension dimension = new Dimension(dimensionType, generator);
+        dimensionRegistry.register(TropicraftDimension.DIMENSION, dimension, Lifecycle.stable());
+    }
 }

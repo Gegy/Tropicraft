@@ -46,8 +46,8 @@ import net.tropicraft.core.common.dimension.feature.TropicraftConfiguredStructur
 import net.tropicraft.core.common.dimension.feature.TropicraftFeatures;
 import net.tropicraft.core.common.dimension.feature.block_state_provider.TropicraftBlockStateProviders;
 import net.tropicraft.core.common.dimension.feature.jigsaw.*;
-import net.tropicraft.core.common.dimension.feature.jigsaw.piece.SingleNoAirJigsawPiece;
 import net.tropicraft.core.common.dimension.feature.jigsaw.piece.NoRotateSingleJigsawPiece;
+import net.tropicraft.core.common.dimension.feature.jigsaw.piece.SingleNoAirJigsawPiece;
 import net.tropicraft.core.common.dimension.feature.pools.TropicraftTemplatePools;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftConfiguredSurfaceBuilders;
 import net.tropicraft.core.common.dimension.surfacebuilders.TropicraftSurfaceBuilders;
@@ -63,8 +63,7 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 @Mod(Constants.MODID)
-public class Tropicraft
-{
+public class Tropicraft {
     public static final ItemGroup TROPICRAFT_ITEM_GROUP = (new ItemGroup("tropicraft") {
         @OnlyIn(Dist.CLIENT)
         public ItemStack createIcon() {
@@ -73,8 +72,8 @@ public class Tropicraft
     });
 
     public Tropicraft() {
-    	// Compatible with all versions that match the semver (excluding the qualifier e.g. "-beta+42")
-    	ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(Tropicraft::getCompatVersion, (s, v) -> Tropicraft.isCompatibleVersion(s)));
+        // Compatible with all versions that match the semver (excluding the qualifier e.g. "-beta+42")
+        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(Tropicraft::getCompatVersion, (s, v) -> Tropicraft.isCompatibleVersion(s)));
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         // General mod setup
@@ -86,7 +85,7 @@ public class Tropicraft
             modBus.addListener(this::setupClient);
             modBus.addListener(this::registerItemColors);
         });
-        
+
         MinecraftForge.EVENT_BUS.addListener(this::onServerStarting);
 
         // Registry objects
@@ -114,14 +113,17 @@ public class Tropicraft
     }
 
     private static final Pattern QUALIFIER = Pattern.compile("-\\w+\\+\\d+");
+
     public static String getCompatVersion() {
-    	return getCompatVersion(ModList.get().getModContainerById(Constants.MODID).orElseThrow(IllegalStateException::new).getModInfo().getVersion().toString());
+        return getCompatVersion(ModList.get().getModContainerById(Constants.MODID).orElseThrow(IllegalStateException::new).getModInfo().getVersion().toString());
     }
+
     private static String getCompatVersion(String fullVersion) {
-    	return QUALIFIER.matcher(fullVersion).replaceAll("");
+        return QUALIFIER.matcher(fullVersion).replaceAll("");
     }
+
     public static boolean isCompatibleVersion(String version) {
-    	return getCompatVersion().equals(getCompatVersion(version));
+        return getCompatVersion().equals(getCompatVersion(version));
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -145,7 +147,7 @@ public class Tropicraft
             }
         }
     }
-    
+
     private void setup(final FMLCommonSetupEvent event) {
         TropicraftPackets.init();
         ScubaData.registerCapability();
@@ -161,7 +163,7 @@ public class Tropicraft
                 StructureVoidProcessor.class
         );
     }
-    
+
     private void onServerStarting(final FMLServerStartingEvent event) {
         CommandTropicsTeleport.register(event.getServer().getCommandManager().getDispatcher());
     }

@@ -13,29 +13,29 @@ import net.tropicraft.core.common.dimension.feature.pools.TropicraftTemplatePool
 import java.util.function.Function;
 
 public final class TropicraftConfiguredStructures {
-	public final StructureFeature<?, ?> homeTree;
-	public final StructureFeature<?, ?> koaVillage;
+    public final StructureFeature<?, ?> homeTree;
+    public final StructureFeature<?, ?> koaVillage;
 
-	public TropicraftConfiguredStructures(WorldgenDataConsumer<StructureFeature<?, ?>> worldgen, TropicraftTemplatePools templatePools) {
-		Register structures = new Register(worldgen);
+    public TropicraftConfiguredStructures(WorldgenDataConsumer<StructureFeature<?, ?>> worldgen, TropicraftTemplatePools templatePools) {
+        Register structures = new Register(worldgen);
 
-		this.homeTree = structures.register("home_tree", TropicraftFeatures.HOME_TREE, templatePools.homeTreeStarts, 7);
-		this.koaVillage = structures.register("koa_village", TropicraftFeatures.KOA_VILLAGE, templatePools.koaTownCenters, 6);
-	}
+        this.homeTree = structures.register("home_tree", TropicraftFeatures.HOME_TREE, templatePools.homeTreeStarts, 7);
+        this.koaVillage = structures.register("koa_village", TropicraftFeatures.KOA_VILLAGE, templatePools.koaTownCenters, 6);
+    }
 
-	static final class Register {
-		private final WorldgenDataConsumer<StructureFeature<?, ?>> worldgen;
+    static final class Register {
+        private final WorldgenDataConsumer<StructureFeature<?, ?>> worldgen;
 
-		Register(WorldgenDataConsumer<StructureFeature<?, ?>> worldgen) {
-			this.worldgen = worldgen;
-		}
+        Register(WorldgenDataConsumer<StructureFeature<?, ?>> worldgen) {
+            this.worldgen = worldgen;
+        }
 
-		public <S extends Structure<?>> StructureFeature<?, ?> register(String id, RegistryObject<S> structure, Function<S, StructureFeature<?, ?>> configure) {
-			return this.worldgen.register(new ResourceLocation(Constants.MODID, id), configure.apply(structure.get()));
-		}
+        public <S extends Structure<?>> StructureFeature<?, ?> register(String id, RegistryObject<S> structure, Function<S, StructureFeature<?, ?>> configure) {
+            return this.worldgen.register(new ResourceLocation(Constants.MODID, id), configure.apply(structure.get()));
+        }
 
-		public <S extends Structure<VillageConfig>> StructureFeature<?, ?> register(String id, RegistryObject<S> structure, JigsawPattern templatePool, int maxDepth) {
-			return this.register(id, structure, s -> s.withConfiguration(new VillageConfig(() -> templatePool, maxDepth)));
-		}
-	}
+        public <S extends Structure<VillageConfig>> StructureFeature<?, ?> register(String id, RegistryObject<S> structure, JigsawPattern templatePool, int maxDepth) {
+            return this.register(id, structure, s -> s.withConfiguration(new VillageConfig(() -> templatePool, maxDepth)));
+        }
+    }
 }

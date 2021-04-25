@@ -17,47 +17,47 @@ public class TropicsSurfaceBuilder extends SurfaceBuilder<TropicsSurfaceBuilder.
         super(codec);
     }
 
-	@Override
+    @Override
     public void buildSurface(Random random, IChunk chunk, Biome biome, int x, int z, int startHeight, double noise, BlockState defaultBlock, BlockState defaultFluid, int seaLevel, long seed, Config config) {
         SurfaceBuilderConfig selectedConfig = config.land;
-    	if (noise > 1.5) {
-        	if (chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, x, z) + 1 >= seaLevel) {
-        		selectedConfig = config.sandy;
-        	} else {
-            	selectedConfig = config.sandyUnderwater;
+        if (noise > 1.5) {
+            if (chunk.getTopBlockY(Heightmap.Type.OCEAN_FLOOR_WG, x, z) + 1 >= seaLevel) {
+                selectedConfig = config.sandy;
+            } else {
+                selectedConfig = config.sandyUnderwater;
             }
         }
 
-    	SurfaceBuilder.DEFAULT.buildSurface(random, chunk, biome, x, z, startHeight, noise, defaultBlock, defaultFluid, seaLevel, seed, selectedConfig);
+        SurfaceBuilder.DEFAULT.buildSurface(random, chunk, biome, x, z, startHeight, noise, defaultBlock, defaultFluid, seaLevel, seed, selectedConfig);
     }
 
-	public static final class Config implements ISurfaceBuilderConfig {
-		public static final Codec<Config> CODEC = RecordCodecBuilder.create(instance -> {
-			return instance.group(
-					SurfaceBuilderConfig.CODEC.fieldOf("land").forGetter(c -> c.land),
-					SurfaceBuilderConfig.CODEC.fieldOf("sandy").forGetter(c -> c.sandy),
-					SurfaceBuilderConfig.CODEC.fieldOf("sandy_underwater").forGetter(c -> c.sandyUnderwater)
-			).apply(instance, Config::new);
-		});
+    public static final class Config implements ISurfaceBuilderConfig {
+        public static final Codec<Config> CODEC = RecordCodecBuilder.create(instance -> {
+            return instance.group(
+                    SurfaceBuilderConfig.CODEC.fieldOf("land").forGetter(c -> c.land),
+                    SurfaceBuilderConfig.CODEC.fieldOf("sandy").forGetter(c -> c.sandy),
+                    SurfaceBuilderConfig.CODEC.fieldOf("sandy_underwater").forGetter(c -> c.sandyUnderwater)
+            ).apply(instance, Config::new);
+        });
 
-		public final SurfaceBuilderConfig land;
-		public final SurfaceBuilderConfig sandy;
-		public final SurfaceBuilderConfig sandyUnderwater;
+        public final SurfaceBuilderConfig land;
+        public final SurfaceBuilderConfig sandy;
+        public final SurfaceBuilderConfig sandyUnderwater;
 
-		public Config(SurfaceBuilderConfig land, SurfaceBuilderConfig sandy, SurfaceBuilderConfig sandyUnderwater) {
-			this.land = land;
-			this.sandy = sandy;
-			this.sandyUnderwater = sandyUnderwater;
-		}
+        public Config(SurfaceBuilderConfig land, SurfaceBuilderConfig sandy, SurfaceBuilderConfig sandyUnderwater) {
+            this.land = land;
+            this.sandy = sandy;
+            this.sandyUnderwater = sandyUnderwater;
+        }
 
-		@Override
-		public BlockState getTop() {
-			return this.land.getTop();
-		}
+        @Override
+        public BlockState getTop() {
+            return this.land.getTop();
+        }
 
-		@Override
-		public BlockState getUnder() {
-			return this.land.getUnder();
-		}
-	}
+        @Override
+        public BlockState getUnder() {
+            return this.land.getUnder();
+        }
+    }
 }
