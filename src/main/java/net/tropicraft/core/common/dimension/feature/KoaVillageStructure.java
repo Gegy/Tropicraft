@@ -12,20 +12,20 @@ import net.minecraft.world.gen.feature.structure.JigsawStructure;
 import net.minecraft.world.gen.feature.structure.VillageConfig;
 
 public class KoaVillageStructure extends JigsawStructure {
-	public KoaVillageStructure(Codec<VillageConfig> codec) {
-		super(codec, 0, true, true);
-	}
+    public KoaVillageStructure(Codec<VillageConfig> codec) {
+        super(codec, 0, true, true);
+    }
 
-	@Override
-	protected boolean func_230363_a_(ChunkGenerator generator, BiomeProvider biomes, long seed, SharedSeedRandom random, int chunkX, int chunkZ, Biome biome, ChunkPos startChunkPos, VillageConfig config) {
-		BlockPos pos = new BlockPos((chunkX << 4) + 8, 0, (chunkZ << 4) + 8);
-		return isValid(generator, pos.add(-4, 0, -4)) &&
-				isValid(generator, pos.add(-4, 0, 4)) &&
-				isValid(generator, pos.add(4, 0, 4)) &&
-				isValid(generator, pos.add(4, 0, -4));
-	}
+    @Override
+    protected boolean func_230363_a_(ChunkGenerator generator, BiomeProvider biomes, long seed, SharedSeedRandom random, int chunkX, int chunkZ, Biome biome, ChunkPos startChunkPos, VillageConfig config) {
+        BlockPos pos = new BlockPos((chunkX << 4) + 8, 0, (chunkZ << 4) + 8);
+        return isValid(generator, pos.add(-4, 0, -4)) &&
+                isValid(generator, pos.add(-4, 0, 4)) &&
+                isValid(generator, pos.add(4, 0, 4)) &&
+                isValid(generator, pos.add(4, 0, -4));
+    }
 
-	private boolean isValid(ChunkGenerator generator, BlockPos pos) {
-		return generator.getHeight(pos.getX(), pos.getZ(), Heightmap.Type.WORLD_SURFACE_WG) == generator.getSeaLevel();
-	}
+    private boolean isValid(ChunkGenerator generator, BlockPos pos) {
+        return generator.getHeight(pos.getX(), pos.getZ(), Heightmap.Type.WORLD_SURFACE_WG) == generator.getSeaLevel();
+    }
 }

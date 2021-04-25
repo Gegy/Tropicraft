@@ -124,6 +124,12 @@ public class VolcanoGenerator {
 
         BlockPos.Mutable pos = new BlockPos.Mutable();
 
+        // if this chunk contains the volcano center
+        if (volcanoCoords.getX() <= chunkX + 15 && volcanoCoords.getX() >= chunkX && volcanoCoords.getZ() <= chunkZ + 15 && volcanoCoords.getZ() >= chunkZ) {
+            BlockPos volcanoBlockPos = new BlockPos(volcanoCoords.getX() & 15, 1, volcanoCoords.getZ() & 15);
+            chunk.setBlockState(volcanoBlockPos, TropicraftBlocks.VOLCANO.get().getDefaultState(), false);
+        }
+
         for (int x = 0; x < CHUNK_SIZE_X; x++) {
             for (int z = 0; z < CHUNK_SIZE_Z; z++) {
 

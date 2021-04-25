@@ -75,19 +75,17 @@ public final class TropicraftBiomes {
         this.carvers = carvers;
         this.surfaces = surfaces;
 
-        Register biomes = new Register(worldgen);
+        this.tropics = worldgen.register(TROPICS, createTropics());
+        this.tropicsBeach = worldgen.register(TROPICS_BEACH, createTropicsBeach());
+        this.rainforestPlains = worldgen.register(RAINFOREST_PLAINS, createRainforest(0.25F, 0.1F));
+        this.rainforestHills = worldgen.register(RAINFOREST_HILLS, createRainforest(0.45F, 0.425F));
+        this.rainforestMountains = worldgen.register(RAINFOREST_MOUNTAINS, createRainforest(0.8F, 0.8F));
+        this.rainforestIslandMountains = worldgen.register(RAINFOREST_ISLAND_MOUNTAINS, createRainforest(0.1F, 1.2F));
 
-        this.tropics = biomes.register(TROPICS, createTropics());
-        this.tropicsBeach = biomes.register(TROPICS_BEACH, createTropicsBeach());
-        this.rainforestPlains = biomes.register(RAINFOREST_PLAINS, createRainforest(0.25F, 0.1F));
-        this.rainforestHills = biomes.register(RAINFOREST_HILLS, createRainforest(0.45F, 0.425F));
-        this.rainforestMountains = biomes.register(RAINFOREST_MOUNTAINS, createRainforest(0.8F, 0.8F));
-        this.rainforestIslandMountains = biomes.register(RAINFOREST_ISLAND_MOUNTAINS, createRainforest(0.1F, 1.2F));
+        this.tropicsOcean = worldgen.register(TROPICS_OCEAN, createTropicsOcean());
+        this.kelpForest = worldgen.register(KELP_FOREST, createKelpForest());
 
-        this.tropicsOcean = biomes.register(TROPICS_OCEAN, createTropicsOcean());
-        this.kelpForest = biomes.register(KELP_FOREST, createKelpForest());
-
-        this.tropicsRiver = biomes.register(TROPICS_RIVER, createTropicsRiver());
+        this.tropicsRiver = worldgen.register(TROPICS_RIVER, createTropicsRiver());
     }
 
     @SubscribeEvent
@@ -353,17 +351,5 @@ public final class TropicraftBiomes {
     private static int getSkyColor(float temperature) {
         float shift = MathHelper.clamp(temperature / 3.0F, -1.0F, 1.0F);
         return MathHelper.hsvToRGB((224.0F / 360.0F) - shift * 0.05F, 0.5F + shift * 0.1F, 1.0F);
-    }
-
-    static final class Register {
-        private final WorldgenDataConsumer<Biome> worldgen;
-
-        Register(WorldgenDataConsumer<Biome> worldgen) {
-            this.worldgen = worldgen;
-        }
-
-        public Biome register(RegistryKey<Biome> id, Biome biome) {
-            return this.worldgen.register(id, biome);
-        }
     }
 }

@@ -429,10 +429,7 @@ public class TropicraftLangProvider extends LanguageProvider {
     
     private void addTooltip(Supplier<? extends IItemProvider> item, List<String> tooltip) {
         for (int i = 0; i < tooltip.size(); i++) {
-            String key = item.get().asItem().getTranslationKey() + ".desc";
-            if (i != 0) {
-                key = key + "." + i;
-            }
+            String key = item.get().asItem().getTranslationKey() + ".desc." + i;
             add(key, tooltip.get(i));
         }
     }

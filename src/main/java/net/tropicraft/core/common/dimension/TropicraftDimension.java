@@ -15,6 +15,7 @@ import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.hooks.BasicEventHooks;
 import net.tropicraft.Constants;
 import net.tropicraft.core.common.dimension.biome.TropicraftBiomeProvider;
@@ -22,6 +23,8 @@ import net.tropicraft.core.common.dimension.chunk.TropicraftChunkGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Field;
+import java.util.LinkedHashSet;
 import java.util.function.Supplier;
 
 public class TropicraftDimension {
@@ -33,6 +36,17 @@ public class TropicraftDimension {
     public static final RegistryKey<Dimension> DIMENSION = RegistryKey.getOrCreateKey(Registry.DIMENSION_KEY, ID);
     public static final RegistryKey<DimensionType> DIMENSION_TYPE = RegistryKey.getOrCreateKey(Registry.DIMENSION_TYPE_KEY, ID);
     public static final RegistryKey<DimensionSettings> DIMENSION_SETTINGS = RegistryKey.getOrCreateKey(Registry.NOISE_SETTINGS_KEY, ID);
+
+    @SuppressWarnings("unchecked")
+    public static void addDefaultDimensionKey() {
+        try {
+            Field dimensionKeysField = ObfuscationReflectionHelper.findField(Dimension.class, "field_236056_e_");
+            LinkedHashSet<RegistryKey<Dimension>> keys = (LinkedHashSet<RegistryKey<Dimension>>) dimensionKeysField.get(null);
+            keys.add(DIMENSION);
+        } catch (ReflectiveOperationException e) {
+            LOGGER.error("Failed to add tropics as a default dimension key", e);
+        }
+    }
 
     public static ChunkGenerator createGenerator(Registry<Biome> biomeRegistry, Registry<DimensionSettings> dimensionSettingsRegistry, long seed) {
         Supplier<DimensionSettings> dimensionSettings = () -> {

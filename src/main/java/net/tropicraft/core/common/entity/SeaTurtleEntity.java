@@ -101,9 +101,9 @@ public class SeaTurtleEntity extends TurtleEntity {
     protected void registerGoals() {
         super.registerGoals();
         // goalSelector
-        GoalSelector goalSelector = ObfuscationReflectionHelper.getPrivateValue(MobEntity.class, this, "goalSelector");
+        GoalSelector goalSelector = ObfuscationReflectionHelper.getPrivateValue(MobEntity.class, this, "field_70714_bg");
         // goals
-        Set<PrioritizedGoal> goalSet = ObfuscationReflectionHelper.getPrivateValue(GoalSelector.class, goalSelector, "availableGoals");
+        Set<PrioritizedGoal> goalSet = ObfuscationReflectionHelper.getPrivateValue(GoalSelector.class, goalSelector, "field_220892_d");
 
         final Optional<PrioritizedGoal> eggGoal = goalSet.stream().filter(p -> p.getGoal().toString().contains("Egg")).findFirst();
         if (eggGoal.isPresent()) {
