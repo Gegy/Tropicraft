@@ -35,7 +35,7 @@ public class WorldSettingsImportMixin {
     )
     @SuppressWarnings("unchecked")
     private void decode(SimpleRegistry<?> registry, RegistryKey<?> registryKey, Codec<?> codec, CallbackInfoReturnable<DataResult<SimpleRegistry<?>>> ci) {
-        if (registryKey == Registry.DIMENSION_KEY && !registry.containsKey(TropicraftDimension.ID)) {
+        if (registryKey == Registry.DIMENSION_KEY && registry.getOrDefault(TropicraftDimension.ID) == null) {
             this.addDimensions((SimpleRegistry<Dimension>) registry);
         }
     }
